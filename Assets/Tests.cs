@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Reflection;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 using PlayQ.UITestTools;
@@ -12,7 +13,7 @@ public class Tests //: UITest
     {
         Debug.Log("SET UP");
     }
-    
+
     [TearDown]
     public void TearDown()
     {
@@ -26,7 +27,7 @@ public class Tests //: UITest
         Debug.Log("IGNORED TEST");
         return 1;
     }
-    
+
     [Test]
     public int ReturnInt()
     {
@@ -58,7 +59,7 @@ public class Tests //: UITest
         Debug.Log("lol");
     }
 
-    [Test]        
+    [Test]
     public void Log()
     {
         Debug.Log("LOG some log");
@@ -87,6 +88,54 @@ public class Tests //: UITest
         yield return new WaitForSeconds(1f);
         Debug.Log("2.4");
     }
+
+    [Test]
+    public void TestProtected()
+    {
+        var type = typeof(B);
+
+        var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
+        foreach (var method in methods)
+        {
+
+        }
+    }
 }
 
- 
+
+
+public class A
+{
+    protected void ProtectedA()
+    {
+        
+    }
+    
+    private void PrivateA()
+    {
+        
+    }
+    
+    public void PublicA()
+    {
+        
+    }
+}
+
+public class B : A
+{
+    protected void ProtectedB()
+    {
+        
+    }
+    
+    private void PrivateB()
+    {
+        
+    }
+    
+    public void PublicB()
+    {
+        
+    }
+}
