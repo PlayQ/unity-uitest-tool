@@ -3,15 +3,29 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using UnityEngine;
-using Debug = UnityEngine.Debug;
+ using NUnit.Framework;
+ using UnityEngine;
+ using UnityEngine.TestTools;
+ using Debug = UnityEngine.Debug;
+
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace PlayQ.UITestTools
 {
     public class PlayModeTestRunner : MonoBehaviour
     {
+        public static Action<MethodInfo> OnTestPassed;
+        public static Action<MethodInfo> OnTestSkipped;
+        public static Action<MethodInfo> OnTestFailed;
+        public static Action OnStartProcessingTests;
+
+        public const string TEST_NAME_SCENE = "RuntimeTestScene.unity";
         public const float DEFAULT_TIME_OUT = 30000f;
         private const string LOG_FILE_NAME = "runtimeTests.txt";
+
+        private static List<UnitTestClass> classesForTest;
 
         private bool currentTestFailed;
         private bool currentTestSuccess;
@@ -25,6 +39,7 @@ namespace PlayQ.UITestTools
             DontDestroyOnLoad(gameObject);
             logger = new PlayModeLogger();
             logSaver = new LogSaver(Path.Combine(Application.persistentDataPath, LOG_FILE_NAME));
+            classesForTest = GetTestClasses();
 
             StartProcessingTests();
         }
@@ -122,13 +137,17 @@ namespace PlayQ.UITestTools
 
         private IEnumerator ProcessTestQueue()
         {
-            foreach (var testClass in GetTestClasses())
+            foreach (var testClass in classesForTest)
             {
                 foreach (var method in testClass.TestMethods)
                 {
                     if (method.IsIgnored)
                     {
                         logger.IgnoreLog(method.FullName);
+                        if (OnTestSkipped != null)
+                        {
+                            OnTestSkipped(method.Method);
+                        }
                         continue;
                     }
 
@@ -137,13 +156,13 @@ namespace PlayQ.UITestTools
 
                     try
                     {
-                        testInstance = Activator.CreateInstance(testClass.Target);
+                        testInstance = Activator.CreateInstance(testClass.Type);
                     }
                     catch (Exception ex)
                     {
                         Debug.LogErrorFormat("Can't instantiate class \"{0}\". Exception: \"{1}\"",
-                            testClass.Target.FullName, ex.Message);
-                        logger.FailLog(method.FullName);
+                            testClass.Type.FullName, ex.Message);
+                        ProcessTestFail(method);
                         continue;
                     }
 
@@ -154,7 +173,7 @@ namespace PlayQ.UITestTools
                     catch (Exception ex)
                     {
                         Debug.LogErrorFormat("Fail during executing set up methods: \"{0}\"", ex.Message);
-                        logger.FailLog(method.FullName);
+                        ProcessTestFail(method);
                         continue;
                     }
 
@@ -167,26 +186,45 @@ namespace PlayQ.UITestTools
                     catch (Exception ex)
                     {
                         Debug.LogErrorFormat("Fail during executing tear down methods: \"{0}\"", ex);
-                        logger.FailLog(method.FullName);
+                        ProcessTestFail(method);
                         continue;
                     }
 
                     if (!currentTestFailed)
                     {
                         logger.SuccessLog(method.FullName);
+                        if (OnTestPassed != null)
+                        {
+                            OnTestPassed(method.Method);
+                        }
                     }
                     else
                     {
-                        logger.FailLog(method.FullName);
+                        ProcessTestFail(method);
                     }
                 }
             }
             FinalizeTest();
         }
 
+        private void ProcessTestFail(UnitTestMethod method)
+        {
+            logger.FailLog(method.FullName);
+            if (OnTestFailed != null)
+            {
+                OnTestFailed(method.Method);
+            }
+        }
+
         private void FinalizeTest()
         {
             logSaver.Close();
+
+#if UNITY_EDITOR
+            EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+            #endif
         }
 
         private void Quit()
@@ -204,18 +242,81 @@ namespace PlayQ.UITestTools
             }
         }
 
-        private static List<TestedClass> GetTestClasses()
+        public static string GetTestScenePath()
         {
-            var findedClasses = new List<TestedClass>();
+            var pathes = Directory.GetFiles(Application.dataPath, TEST_NAME_SCENE, SearchOption.AllDirectories);
+            if (pathes.Length == 0)
+            {
+                Debug.LogError("Can't find test scene");
+                return null;
+            }
+
+            var testScenePath = pathes[0];
+            var assetsIndex = testScenePath.IndexOf("Assets", StringComparison.Ordinal);
+            return testScenePath.Remove(0, assetsIndex);
+        }
+        
+        public static List<UnitTestClass> GetTestClasses()
+        {
+            var findedClasses = new List<UnitTestClass>();
             var targetAssembly = Assembly.GetAssembly(typeof(PlayModeTestRunner));
             var types = targetAssembly.GetTypes();
 
             foreach (var type in types)
             {
-                findedClasses.Add(new TestedClass(type));
+                var methods = GetTestMethods(type);
+                if (methods.Count == 0)
+                {
+                    continue;
+                }
+                var unitTestClass = new UnitTestClass(type)
+                {
+                    TestMethods = methods,
+                    SetUpMethods = GetMethodsWithCustomAttribute<SetUpAttribute>(type),
+                    TearDownMethods = GetMethodsWithCustomAttribute<TearDownAttribute>(type)
+                };
+                findedClasses.Add(unitTestClass);
             }
 
             return findedClasses;
+        }
+
+        private static List<UnitTestMethod> GetTestMethods(Type t)
+        {
+            var list = new List<UnitTestMethod>();
+            var asyncTests = GetMethodsWithCustomAttribute<UnityTestAttribute>(t);
+            foreach (var asyncTest in asyncTests)
+            {
+                list.Add(new UnitTestMethod(asyncTest, false));
+            }
+
+            var syncTests = GetMethodsWithCustomAttribute<TestAttribute>(t);
+            foreach (var syncTest in syncTests)
+            {
+                list.Add(new UnitTestMethod(syncTest, true));
+            }
+            return list;
+        }
+
+        private static List<MethodInfo> GetMethodsWithCustomAttribute<T>(Type targetType)
+        {
+            var findedMethods = new List<MethodInfo>();
+            var methods = targetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
+                                                BindingFlags.NonPublic);
+            foreach (var method in methods)
+            {
+                var attrs = method.GetCustomAttributes(false);
+                foreach (var attr in attrs)
+                {
+                    var isTestMethod = attr.GetType() == typeof(T);
+                    if (isTestMethod)
+                    {
+                        findedMethods.Add(method);
+                        break;
+                    }
+                }
+            }
+            return findedMethods;
         }
     }
 }

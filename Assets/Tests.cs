@@ -44,7 +44,7 @@ public class Tests //: UITest
 
     [UnityTest]
     [Timeout(5000)]
-    public IEnumerable TimeOut()
+    public IEnumerator TimeOut()
     {
         yield return new WaitForSeconds(10f);
     }
@@ -78,7 +78,7 @@ public class Tests //: UITest
     }
 
     [UnityTest]
-    public IEnumerable Success2()
+    public IEnumerator Success2()
     {
         Debug.Log("2.1");
         yield return new WaitForSeconds(1f);
@@ -88,54 +88,30 @@ public class Tests //: UITest
         yield return new WaitForSeconds(1f);
         Debug.Log("2.4");
     }
-
-    [Test]
-    public void TestProtected()
-    {
-        var type = typeof(B);
-
-        var methods = type.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic );
-        foreach (var method in methods)
-        {
-
-        }
-    }
 }
 
-
-
-public class A
+public class SuccessTests //: UITest
 {
-    protected void ProtectedA()
+    [UnityTest]
+    public IEnumerator Success1()
     {
-        
+        Debug.Log("2.1");
+        yield return new WaitForSeconds(1f);
     }
-    
-    private void PrivateA()
-    {
-        
-    }
-    
-    public void PublicA()
-    {
-        
-    }
-}
 
-public class B : A
-{
-    protected void ProtectedB()
+    [UnityTest]
+    public IEnumerator Success2()
     {
-        
+        Debug.Log("2.1");
+        yield return new WaitForSeconds(1f);
     }
-    
-    private void PrivateB()
+
+
+    [UnityTest]
+    [Ignore("reason")]
+    public IEnumerator Ignore()
     {
-        
-    }
-    
-    public void PublicB()
-    {
-        
+        Debug.Log("2.1");
+        yield return new WaitForSeconds(1f);
     }
 }
