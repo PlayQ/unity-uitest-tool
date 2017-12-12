@@ -32,7 +32,7 @@ namespace PlayQ.UITestTools
         }
 
         [TearDown]
-        private void Clean()
+        protected void Clean()
         {
             int sceneCound = SceneManager.sceneCount;
             var loadedScenes = new Scene[sceneCound];
@@ -133,7 +133,7 @@ namespace PlayQ.UITestTools
             {
                 return gameObject == null;
                     
-            }, waitTimeout, "WaitForDestroy "+gameObject.GetType());
+            }, waitTimeout, "WaitForDestroy "+ (gameObject != null ? gameObject.GetType().ToString() : ""));
         }
 
         protected IEnumerator WaitForCondition(Func<bool> func, float waitTimeout = 2f)
