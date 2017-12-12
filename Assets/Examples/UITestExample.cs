@@ -2,18 +2,16 @@
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
-using UnityEngine.SceneManagement;
-using System.Linq;
 using PlayQ.UITestTools;
 
-public class UITestExample : UITest
+public class UITestExample : UITestBase
 {
     [SetUp]
     public void Init()
     {
         LoadSceneForSetUp("TestableGameScene");
     }
-    
+
     [UnityTest]
     public IEnumerator SecondScreenCanBeOpenedFromTheFirstOne()
     {
@@ -27,7 +25,7 @@ public class UITestExample : UITest
         Click("Button-OpenSecondScreen");
 
         yield return WaitForObject<SecondScreen>();
-        
+
         // Wait until Text component with given name appears and assert its value
         yield return WaitForObject("SecondScreen/Text");
         Check.TextEquals("SecondScreen/Text", "Second screen");
@@ -44,7 +42,7 @@ public class UITestExample : UITest
         yield return WaitForObject<FirstScreen>();
 
         // Predefine the mocked server response
-        FirstScreen.NetworkClient.MockResponse = "Success!";
+//        FirstScreen.NetworkClient.MockResponse = "Success!";
 
         yield return WaitForObject("Button-NetworkRequest");
         Click("Button-NetworkRequest");
@@ -53,7 +51,7 @@ public class UITestExample : UITest
         Check.TextEquals("FirstScreen/Text-Response", "Success!");
 
         // Assert the requested server parameter
-        Assert.AreEqual(FirstScreen.NetworkClient.MockRequest, "i_need_data");
+//        Assert.AreEqual(FirstScreen.NetworkClient.MockRequest, "i_need_data");
     }
 
     [UnityTest]

@@ -10,7 +10,7 @@ using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools
 {
-    public class UITest
+    public abstract class UITestBase
     {
         protected void LoadSceneForSetUp(string sceneName)
         {
