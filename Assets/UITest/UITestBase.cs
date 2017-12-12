@@ -223,45 +223,23 @@ namespace PlayQ.UITestTools
 
     public static class Check
     {
-        /*
-        private class LabelTextAppeared : Condition
+        public static void TextEquals(string path, string expectedText)
         {
-            string labalName;
-            string expectedText;
-
-            public LabelTextAppeared(string labalName, string expectedText, float waitTimeout = 2f)
-                : base(waitTimeout)
+            var go = GameObject.Find(path);
+            if (go == null)
             {
-                this.labalName = labalName;
-                this.expectedText = expectedText;
+                Assert.Fail("Label object " + path + " does not exist or disabled");
             }
-
-            public override bool Satisfied()
+            
+            var t = go.GetComponent<Text>();
+            if (t == null)
             {
-                var go = GameObject.Find(labalName);
-                if (go == null)
-                {
-                    Assert.Fail("Label object " + labalName + " does not exist");
-                }
-                if (!go.activeInHierarchy) Assert.Fail("Label object " + labalName + " is inactive");
-                var t = go.GetComponent<Text>();
-                if (t == null)
-                {
-                    Assert.Fail("Label object " + labalName + " has no Text attached");
-                }
-                if (t.text != expectedText)
-                {
-                    Assert.Fail("Label " + labalName + "\n text expected: " + expectedText + ",\n actual: " + t.text);
-                }
-                return true;
+                Assert.Fail("Label object " + path + " has no Text attached");
             }
-
-        }
-*/
-        public static void TextEquals(string path, string text)
-        {
-            throw new NotImplementedException();
-            //yield return WaitFor(new LabelTextAppeared(id, text, waitTimeout));
+            if (t.text != expectedText)
+            {
+                Assert.Fail("Label " + path + "\n text expected: " + expectedText + ",\n actual: " + t.text);
+            }
         }
 
     }

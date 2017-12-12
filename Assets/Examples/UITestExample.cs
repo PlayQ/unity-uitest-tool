@@ -22,8 +22,8 @@ public class UITestExample : UITestBase
         yield return WaitForObject<FirstScreen>();
 
         // Wait until button with given name appears and simulate press event
-        yield return WaitForObject("SecondScreen/Text");
         Click("Button-OpenSecondScreen");
+        yield return WaitForObject("SecondScreen/Text");
 
         yield return WaitForObject<SecondScreen>();
 
@@ -42,14 +42,12 @@ public class UITestExample : UITestBase
     {
         yield return WaitForObject<FirstScreen>();
 
-        // Predefine the mocked server response
-//        FirstScreen.NetworkClient.MockResponse = "Success!";
 
         yield return WaitForObject("Button-NetworkRequest");
         Click("Button-NetworkRequest");
 
         // Check the response displayed on UI
-        Check.TextEquals("FirstScreen/Text-Response", "Success!");
+        Check.TextEquals("FirstScreen/Text-Response", "Test answer");
 
         // Assert the requested server parameter
 //        Assert.AreEqual(FirstScreen.NetworkClient.MockRequest, "i_need_data");
