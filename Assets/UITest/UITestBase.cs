@@ -17,16 +17,15 @@ namespace PlayQ.UITestTools
             SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
         }
 
-        private IEnumerator WaitFor(WaitCondition condition)
+        private IEnumerator WaitFor(Func<bool> condition, float timeout, string testInfo)
         {
-            string stackTrace = Environment.StackTrace;
             float time = 0;
-            while (!condition.Satisfied())
+            while (!condition())
             {
                 time += Time.unscaledDeltaTime;
-                if (time > condition.WaitTimeout)
+                if (time > timeout)
                 {
-                    throw new Exception("Operation timed out: " + condition + "\n" + stackTrace);
+                    throw new Exception("Operation timed out: " + testInfo);
                 }
                 yield return null;
             }
@@ -55,7 +54,7 @@ namespace PlayQ.UITestTools
 
         #region Interactions
 
-        protected void Click(GameObject go, float waitTimeout = 2f)
+        protected void Click(GameObject go)
         {
             if (!go.activeInHierarchy)
             {
@@ -64,94 +63,140 @@ namespace PlayQ.UITestTools
             ExecuteEvents.Execute(go, new PointerEventData(EventSystem.current), ExecuteEvents.pointerClickHandler);
         }
 
-        protected void Click(string path, float waitTimeout = 2f)
+        protected void Click(string path)
         {
             GameObject go = GameObject.Find(path);
             if (go == null)
             {
                 Assert.Fail("Trying to click to " + path + " but it doesn't exist");
             }
-            Click(go, waitTimeout);
+            Click(go);
         }
-
-
         #endregion
         
         #region Waits
         //todo investigate
         protected IEnumerator WaitForAnimationPlaying(string objectName, string param, float waitTimeout = 2f)
         {
-            var condition = new ObjectAnimationPlaying(objectName, param, waitTimeout);
-            yield return WaitFor(condition);
+            yield return WaitFor(() =>
+            {
+                GameObject gameObject = GameObject.Find(objectName);
+                return gameObject.GetComponent<Animation>().IsPlaying(param);
+                
+            }, waitTimeout, "WaitForAnimationPlaying " + objectName + "  animating param " + param);
         }
 
         protected IEnumerator WaitForObject<T>(float waitTimeout = 2f) where T : Component
         {
-            var condition = new ObjectAppeared<T>(waitTimeout);
-            yield return WaitFor(condition);
+            yield return WaitFor(() =>
+            {
+                var obj = Object.FindObjectOfType(typeof(T));
+                return obj != null;
+                    
+            }, waitTimeout, "WaitForObject<"+typeof(T)+">");
         }
 
         protected IEnumerator WaitForObject(string path, float waitTimeout = 2f)
         {
-            var condition = new ObjectAppeared(path, waitTimeout);
-            yield return WaitFor(condition);
+            yield return WaitFor(() =>
+            {
+                var o = GameObject.Find(path);
+                return o != null;
+                    
+            }, waitTimeout, "WaitForObject path: " + path);
         }
 
         protected IEnumerator WaitForDestroy<T>(float waitTimeout = 2f) where T : Component
         {
-            var condition = new ObjectDestroyed<T>(waitTimeout);
-            yield return WaitFor(condition);
+            yield return WaitFor(() =>
+            {
+                var obj = Object.FindObjectOfType(typeof(T)) as T;
+                return obj == null;
+                    
+            }, waitTimeout, "WaitForDestroy<"+typeof(T)+">");
         }
 
         protected IEnumerator WaitForDestroy(string path, float waitTimeout = 2f)
         {
-            var condition = new ObjectDestroyed(path, waitTimeout);
-            yield return WaitFor(condition);
+            yield return WaitFor(() =>
+            {
+                var gameObj = GameObject.Find(path);
+                return gameObj == null;
+                    
+            }, waitTimeout, "WaitForDestroy path: " + path );
         }
         
-        //todo implement
+        
         protected IEnumerator WaitForDestroy(GameObject gameObject, float waitTimeout = 2f)
         {
-            throw new NotImplementedException();
+            yield return WaitFor(() =>
+            {
+                return gameObject == null;
+                    
+            }, waitTimeout, "WaitForDestroy "+gameObject.GetType());
         }
 
         protected IEnumerator WaitForCondition(Func<bool> func, float waitTimeout = 2f)
         {
-            var condition = new BoolCondition(func, waitTimeout);
-            yield return WaitFor(condition);
+            yield return WaitFor(func, waitTimeout, "WaitForCondition");
         }
-
-        protected IEnumerator LoadScene(string name, float waitTimeout = 2f)
-        {
-            SceneManager.LoadScene(name, LoadSceneMode.Additive);
-            yield return WaitFor(new SceneLoaded(name, waitTimeout));
-        }
-
-        #endregion
         
-        #region WaitConditions
-        private abstract class WaitCondition
+        protected IEnumerator ButtonAccessible(GameObject button, float waitTimeout = 2f)
         {
-            public float WaitTimeout { get; private set; }
-
-            public WaitCondition(float waitTimeout)
+            yield return WaitFor(() =>
             {
-                WaitTimeout = waitTimeout;
-            }
-
-            public abstract bool Satisfied();
+                return button != null && button.GetComponent<Button>() != null;
+                
+            }, waitTimeout, "ButtonAccessible " + button.GetType());
         }
-        private class SceneLoaded : WaitCondition
+        
+        protected IEnumerator WaitObjectEnabled(string path, float waitTimeout = 2f)
         {
-            private string sceneName;
-
-            public SceneLoaded(string sceneName, float waitTimeout = 2f)
-                : base(waitTimeout)
+            yield return WaitFor(() =>
             {
-                this.sceneName = sceneName;
-            }
+                var obj = GameObject.Find(path); //finds only enabled gameobjects
+                return obj != null;
 
-            public override bool Satisfied()
+            }, waitTimeout, "WaitObjectEnabled path: " + path);
+        }
+        
+        protected IEnumerator WaitObjectEnabled<T>(float waitTimeout = 2f) where T : Component
+        {
+            yield return WaitFor(() =>
+            {
+                var obj = Object.FindObjectOfType<T>();
+                return obj != null && obj.gameObject.activeInHierarchy;
+
+            }, waitTimeout, "WaitObjectEnabled<"+typeof(T)+">");
+        }
+        
+        
+        protected IEnumerator WaitObjectDisabled<T>(float waitTimeout = 2f) where T : Component
+        {
+            yield return WaitFor(() =>
+            {
+                var obj = Object.FindObjectOfType<T>();
+                return obj != null && !obj.gameObject.activeInHierarchy;
+
+            }, waitTimeout, "WaitObjectDisabled<"+typeof(T)+">");
+        }
+        
+        protected IEnumerator WaitObjectDisabled(string path, float waitTimeout = 2f)
+        {
+            yield return WaitFor(() =>
+            {
+                var obj = GameObject.Find(path); //finds only enabled gameobjects
+                return obj == null;
+
+            }, waitTimeout, "WaitObjectDisabled path: " + path);
+        }
+
+        
+        protected IEnumerator LoadScene(string sceneName, float waitTimeout = 2f)
+        {
+            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+            
+            yield return WaitFor(() =>
             {
                 int sceneCount = SceneManager.sceneCount;
                 if (sceneCount == 0)
@@ -169,171 +214,9 @@ namespace PlayQ.UITestTools
                 {
                     return scene.name == sceneName;
                 });
-            }
+            }, waitTimeout, "LoadScene name: " + sceneName);
         }
-        private class ObjectAnimationPlaying : WaitCondition
-        {
-            string objectName;
-            string param;
 
-            public ObjectAnimationPlaying(string objectName, string param, float waitTimeout = 2f)
-                : base(waitTimeout)
-            {
-                this.objectName = objectName;
-                this.param = param;
-            }
-
-            public override bool Satisfied()
-            {
-                GameObject gameObject = GameObject.Find(objectName);
-                return gameObject.GetComponent<Animation>().IsPlaying(param);
-            }
-        }
-        private class ObjectAppeared : WaitCondition
-        {
-            private string path;
-            public ObjectAppeared(string path, float waitTimeout = 2f)
-                : base(waitTimeout)
-            {
-                this.path = path;
-            }
-
-            public override bool Satisfied()
-            {
-                var o = GameObject.Find(path);
-                return o != null;
-            }
-        }
-        private class ObjectAppeared<T> : WaitCondition where T : Component
-        {
-            public ObjectAppeared(float waitTimeout = 2f) : base(waitTimeout)
-            {
-            }
-
-            public override bool Satisfied()
-            {
-                var obj = Object.FindObjectOfType(typeof(T)) as T;
-                return obj != null;
-            }
-        }
-        private class ObjectDestroyed : WaitCondition
-        {
-            private string path;
-            private GameObject o;
-
-            public ObjectDestroyed(string path, float waitTimeout = 2f) : base(waitTimeout)
-            {
-                this.path = path;
-            }
-
-            public override bool Satisfied()
-            {
-                o = GameObject.Find(path);
-                return o == null;
-            }
-        }
-        private class ObjectDestroyed<T> : WaitCondition where T : Component
-        {
-
-            public ObjectDestroyed(float waitTimeout = 2f) : base(waitTimeout)
-            {
-            }
-
-            public override bool Satisfied()
-            {
-                var obj = Object.FindObjectOfType(typeof(T)) as T;
-                return obj == null;
-            }
-        }
-        private class ObjectEnabled : WaitCondition
-        {
-            private string path;
-            private GameObject o;
-
-            public ObjectEnabled(string path, float waitTimeout = 2f)
-                : base(waitTimeout)
-            {
-                this.path = path;
-            }
-
-            public override bool Satisfied()
-            {
-                o = GameObject.Find(path);
-                return o != null && o.activeInHierarchy;
-            }
-        }
-        private class ObjectEnabled<T> : WaitCondition where T : Component
-        {
-            public ObjectEnabled(float waitTimeout = 2f)
-                : base(waitTimeout)
-            {
-            }
-
-            public override bool Satisfied()
-            {
-                var o = Object.FindObjectOfType(typeof(T)) as T;
-                return o != null && o.gameObject.activeInHierarchy;
-            }
-        }
-        private class ObjectDisabled : WaitCondition
-        {
-            private string path;
-            private GameObject o;
-
-            public ObjectDisabled(string path, float waitTimeout = 2f) : base(waitTimeout)
-            {
-                this.path = path;
-            }
-
-            public override bool Satisfied()
-            {
-                o = GameObject.Find(path);
-                return o != null && !o.activeInHierarchy;
-            }
-
-        }
-        private class ObjectDisabled<T> : WaitCondition where T : Component
-        {
-            public ObjectDisabled(float waitTimeout = 2f) : base(waitTimeout)
-            {
-            }
-
-            public override bool Satisfied()
-            {
-                var o = Object.FindObjectOfType(typeof(T)) as T;
-                return o != null && !o.gameObject.activeInHierarchy;
-            }
-
-        }
-        private class BoolCondition : WaitCondition
-        {
-            private Func<bool> getter;
-
-            public BoolCondition(Func<bool> getter, float waitTimeout = 2f) : base(waitTimeout)
-            {
-                this.getter = getter;
-            }
-
-            public override bool Satisfied()
-            {
-                if (getter == null) return false;
-                return getter();
-            }
-        }
-        private class ButtonAccessible : WaitCondition
-        {
-            private GameObject button;
-
-            public ButtonAccessible(GameObject button, float waitTimeout = 2f) : base(waitTimeout)
-            {
-                this.button = button;
-            }
-
-            public override bool Satisfied()
-            {
-                return button != null && button.GetComponent<Button>() != null;
-            }
-        }
         #endregion
     }
 

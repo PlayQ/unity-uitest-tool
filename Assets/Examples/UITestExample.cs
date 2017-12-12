@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 using PlayQ.UITestTools;
+using Object = UnityEngine.Object;
 
 public class UITestExample : UITestBase
 {
