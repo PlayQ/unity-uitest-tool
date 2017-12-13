@@ -11,7 +11,7 @@ public class UITestSuccess : UITestBase
     [SetUp]
     public void Init()
     {
-        LoadSceneForSetUp("TestableGameScene");
+       // LoadSceneForSetUp("TestableGameScene");
     }
 
     [UnityTest]
@@ -61,7 +61,7 @@ public class UITestSuccess : UITestBase
         Object.Destroy(objectInstance);
         
         //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-        yield return WaitForDestroy<ObjectThatWillBeDestroyed>();
+        yield return WaitForDestroy<ObjectThatWillBeDestroyed>(10);
         
         //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
         yield return WaitForDestroy("Object_that_will_be_destroyed");
@@ -132,8 +132,48 @@ public class UITestSuccess : UITestBase
         //ensure object disbaled by object instance
         Check.IsDisable(objectInstance.gameObject);
     }
-    
-    
+
+    [UnityTest]
+    public IEnumerator CheckObjectDisabledFailCases()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        try {
+            Check.IsDisable<EnabledAtStart>();
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("enabled")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsDisable("Object_enabled_at_start");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("enabled")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsDisable<EnabledAtStart>("Object_enabled_at_start");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("enabled")) {
+                throw ex;
+            }
+        }
+        
+        var objectInstance = UITestTools.FindAnyGameObject<EnabledAtStart>();
+        
+        try {
+            Check.IsDisable(objectInstance.gameObject);
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("enabled")) {
+                throw ex;
+            }
+        }
+    }
+
 
     [UnityTest]
     public IEnumerator CheckObjectEnabled()
@@ -155,6 +195,49 @@ public class UITestSuccess : UITestBase
         
         //ensure object enabled by object instance
         Check.IsEnable(objectInstance.gameObject);
+        
+       
+    }
+
+    [UnityTest]
+    public IEnumerator CheckObjectEnabledFailCases()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        try {
+            Check.IsEnable<DisabledAtStart>();
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("Object disabled")) {
+                throw ex;
+            }
+        }
+        
+        
+        try {
+            Check.IsEnable("Object_disabled_at_start");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("Object disabled")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsEnable<DisabledAtStart>("Object_disabled_at_start");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("Object disabled")) {
+                throw ex;
+            }
+        }
+        
+        var objectInstance = UITestTools.FindAnyGameObject<DisabledAtStart>();
+        try {
+            Check.IsEnable(objectInstance.gameObject);
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("Object disabled")) {
+                throw ex;
+            }
+        }
     }
 
     [UnityTest]
@@ -164,12 +247,41 @@ public class UITestSuccess : UITestBase
         yield return LoadScene("1");
         
         Check.IsExist("Object_disabled_at_start");
-        
         Check.IsExist<DisabledAtStart>();
-        
         Check.IsExist<DisabledAtStart>("Object_disabled_at_start");
     }
-    
+
+    [UnityTest]
+    public IEnumerator CheckObjectExistsFailCases()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        try {
+            Check.IsNotExist("NonExist");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("not exist.")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsExist<NonExist>();
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("not exist.")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsExist<NonExist>("NonExist");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("not exist.")) {
+                throw ex;
+            }
+        }
+    }
+
     [UnityTest]
     public IEnumerator CheckObjectDontExists()
     {
@@ -177,10 +289,41 @@ public class UITestSuccess : UITestBase
         yield return LoadScene("1");
         
         Check.IsNotExist("NonExist");
-        
         Check.IsNotExist<NonExist>();
-        
         Check.IsNotExist<NonExist>("NonExist");
+        
+        
+    }
+
+    [UnityTest]
+    public IEnumerator CheckObjectDontExistsFailCases()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        try {
+            Check.IsNotExist("Object_enabled_at_start");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith(" exists.")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsNotExist<EnabledAtStart>();
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith(" exists.")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsNotExist<EnabledAtStart>("Object_enabled_at_start");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith(" exists.")) {
+                throw ex;
+            }
+        }
     }
     
     [UnityTest]
@@ -189,10 +332,55 @@ public class UITestSuccess : UITestBase
         //Wait for scene loading
         yield return LoadScene("1");
         
-        Check.IsToggle("container/Toggle");
+        Check.IsToggleOn("container/Toggle_on");
+        Check.IsToggleOff("container/Toggle_off");
+    }
 
-        Check.IsNotToggle("container/child_enabled");
-
+    [UnityTest]
+    public IEnumerator CheckForToggleOffFailCases()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        try {
+            Check.IsToggleOff("container/Toggle_on");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("is ON.")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsToggleOff("Object_enabled_at_start");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("has no Toggle component.")) {
+                throw ex;
+            }
+        }
+        
+    }
+    
+    [UnityTest]
+    public IEnumerator CheckForToggleOnFailCases()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        try {
+            Check.IsToggleOn("container/Toggle_off");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("is OFF.")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.IsToggleOn("Object_enabled_at_start");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("has no Toggle component.")) {
+                throw ex;
+            }
+        }
     }
 
 }
