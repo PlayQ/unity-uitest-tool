@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.IO;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -45,7 +46,19 @@ namespace PlayQ.UITestTools
 
         protected void MakeScreenShot(string name)
         {
-            throw new NotImplementedException();
+            if (!Application.isMobilePlatform)
+            {
+                name = new StringBuilder().Append(Application.persistentDataPath).Append(Path.DirectorySeparatorChar)
+                    .Append(name).Append('-').Append(DateTime.UtcNow.ToString(PlayModeLogger.FILE_DATE_FORMAT))
+                    .Append(".png").ToString();
+            }
+            else
+            {
+                name = new StringBuilder().Append(name).Append('-')
+                    .Append(DateTime.UtcNow.ToString(PlayModeLogger.FILE_DATE_FORMAT))
+                    .Append(".png").ToString();
+            }
+            Application.CaptureScreenshot(name);
         }
 
         protected T FindObject<T>() where T : Object
@@ -246,16 +259,15 @@ namespace PlayQ.UITestTools
 
         #region Waits
 
-        //todo investigate
-        protected IEnumerator WaitForAnimationPlaying(string objectName, string param, float waitTimeout = 2f)
-        {
-            yield return WaitFor(() =>
-            {
-                GameObject gameObject = GameObject.Find(objectName);
-                return gameObject.GetComponent<Animation>().IsPlaying(param);
-
-            }, waitTimeout, "WaitForAnimationPlaying " + objectName + "  animating param " + param);
-        }
+//        protected IEnumerator WaitForAnimationPlaying(string objectName, string param, float waitTimeout = 2f)
+//        {
+//            yield return WaitFor(() =>
+//            {
+//                GameObject gameObject = GameObject.Find(objectName);
+//                return gameObject.GetComponent<Animation>().IsPlaying(param);
+//
+//            }, waitTimeout, "WaitForAnimationPlaying " + objectName + "  animating param " + param);
+//        }
 
         protected IEnumerator WaitForObject<T>(float waitTimeout = 2f) where T : Component
         {

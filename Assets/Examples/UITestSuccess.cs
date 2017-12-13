@@ -20,7 +20,15 @@ public class UITestSuccess : UITestBase
         //Wait for scene loading
         yield return LoadScene("1");
     }
-    
+
+    [UnityTest]
+    public IEnumerator Screen()
+    {
+        //Wait for scene loading
+        yield return null;
+        MakeScreenShot("some path");
+    }
+
     [UnityTest]
     public IEnumerator WaitForObjectOnScene()
     {
