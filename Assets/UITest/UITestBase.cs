@@ -11,6 +11,113 @@ using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools
 {
+    public static class UITestTools
+    {
+        public static string GameObjectFullPath(GameObject gObj)
+        {
+            if (gObj == null)
+            {
+                throw new NullReferenceException("given object is null!");
+            }
+            
+            GameObject upwise = gObj;
+            
+            StringBuilder sb = new StringBuilder();
+
+            while (upwise)
+            {
+                sb.Insert(0, upwise.gameObject.name);
+                if (upwise.transform.parent != null)
+                {
+                    sb.Insert(0, '/');
+                    upwise = upwise.transform.parent.gameObject;
+                }
+                else
+                {
+                    break;   
+                }
+            }
+
+            return sb.ToString();
+        }
+        
+        public static GameObject FindAnyGameObject<T>(String path) where T: Component
+        {
+            if (String.IsNullOrEmpty(path))
+            {
+                return null;
+            }
+            
+            var objects = Resources.FindObjectsOfTypeAll<T>();
+
+            if (objects == null || objects.Length == 0)
+            {
+                return null;
+            }
+
+            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
+            if (objectsOnScene == null || objectsOnScene.Length == 0)
+            {
+                return null;
+            }
+
+           
+            var result = objectsOnScene.FirstOrDefault(obj =>
+            {
+                var fullPath = GameObjectFullPath(obj.gameObject); 
+                var resultComparsion =  fullPath.EndsWith(path, StringComparison.Ordinal);
+                return resultComparsion;
+            });
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            return result.gameObject;
+
+        }
+
+        public static GameObject FindAnyGameObject(string path)
+        {
+            var objectsOnScene = Resources.FindObjectsOfTypeAll<GameObject>();
+
+            if (objectsOnScene.Length == 0)
+            {
+                return null;
+            }
+            
+            return objectsOnScene.FirstOrDefault(gObj =>
+            {
+                if (gObj.name == "Object_disabled_at_start")
+                {
+                    var test = GameObjectFullPath(gObj);
+                    
+                    Debug.Log(test);
+                }
+                return gObj.scene != null && GameObjectFullPath(gObj).EndsWith(path);
+            });
+        }
+        
+        public static T FindAnyGameObject<T>() where T : Component
+        {
+            var objects = Resources.FindObjectsOfTypeAll<T>();
+
+            if (objects == null || objects.Length == 0)
+            {
+                return null;
+            }
+
+            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
+            if (objectsOnScene == null || objectsOnScene.Length == 0)
+            {
+                return null;
+            }
+
+            return objectsOnScene.FirstOrDefault();
+        }
+    }
+    
     public abstract class UITestBase
     {
         protected void LoadSceneForSetUp(string sceneName)
@@ -48,20 +155,6 @@ namespace PlayQ.UITestTools
             throw new NotImplementedException();
         }
 
-        protected T FindObject<T>() where T : Object
-        {
-            return Object.FindObjectOfType<T>();
-        }
-
-        protected T FindObject<T>(string name) where T : Object
-        {
-            return Object.FindObjectsOfType<T>().First(x => x.name == name);
-        }
-
-        protected GameObject FindObject(string name = null)
-        {
-            return GameObject.Find(name);
-        }
 
         protected GameObject FindObjectByPixels(Vector2 pixels)
         {
@@ -160,7 +253,7 @@ namespace PlayQ.UITestTools
 
         protected void DragPixels(string path, Vector2 direction, float time = 1)
         {
-            GameObject go = FindObject(path);
+            GameObject go = UITestTools.FindAnyGameObject(path);
             if (go == null)
             {
                 Assert.Fail("Cannot grag object " + path + ", couse there are not exist.");
@@ -175,7 +268,7 @@ namespace PlayQ.UITestTools
 
         protected void DragPercents(string path, Vector2 direction, float time = 1)
         {
-            GameObject go = FindObject(path);
+            GameObject go = UITestTools.FindAnyGameObject(path);
             if (go == null)
             {
                 Assert.Fail("Cannot grag object " + path + ", couse there are not exist.");
@@ -195,7 +288,7 @@ namespace PlayQ.UITestTools
 
         protected void SetText(string path, string text)
         {
-            GameObject go = FindObject(path);
+            GameObject go = UITestTools.FindAnyGameObject(path);
             if (go == null)
             {
                 Assert.Fail("Cannot set text to object " + path + ", couse there are not exist.");
@@ -215,7 +308,7 @@ namespace PlayQ.UITestTools
 
         protected void AppendText(string path, string text)
         {
-            GameObject go = FindObject(path);
+            GameObject go = UITestTools.FindAnyGameObject(path);
             if (go == null)
             {
                 Assert.Fail("Cannot set text to object " + path + ", couse there are not exist.");
@@ -247,7 +340,7 @@ namespace PlayQ.UITestTools
         #region Waits
 
         //todo investigate
-        protected IEnumerator WaitForAnimationPlaying(string objectName, string param, float waitTimeout = 2f)
+        /*protected IEnumerator WaitForAnimationPlaying(string objectName, string param, float waitTimeout = 2f)
         {
             yield return WaitFor(() =>
             {
@@ -255,23 +348,23 @@ namespace PlayQ.UITestTools
                 return gameObject.GetComponent<Animation>().IsPlaying(param);
 
             }, waitTimeout, "WaitForAnimationPlaying " + objectName + "  animating param " + param);
-        }
+        }*/
 
         protected IEnumerator WaitForObject<T>(float waitTimeout = 2f) where T : Component
         {
             yield return WaitFor(() =>
             {
-                var obj = Object.FindObjectOfType(typeof(T));
+                var obj = UITestTools.FindAnyGameObject<T>();
                 return obj != null;
 
             }, waitTimeout, "WaitForObject<" + typeof(T) + ">");
         }
 
-        protected IEnumerator WaitForObject<T>(string name, float waitTimeout = 2f) where T : Component
+        protected IEnumerator WaitForObject<T>(string path, float waitTimeout = 2f) where T : Component
         {
             yield return WaitFor(() =>
             {
-                var obj = Object.FindObjectOfType(typeof(T));
+                var obj = UITestTools.FindAnyGameObject<T>(path);
                 return obj != null;
 
             }, waitTimeout, "WaitForObject<" + typeof(T) + ">");
@@ -281,7 +374,7 @@ namespace PlayQ.UITestTools
         {
             yield return WaitFor(() =>
             {
-                var o = GameObject.Find(path);
+                var o = UITestTools.FindAnyGameObject(path);
                 return o != null;
 
             }, waitTimeout, "WaitForObject path: " + path);
@@ -291,7 +384,7 @@ namespace PlayQ.UITestTools
         {
             yield return WaitFor(() =>
             {
-                var obj = Object.FindObjectOfType(typeof(T)) as T;
+                var obj = UITestTools.FindAnyGameObject<T>();
                 return obj == null;
 
             }, waitTimeout, "WaitForDestroy<" + typeof(T) + ">");
@@ -301,7 +394,7 @@ namespace PlayQ.UITestTools
         {
             yield return WaitFor(() =>
             {
-                var gameObj = GameObject.Find(path);
+                var gameObj = UITestTools.FindAnyGameObject(path);
                 return gameObj == null;
 
             }, waitTimeout, "WaitForDestroy path: " + path);
@@ -345,7 +438,7 @@ namespace PlayQ.UITestTools
             yield return WaitFor(() =>
             {
                 var obj = Object.FindObjectOfType<T>();
-                return obj != null && obj.gameObject.activeInHierarchy;
+                return obj != null;
 
             }, waitTimeout, "WaitObjectEnabled<" + typeof(T) + ">");
         }
@@ -355,7 +448,7 @@ namespace PlayQ.UITestTools
         {
             yield return WaitFor(() =>
             {
-                var obj = Object.FindObjectOfType<T>();
+                var obj = UITestTools.FindAnyGameObject<T>();
                 return obj != null && !obj.gameObject.activeInHierarchy;
 
             }, waitTimeout, "WaitObjectDisabled<" + typeof(T) + ">");
@@ -365,8 +458,8 @@ namespace PlayQ.UITestTools
         {
             yield return WaitFor(() =>
             {
-                var obj = GameObject.Find(path); //finds only enabled gameobjects
-                return obj == null;
+                var obj = UITestTools.FindAnyGameObject(path);
+                return obj != null && !obj.gameObject.activeInHierarchy;
 
             }, waitTimeout, "WaitObjectDisabled path: " + path);
         }
@@ -384,108 +477,6 @@ namespace PlayQ.UITestTools
 
     public static class Check
     {
-        public static string GameObjectFullPath(GameObject gObj)
-        {
-            if (gObj == null)
-            {
-                throw new NullReferenceException("given object is null!");
-            }
-            
-            GameObject upwise = gObj;
-            
-            StringBuilder sb = new StringBuilder();
-
-            while (upwise)
-            {
-                sb.Insert(0, upwise.name);
-                if (upwise.transform.parent != null)
-                {
-                    sb.Insert(0, '/');
-                    upwise = upwise.transform.parent.gameObject;
-                }
-                else
-                {
-                    break;   
-                }
-            }
-
-            return sb.ToString();
-        }
-        
-        public static GameObject FindAnyGameObject<T>(String path) where T: Component
-        {
-            if (String.IsNullOrEmpty(path))
-            {
-                return null;
-            }
-            
-            var objects = Resources.FindObjectsOfTypeAll<T>();
-
-            if (objects == null || objects.Length == 0)
-            {
-                return null;
-            }
-
-            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
-            if (objectsOnScene == null || objectsOnScene.Length == 0)
-            {
-                return null;
-            }
-
-           
-            var result = objectsOnScene.FirstOrDefault(obj =>
-            {
-                return GameObjectFullPath(obj.gameObject).EndsWith(path);
-            });
-
-            if (result == null)
-            {
-                return null;
-            }
-
-            return result.gameObject;
-
-        }
-
-        public static GameObject FindAnyGameObject(string path)
-        {
-            var objectsOnScene = Resources.FindObjectsOfTypeAll<GameObject>();
-
-            if (objectsOnScene.Length == 0)
-            {
-                return null;
-            }
-            
-            return objectsOnScene.FirstOrDefault(gObj =>
-            {
-                if (gObj.name == "Object_disabled_at_start")
-                {
-                    var test = GameObjectFullPath(gObj);
-                    
-                    Debug.Log(test);
-                }
-                return gObj.scene != null && GameObjectFullPath(gObj).EndsWith(path);
-            });
-        }
-        
-        public static T FindAnyGameObject<T>() where T : Component
-        {
-            var objects = Resources.FindObjectsOfTypeAll<T>();
-
-            if (objects == null || objects.Length == 0)
-            {
-                return null;
-            }
-
-            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
-            if (objectsOnScene == null || objectsOnScene.Length == 0)
-            {
-                return null;
-            }
-
-            return objectsOnScene.FirstOrDefault();
-        }
-
         public static void TextEquals(string path, string expectedText)
         {
             var go = GameObject.Find(path);
@@ -534,7 +525,7 @@ namespace PlayQ.UITestTools
 
         public static void IsEnable(string path)
         {
-            var go = FindAnyGameObject(path);
+            var go = UITestTools.FindAnyGameObject(path);
             
             if (go == null)
             {
@@ -548,7 +539,7 @@ namespace PlayQ.UITestTools
 
         public static void IsEnable<T>(string path) where T : Component
         {
-            var go = FindAnyGameObject<T>(path);
+            var go =UITestTools.FindAnyGameObject<T>(path);
 
             if (go == null)
             {
@@ -562,7 +553,7 @@ namespace PlayQ.UITestTools
 
         public static void IsEnable<T>() where T : Component
         {
-            var go = FindAnyGameObject<T>();
+            var go = UITestTools.FindAnyGameObject<T>();
             
             if (go == null)
             {
@@ -578,13 +569,13 @@ namespace PlayQ.UITestTools
         {
             if (!go.activeInHierarchy)
             {
-                Assert.Fail("IsEnable by object instance: Game Object " + GameObjectFullPath(go) + " disabled.");
+                Assert.Fail("IsEnable by object instance: Game Object " + UITestTools.GameObjectFullPath(go) + " disabled.");
             }
         }
 
         public static void IsDisable(string path)
         {
-            var go = FindAnyGameObject(path);
+            var go = UITestTools.FindAnyGameObject(path);
             
             if (go == null)
             {
@@ -598,7 +589,7 @@ namespace PlayQ.UITestTools
 
         public static void IsDisable<T>(string path) where T : Component
         {
-            var go = FindAnyGameObject<T>(path);
+            var go = UITestTools.FindAnyGameObject<T>(path);
             
             if (go == null)
             {
@@ -612,7 +603,7 @@ namespace PlayQ.UITestTools
 
         public static void IsDisable<T>() where T : Component
         {
-            var go = FindAnyGameObject<T>();
+            var go = UITestTools.FindAnyGameObject<T>();
             
             if (go == null)
             {
@@ -628,13 +619,13 @@ namespace PlayQ.UITestTools
         {
             if (go.activeInHierarchy)
             {
-                Assert.Fail("IsDisable by object instance: Game Object " + GameObjectFullPath(go) + " enabled.");
+                Assert.Fail("IsDisable by object instance: Game Object " + UITestTools.GameObjectFullPath(go) + " enabled.");
             }
         }
 
         public static void IsExist(string path)
         {
-            var go = FindAnyGameObject(path);
+            var go = UITestTools.FindAnyGameObject(path);
             
             if (go == null)
             {
@@ -644,7 +635,7 @@ namespace PlayQ.UITestTools
 
         public static void IsExist<T>(string path) where T : Component
         {
-            var go = FindAnyGameObject<T>(path);
+            var go = UITestTools.FindAnyGameObject<T>(path);
             
             if (go == null)
             {
@@ -654,7 +645,7 @@ namespace PlayQ.UITestTools
 
         public static void IsExist<T>() where T : Component
         {
-            var go = FindAnyGameObject<T>();
+            var go = UITestTools.FindAnyGameObject<T>();
             
             if (go == null)
             {
@@ -664,7 +655,7 @@ namespace PlayQ.UITestTools
         
         public static void IsNotExist(string path)
         {
-            var go = FindAnyGameObject(path);
+            var go = UITestTools.FindAnyGameObject(path);
             
             if (go != null)
             {
@@ -674,7 +665,7 @@ namespace PlayQ.UITestTools
 
         public static void IsNotExist<T>(string path) where T : Component
         {
-            var go = FindAnyGameObject<T>(path);
+            var go = UITestTools.FindAnyGameObject<T>(path);
             
             if (go != null)
             {
@@ -684,7 +675,7 @@ namespace PlayQ.UITestTools
 
         public static void IsNotExist<T>() where T : Component
         {
-            var go = FindAnyGameObject<T>();
+            var go = UITestTools.FindAnyGameObject<T>();
             
             if (go != null)
             {
@@ -696,7 +687,7 @@ namespace PlayQ.UITestTools
 
         public static void IsToggle(string path)
         {
-            var go = FindAnyGameObject(path);
+            var go = UITestTools.FindAnyGameObject(path);
             if (go == null)
             {
                 Assert.Fail("IsToggle: toggle " + path + " not exist.");
@@ -714,20 +705,16 @@ namespace PlayQ.UITestTools
         }
         public static void IsNotToggle(string path)
         {
-            var go = FindAnyGameObject(path);
+            var go = UITestTools.FindAnyGameObject(path);
             if (go == null)
             {
                 Assert.Fail("IsNotToggle: toggle " + path + " not exist.");
             }
             
             Toggle toggle = go.GetComponent<Toggle>();
-            if (toggle == null)
+            if (toggle != null)
             {
-                Assert.Fail("IsNotToggle: Game object " + path + " has no Toggle component.");
-            }
-            if (toggle.isOn)
-            {
-                Assert.Fail("IsNotToggle: toggle " + path + " is enabled.");
+                Assert.Fail("IsNotToggle: Game object " + path + " has Toggle component.");
             }
         }
     }

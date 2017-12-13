@@ -34,6 +34,10 @@ public class UITestSuccess : UITestBase
         //search for object with component "Child" on it"
         //if object is not found - waits for object appearing for duration
         yield return WaitForObject<Child>();
+
+        //search for object with component "Child" on it and hierarchy "container/child_enabled" 
+        //if object is not found - waits for object appearing for duration
+        yield return WaitForObject<Child>("container/child_with_component");
     }
     
     [UnityTest]
@@ -42,21 +46,17 @@ public class UITestSuccess : UITestBase
         //Wait for scene loading
         yield return LoadScene("1");
      
-        //check object exists at the beginning by component
-        yield return WaitForObject<ObjectThatWillBeDestroyedInSecond>();
-
-        //check object exists at the beginning by name in hierarchy
-        yield return WaitForObject("Object_that_will_be_destroyed_in_second");
+      
         
         //manually search for object in scene
-         var objectInstance = Object.FindObjectOfType(typeof(ObjectThatWillBeDestroyedInSecond)) as GameObject;
-        
+         var objectInstance = UITestTools.FindAnyGameObject<ObjectThatWillBeDestroyed>().gameObject;
+        Object.Destroy(objectInstance);
         
         //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-        yield return WaitForDestroy<ObjectThatWillBeDestroyedInSecond>();
+        yield return WaitForDestroy<ObjectThatWillBeDestroyed>();
         
         //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
-        yield return WaitForDestroy("Object_that_will_be_destroyed_in_second");
+        yield return WaitForDestroy("Object_that_will_be_destroyed");
         
         //wait during interval for object destraction by object instance
         yield return WaitForDestroy(objectInstance);
@@ -68,17 +68,8 @@ public class UITestSuccess : UITestBase
         //Wait for scene loading
         yield return LoadScene("1");
         
-        //ensure object enabled by component
-        Check.IsEnable<EnabledAtStart>();
-     
-        //ensure object enabled by path in hierarchy
-        Check.IsEnable("Object_enabled_at_start");
-
         //get manual reference to the object
-        var objectInstance = Object.FindObjectOfType<EnabledAtStart>();
-        
-        //ensure object enabled by object instance
-        Check.IsEnable(objectInstance.gameObject);
+        var objectInstance = UITestTools.FindAnyGameObject<EnabledAtStart>();
         
         //manually disable object
         objectInstance.gameObject.SetActive(false);
@@ -97,21 +88,9 @@ public class UITestSuccess : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
-        
-        //ensure object disabled by component
-        Check.IsDisable<DisabledAtStart>();
-     
-        //ensure object disabled by path in hierarchy
-        Check.IsDisable("Object_disabled_at_start");
-        
-        //ensure object disabled by path in hierarchy and component type
-        Check.IsDisable<DisabledAtStart>("Object_disabled_at_start");
 
         //get manual reference to the object
-        var objectInstance = Check.FindAnyGameObject<DisabledAtStart>();
-        
-        //ensure object disbaled by object instance
-        Check.IsDisable(objectInstance.gameObject);
+        var objectInstance = UITestTools.FindAnyGameObject<DisabledAtStart>();
         
         //manually enable object
         objectInstance.gameObject.SetActive(true);
@@ -123,60 +102,91 @@ public class UITestSuccess : UITestBase
         WaitObjectEnabled("Object_disabled_at_start");
 
     }
-    
-    //[UnityTest]
-    public IEnumerator WaitForStaff()
-    {
-    // Wait until object with given component appears in the scene
-        yield return WaitForObject<FirstScreen>();
 
-        // Click on button
-        Click("Button-OpenSecondScreen");
-        
-        //Wait untio
-        yield return WaitForObject("SecondScreen/Text");
-
-        yield return WaitForObject<SecondScreen>();
-
-        // Wait until Text component with given name appears and assert its value
-        yield return WaitForObject("SecondScreen/Text");
-        Check.TextEquals("SecondScreen/Text", "Second screen");
-
-        Click("Button-Close");
-
-        // Wait until object with given component disappears from the scene
-        yield return WaitForDestroy<SecondScreen>();
-    }
-
-    //[UnityTest]
-    public IEnumerator SuccessfulNetworkResponseIsDisplayedOnTheFirstScreen()
-    {
-        yield return WaitForObject<FirstScreen>();
-
-
-        yield return WaitForObject("Button-NetworkRequest");
-        Click("Button-NetworkRequest");
-
-        // Check the response displayed on UI
-        Check.TextEquals("FirstScreen/Text-Response", "Test answer");
-
-        // Assert the requested server parameter
-//        Assert.AreEqual(FirstScreen.NetworkClient.MockRequest, "i_need_data");
-    }
-
-    /*
     [UnityTest]
-    public IEnumerator FailingBoolCondition()
+    public IEnumerator CheckObjectDisabled()
     {
-        yield return WaitForObject("FirstScreen");
-        var s = Object.FindObjectOfType<FirstScreen>();
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        //ensure object disabled by component
+        Check.IsDisable<DisabledAtStart>();
+     
+        //ensure object disabled by path in hierarchy
+        Check.IsDisable("Object_disabled_at_start");
+        
+        //ensure object disabled by path in hierarchy and component type
+        Check.IsDisable<DisabledAtStart>("Object_disabled_at_start");
 
-        // Wait until FirstScene component is disabled, this line will fail by timeout
-        // BoolCondition can be used to wait until any condition is satisfied
-        yield return WaitForCondition(() => !s.enabled);
+        //get manual reference to the object
+        var objectInstance = UITestTools.FindAnyGameObject<DisabledAtStart>();
+        
+        //ensure object disbaled by object instance
+        Check.IsDisable(objectInstance.gameObject);
     }
     
-    */
+    
+
+    [UnityTest]
+    public IEnumerator CheckObjectEnabled()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        //get manual reference to the object
+        var objectInstance = UITestTools.FindAnyGameObject<EnabledAtStart>();
+        
+        //ensure object enabled by component
+        Check.IsEnable<EnabledAtStart>();
+     
+        //ensure object enabled by path in hierarchy
+        Check.IsEnable("Object_enabled_at_start");
+
+        //ensure object enabled by path in hierarchy and component type
+        Check.IsEnable<EnabledAtStart>("Object_enabled_at_start");
+        
+        //ensure object enabled by object instance
+        Check.IsEnable(objectInstance.gameObject);
+    }
+
+    [UnityTest]
+    public IEnumerator CheckObjectExists()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        Check.IsExist("Object_disabled_at_start");
+        
+        Check.IsExist<DisabledAtStart>();
+        
+        Check.IsExist<DisabledAtStart>("Object_disabled_at_start");
+    }
+    
+    [UnityTest]
+    public IEnumerator CheckObjectDontExists()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        Check.IsNotExist("NonExist");
+        
+        Check.IsNotExist<NonExist>();
+        
+        Check.IsNotExist<NonExist>("NonExist");
+    }
+    
+    [UnityTest]
+    public IEnumerator CheckForToggle()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        Check.IsToggle("container/Toggle");
+
+        Check.IsNotToggle("container/child_enabled");
+
+    }
+
 }
 
  
