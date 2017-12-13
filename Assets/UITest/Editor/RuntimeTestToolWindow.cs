@@ -18,6 +18,13 @@ namespace PlayQ.UITestTools
             Failed
         }
 
+        [Serializable]
+        private class OpenClassInfo
+        {
+            public string ClassName;
+            public bool State;
+        }
+
         [MenuItem("Window/Runtime Test Runner")]
         private static void ShowWindow()
         {
@@ -27,13 +34,14 @@ namespace PlayQ.UITestTools
         private List<UnitTestClass> testClasses;
 
         private Dictionary<MethodInfo, TestState> testInfo = new Dictionary<MethodInfo, TestState>();
-        private Dictionary<Type, bool> openedClasses = new Dictionary<Type, bool>();
-        
+        private Dictionary<string, bool> openedClasses = new Dictionary<string, bool>();
+        private List<OpenClassInfo> openedClassesList = new List<OpenClassInfo>();
+
         private Texture2D successIcon;
         private Texture2D failIcon;
         private Texture2D ignoreIcon;
         private Texture2D defaultIcon;
-        
+
         private GUIStyle offsetStyle;
         private Vector2 scrollPosition;
 
@@ -58,13 +66,30 @@ namespace PlayQ.UITestTools
         private void OnEnable()
         {
             hideFlags = HideFlags.HideAndDontSave;
-            testInfo = new Dictionary<MethodInfo, TestState>();
-            openedClasses = new Dictionary<Type, bool>();
             testClasses = PlayModeTestRunner.GetTestClasses();
 
+            RestoreOpenedClasses();
             CreateStyleClasses();
             SubscribeToEvents();
             LoadImgs();
+        }
+
+        private void RestoreOpenedClasses()
+        {
+            foreach (var value in openedClassesList)
+            {
+                openedClasses.Add(value.ClassName, value.State);
+            }
+            openedClassesList.Clear();
+        }
+
+        // for storing opened classes during entering to play mode
+        private void StoreOpenedClasses()
+        {
+            foreach (var keyValue in openedClasses)
+            {
+                openedClassesList.Add(new OpenClassInfo {ClassName = keyValue.Key, State = keyValue.Value});
+            }
         }
 
         private void CreateStyleClasses()
@@ -90,6 +115,8 @@ namespace PlayQ.UITestTools
 
         private void OnDisable()
         {
+            StoreOpenedClasses();
+
             PlayModeTestRunner.OnStartProcessingTests -= OnStartProcessingTests;
             PlayModeTestRunner.OnTestFailed -= OnTestFailed;
             PlayModeTestRunner.OnTestPassed -= OnTestPassed;
@@ -143,10 +170,11 @@ namespace PlayQ.UITestTools
 
         private void DrawClass(UnitTestClass testClass)
         {
-            var isOpened = openedClasses.ContainsKey(testClass.Type) && openedClasses[testClass.Type] == true;
+            var isOpened = openedClasses.ContainsKey(testClass.Type.FullName) &&
+                           openedClasses[testClass.Type.FullName] == true;
             var content = new GUIContent(testClass.Type.FullName, GetClassIcon(testClass));
             isOpened = EditorGUILayout.Foldout(isOpened, content, true, defaultFoldoutStyle);
-            openedClasses[testClass.Type] = isOpened;
+            openedClasses[testClass.Type.FullName] = isOpened;
 
             if (isOpened)
             {
