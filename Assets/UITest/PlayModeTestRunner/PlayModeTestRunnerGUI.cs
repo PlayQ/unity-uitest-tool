@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace PlayQ.UITestTools
@@ -23,22 +22,26 @@ namespace PlayQ.UITestTools
 
         public void Draw()
         {
-            GUI.color = Color.white;
-            GUILayout.BeginVertical(EditorStyles.helpBox);
-            scrollState = GUILayout.BeginScrollView(scrollState);
             GUI.color = Color.black;
+            GUILayout.BeginVertical(GUI.skin.box);
+            scrollState = GUILayout.BeginScrollView(scrollState);
+           
             if (currentTest != null)
             {
+                GUI.color = Color.white;
                 GUILayout.Label(currentTest);
+                GUI.color = Color.black;
             }
 
             if (failedTests.Count > 0)
             {
+                GUI.color = Color.white;
                 GUILayout.Label("Failed: ");
                 foreach (var test in failedTests)
                 {
                     GUILayout.Label(test);
                 }
+                GUI.color = Color.black;
             }
             GUILayout.EndScrollView();
             GUILayout.EndVertical();
