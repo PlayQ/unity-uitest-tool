@@ -17,7 +17,7 @@ namespace PlayQ.UITestTools
     public class PlayModeTestRunner : MonoBehaviour
     {
         public static Action<MethodInfo> OnTestPassed;
-        public static Action<MethodInfo> OnTestSkipped;
+        public static Action<MethodInfo> OnTestIgnored;
         public static Action<MethodInfo> OnTestFailed;
         public static Action OnStartProcessingTests;
 
@@ -32,12 +32,14 @@ namespace PlayQ.UITestTools
         private Coroutine cachedCoroutine;
         private PlayModeLogger logger;
         private LogSaver logSaver;
-
+        private PlayModeTestRunnerGUI guiDrawer;
+        
         // Mono behaviour 
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
             logger = new PlayModeLogger();
+            guiDrawer = new PlayModeTestRunnerGUI();
             logSaver = new LogSaver(Path.Combine(Application.persistentDataPath, LOG_FILE_NAME));
             classesForTest = GetTestClasses();
 
@@ -137,6 +139,11 @@ namespace PlayQ.UITestTools
 
         private IEnumerator ProcessTestQueue()
         {
+            if (OnStartProcessingTests != null)
+            {
+                OnStartProcessingTests();
+            }
+
             foreach (var testClass in classesForTest)
             {
                 foreach (var method in testClass.TestMethods)
@@ -144,14 +151,15 @@ namespace PlayQ.UITestTools
                     if (method.IsIgnored)
                     {
                         logger.IgnoreLog(method.FullName);
-                        if (OnTestSkipped != null)
+                        if (OnTestIgnored != null)
                         {
-                            OnTestSkipped(method.Method);
+                            OnTestIgnored(method.Method);
                         }
                         continue;
                     }
 
                     object testInstance = null;
+                    guiDrawer.SetCurrentTest(method.FullName);
                     logger.StartLog(method.FullName);
 
                     try
@@ -210,6 +218,7 @@ namespace PlayQ.UITestTools
         private void ProcessTestFail(UnitTestMethod method)
         {
             logger.FailLog(method.FullName);
+            guiDrawer.AddFailedTest(method.FullName);
             if (OnTestFailed != null)
             {
                 OnTestFailed(method.Method);
@@ -256,6 +265,13 @@ namespace PlayQ.UITestTools
             return testScenePath.Remove(0, assetsIndex);
         }
         
+        // GUI
+
+        private void OnGUI()
+        {
+            guiDrawer.Draw();
+        }
+
         public static List<UnitTestClass> GetTestClasses()
         {
             var findedClasses = new List<UnitTestClass>();
