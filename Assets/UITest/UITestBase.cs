@@ -122,6 +122,11 @@ namespace PlayQ.UITestTools
     
     public abstract class UITestBase
     {
+        protected EventSystem FindCurrentEventSystem()
+        {
+            return GameObject.FindObjectOfType<EventSystem>();
+        }
+        
         protected void LoadSceneForSetUp(string sceneName)
         {
             SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
@@ -184,6 +189,7 @@ namespace PlayQ.UITestTools
             var pointerData = new PointerEventData(EventSystem.current);
             var resultsData = new List<RaycastResult>();
             pointerData.position = new Vector2(x ,y);
+            
             EventSystem.current.RaycastAll(pointerData, resultsData);
 
             return resultsData.Count > 0 ? resultsData[0].gameObject : null;
