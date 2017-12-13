@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
-using UnityEngine;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
@@ -13,7 +14,7 @@ namespace PlayQ.UITestTools
         {
             Undefined,
             Passed,
-            Skipped,
+            Ignored,
             Failed
         }
 
@@ -25,14 +26,15 @@ namespace PlayQ.UITestTools
 
         private List<UnitTestClass> testClasses;
 
-        private Dictionary<MethodInfo, TestState> testPassInfo = new Dictionary<MethodInfo, TestState>();
+        private Dictionary<MethodInfo, TestState> testInfo = new Dictionary<MethodInfo, TestState>();
         private Dictionary<Type, bool> openedClasses = new Dictionary<Type, bool>();
-
+        
+        private Texture2D successIcon;
+        private Texture2D failIcon;
+        private Texture2D ignoreIcon;
+        private Texture2D defaultIcon;
+        
         private GUIStyle offsetStyle;
-        private GUIStyle passedStyle;
-        private GUIStyle failedStyle;
-        private GUIStyle unknownStyle;
-        private GUIStyle skippedStyle;
         private Vector2 scrollPosition;
 
         private GUIStyle defaultFoldoutStyle
@@ -53,57 +55,37 @@ namespace PlayQ.UITestTools
             }
         }
 
-        private GUIStyle passedFoldoutStyle
-        {
-            get
-            {
-                return new GUIStyle(EditorStyles.foldout)
-                {
-                    normal = {textColor = new Color(0f, 0.7f, 0f)},
-                    active = {textColor = new Color(0f, 0.7f, 0f)},
-                    hover = {textColor = new Color(0f, 0.7f, 0f)},
-                    onActive = {textColor = new Color(0f, 0.7f, 0f)},
-                    onFocused = {textColor = new Color(0f, 0.7f, 0f)},
-                    onHover = {textColor = new Color(0f, 0.7f, 0f)},
-                    onNormal = {textColor = new Color(0f, 0.7f, 0f)},
-                    focused = {textColor = new Color(0f, 0.7f, 0f)}
-                };
-            }
-        }
-
-        private GUIStyle failedFoldoutStyle
-        {
-            get
-            {
-                return new GUIStyle(EditorStyles.foldout)
-                {
-                    normal = {textColor = new Color(1f, 0f, 0f)},
-                    active = {textColor = new Color(1f, 0f, 0f)},
-                    hover = {textColor = new Color(1f, 0f, 0f)},
-                    onActive = {textColor = new Color(1f, 0f, 0f)},
-                    onFocused = {textColor = new Color(1f, 0f, 0f)},
-                    onHover = {textColor = new Color(1f, 0f, 0f)},
-                    onNormal = {textColor = new Color(1f, 0f, 0f)},
-                    focused = {textColor = new Color(1f, 0f, 0f)}
-                };
-            }
-        }
-
-
         private void OnEnable()
         {
-            offsetStyle = new GUIStyle {margin = {left = 20}};
-            passedStyle = new GUIStyle {normal = {textColor = new Color(0f, 0.7f, 0f)}};
-            failedStyle = new GUIStyle {normal = {textColor = new Color(1f, 0f, 0f)}};
-            skippedStyle = new GUIStyle {normal = {textColor = new Color(0.5f, 0.5f, 0.5f)}};
-            unknownStyle = new GUIStyle {normal = {textColor = Color.black}};
-
+            hideFlags = HideFlags.HideAndDontSave;
+            testInfo = new Dictionary<MethodInfo, TestState>();
+            openedClasses = new Dictionary<Type, bool>();
             testClasses = PlayModeTestRunner.GetTestClasses();
 
+            CreateStyleClasses();
+            SubscribeToEvents();
+            LoadImgs();
+        }
+
+        private void CreateStyleClasses()
+        {
+            offsetStyle = new GUIStyle {margin = {left = 20}};
+        }
+
+        private void SubscribeToEvents()
+        {
             PlayModeTestRunner.OnStartProcessingTests += OnStartProcessingTests;
             PlayModeTestRunner.OnTestFailed += OnTestFailed;
             PlayModeTestRunner.OnTestPassed += OnTestPassed;
-            PlayModeTestRunner.OnTestSkipped += OnTestSkipped;
+            PlayModeTestRunner.OnTestIgnored += OnTestIgnored;
+        }
+
+        private void LoadImgs()
+        {
+            successIcon = Resources.Load<Texture2D>("passed");
+            failIcon = Resources.Load<Texture2D>("failed");
+            ignoreIcon = Resources.Load<Texture2D>("ignored");
+            defaultIcon = Resources.Load<Texture2D>("normal");
         }
 
         private void OnDisable()
@@ -111,30 +93,30 @@ namespace PlayQ.UITestTools
             PlayModeTestRunner.OnStartProcessingTests -= OnStartProcessingTests;
             PlayModeTestRunner.OnTestFailed -= OnTestFailed;
             PlayModeTestRunner.OnTestPassed -= OnTestPassed;
-            PlayModeTestRunner.OnTestSkipped -= OnTestSkipped;
+            PlayModeTestRunner.OnTestIgnored -= OnTestIgnored;
         }
 
-        private void OnTestSkipped(MethodInfo methodInfo)
+        private void OnTestIgnored(MethodInfo methodInfo)
         {
-            testPassInfo[methodInfo] = TestState.Skipped;
+            testInfo[methodInfo] = TestState.Ignored;
             Repaint();
         }
 
         private void OnTestPassed(MethodInfo methodInfo)
         {
-            testPassInfo[methodInfo] = TestState.Passed;
+            testInfo[methodInfo] = TestState.Passed;
             Repaint();
         }
 
         private void OnTestFailed(MethodInfo methodInfo)
         {
-            testPassInfo[methodInfo] = TestState.Failed;
+            testInfo[methodInfo] = TestState.Failed;
             Repaint();
         }
 
         private void OnStartProcessingTests()
         {
-            testPassInfo.Clear();
+            testInfo.Clear();
             Repaint();
         }
 
@@ -142,6 +124,7 @@ namespace PlayQ.UITestTools
         {
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
             DrawHeader();
+            DrawStatistics();
             DrawClasses();
             GUILayout.EndScrollView();
         }
@@ -161,8 +144,8 @@ namespace PlayQ.UITestTools
         private void DrawClass(UnitTestClass testClass)
         {
             var isOpened = openedClasses.ContainsKey(testClass.Type) && openedClasses[testClass.Type] == true;
-            var style = GetClassState(testClass);
-            isOpened = EditorGUILayout.Foldout(isOpened, testClass.Type.FullName, true, style);
+            var content = new GUIContent(testClass.Type.FullName, GetClassIcon(testClass));
+            isOpened = EditorGUILayout.Foldout(isOpened, content, true, defaultFoldoutStyle);
             openedClasses[testClass.Type] = isOpened;
 
             if (isOpened)
@@ -178,50 +161,85 @@ namespace PlayQ.UITestTools
 
         private void DrawMethod(MethodInfo method, Type type)
         {
-            var style = testPassInfo.ContainsKey(method) ? GetMethodStyle(testPassInfo[method]) : unknownStyle;
-            EditorGUILayout.LabelField(method.Name, style);
+            var content = testInfo.ContainsKey(method)
+                ? new GUIContent(method.Name, GetMethodIcon(testInfo[method]))
+                : new GUIContent(method.Name, defaultIcon);
+            EditorGUILayout.LabelField(content);
         }
 
-        private GUIStyle GetClassState(UnitTestClass testClass)
+        private Texture2D GetClassIcon(UnitTestClass testClass)
         {
             var passedTests = 0;
+            var ignoredTests = 0;
             foreach (var testMethod in testClass.TestMethods)
             {
                 TestState state;
-                if (testPassInfo.TryGetValue(testMethod.Method, out state))
+                if (testInfo.TryGetValue(testMethod.Method, out state))
                 {
                     switch (state)
                     {
                         case TestState.Passed:
-                        case TestState.Skipped:
                             passedTests++;
                             break;
+                        case TestState.Ignored:
+                            ignoredTests++;
+                            break;
                         case TestState.Failed:
-                            return failedFoldoutStyle;
+                            return failIcon;
                     }
                 }
             }
-            return passedTests == testClass.TestMethods.Count ? passedFoldoutStyle : defaultFoldoutStyle;
+            if (passedTests == testClass.TestMethods.Count)
+            {
+                return successIcon;
+            }
+            return ignoredTests > 0 ? ignoreIcon : defaultIcon;
         }
 
-        private GUIStyle GetMethodStyle(TestState state)
+
+        private Texture2D GetMethodIcon(TestState state)
         {
             switch (state)
             {
                 case TestState.Undefined:
-                    return unknownStyle;
+                    return defaultIcon;
                 case TestState.Passed:
-                    return passedStyle;
-                case TestState.Skipped:
-                    return skippedStyle;
+                    return successIcon;
+                case TestState.Ignored:
+                    return ignoreIcon;
                 case TestState.Failed:
-                    return failedStyle;
+                    return failIcon;
                 default:
                     throw new ArgumentOutOfRangeException("state", state, null);
             }
         }
 
-        private static void DrawHeader()
+        private void DrawStatistics()
+        {
+            GUILayout.BeginVertical(EditorStyles.helpBox);
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(new GUIContent("Passed", successIcon), GUILayout.Width(300f));
+            GUILayout.Label(testInfo.Values.Count(t => t == TestState.Passed).ToString());
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(new GUIContent("Failed", failIcon), GUILayout.Width(300f));
+            GUILayout.Label(testInfo.Values.Count(t => t == TestState.Failed).ToString());
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(new GUIContent("Ignored", ignoreIcon), GUILayout.Width(300f));
+            GUILayout.Label(testInfo.Values.Count(t => t == TestState.Ignored).ToString());
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(new GUIContent("Total", defaultIcon), GUILayout.Width(300f));
+            GUILayout.Label(testClasses.SelectMany(c => c.TestMethods).Count().ToString());
+            EditorGUILayout.EndHorizontal();
+            GUILayout.EndVertical();
+        }
+
+        private void DrawHeader()
         {
             GUILayout.Space(5f);
             EditorGUILayout.BeginHorizontal();

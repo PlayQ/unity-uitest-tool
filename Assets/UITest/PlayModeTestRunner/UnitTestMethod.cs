@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
@@ -15,7 +16,7 @@ namespace PlayQ.UITestTools
         {
             Method = methodInfo;
             Sync = sync;
-            FullName = methodInfo.DeclaringType.Namespace + methodInfo.Name;
+            FullName = methodInfo.DeclaringType.FullName + "." + methodInfo.Name;
 
             var attrs = methodInfo.GetCustomAttributes(false);
             foreach (var attr in attrs)
