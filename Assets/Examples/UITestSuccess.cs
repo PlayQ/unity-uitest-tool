@@ -24,9 +24,26 @@ public class UITestSuccess : UITestBase
     [UnityTest]
     public IEnumerator Screen()
     {
-        //Wait for scene loading
         yield return null;
         MakeScreenShot("some path");
+    }
+
+    [UnityTest]
+    public IEnumerator FindObjectByPixels()
+    {
+        yield return WaitFrame();
+        var obj = FindObjectByPixels(UnityEngine.Screen.width / 2f, UnityEngine.Screen.height / 2f);
+        Assert.IsNotNull(obj);
+        Assert.AreEqual(obj.name, "Image");
+    }
+
+    [UnityTest]
+    public IEnumerator FindObjectByPercents()
+    {
+        yield return WaitFrame();
+        var obj = FindObjectByPercents(0.5f, 0.5f);
+        Assert.IsNotNull(obj);
+        Assert.AreEqual(obj.name, "Image");
     }
 
     [UnityTest]

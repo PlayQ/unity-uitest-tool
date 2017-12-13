@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
@@ -169,14 +170,28 @@ namespace PlayQ.UITestTools
         }
 
 
-        protected GameObject FindObjectByPixels(Vector2 pixels)
+        protected IEnumerator WaitFrame(int count = 1)
         {
-            throw new NotImplementedException();
+            while (count > 0)
+            {
+                yield return null;
+                count--;
+            }
         }
 
-        protected GameObject FindObjectByPercents(Vector2 percents)
+        protected GameObject FindObjectByPixels(float x, float y)
         {
-            throw new NotImplementedException();
+            var pointerData = new PointerEventData(EventSystem.current);
+            var resultsData = new List<RaycastResult>();
+            pointerData.position = new Vector2(x ,y);
+            EventSystem.current.RaycastAll(pointerData, resultsData);
+
+            return resultsData.Count > 0 ? resultsData[0].gameObject : null;
+        }
+
+        protected GameObject FindObjectByPercents(float x, float y)
+        {
+            return FindObjectByPixels(Screen.width * x, Screen.height * y);
         }
 
         private IEnumerator WaitFor(Func<bool> condition, float timeout, string testInfo)
@@ -216,22 +231,22 @@ namespace PlayQ.UITestTools
 
         #region Interactions
 
-        protected void ClickPixels(Vector2 pixels)
+        protected void ClickPixels(float x, float y)
         {
-            GameObject go = FindObjectByPixels(pixels);
+            GameObject go = FindObjectByPixels(x, y);
             if (go == null)
             {
-                Assert.Fail("Cannot click to pixels [" + pixels.x + ";" + pixels.y + "], couse there are no objects.");
+                Assert.Fail("Cannot click to pixels [" + x + ";" + y + "], couse there are no objects.");
             }
             Click(go);
         }
 
-        protected void ClickPercents(Vector2 percents)
+        protected void ClickPercents(float x, float y)
         {
-            GameObject go = FindObjectByPercents(percents);
+            GameObject go = FindObjectByPercents(x, y);
             if (go == null)
             {
-                Assert.Fail("Cannot click to percents [" + percents.x + ";" + percents.y +
+                Assert.Fail("Cannot click to percents [" + x + ";" + y +
                             "], couse there are no objects.");
             }
             Click(go);
@@ -239,7 +254,7 @@ namespace PlayQ.UITestTools
 
         protected void DragPixels(Vector2 start, Vector2 end, float time = 1)
         {
-            GameObject go = FindObjectByPixels(start);
+            GameObject go = FindObjectByPixels(start.x, start.y);
             if (go == null)
             {
                 Assert.Fail("Cannot grag object from pixels [" + start.x + ";" + start.y +
@@ -250,7 +265,7 @@ namespace PlayQ.UITestTools
 
         protected void DragPercents(Vector2 start, Vector2 end, float time = 1)
         {
-            GameObject go = FindObjectByPercents(start);
+            GameObject go = FindObjectByPercents(start.x, start.y);
             if (go == null)
             {
                 Assert.Fail("Cannot grag object from percents [" + start.x + ";" + start.y +
