@@ -62,7 +62,67 @@ public class UITestSuccess : UITestBase
         yield return WaitForDestroy(objectInstance);
     }
 
+    [UnityTest]
+    public IEnumerator WaitForObjectDisabled()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        //ensure object enabled by component
+        Check.IsEnable<EnabledAtStart>();
+     
+        //ensure object enabled by path in hierarchy
+        Check.IsEnable("Object_enabled_at_start");
+
+        //get manual reference to the object
+        var objectInstance = Object.FindObjectOfType<EnabledAtStart>();
+        
+        //ensure object enabled by object instance
+        Check.IsEnable(objectInstance.gameObject);
+        
+        //manually disable object
+        objectInstance.gameObject.SetActive(false);
+
+        //check for disabled
+        WaitObjectDisabled("Object_enabled_at_start");
+
+        //check for disabled
+        WaitObjectDisabled<EnabledAtStart>();
+
+    }
     
+    
+    [UnityTest]
+    public IEnumerator WaitForObjectEnabled()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        //ensure object disabled by component
+        Check.IsDisable<DisabledAtStart>();
+     
+        //ensure object disabled by path in hierarchy
+        Check.IsDisable("Object_disabled_at_start");
+        
+        //ensure object disabled by path in hierarchy and component type
+        Check.IsDisable<DisabledAtStart>("Object_disabled_at_start");
+
+        //get manual reference to the object
+        var objectInstance = Check.FindAnyGameObject<DisabledAtStart>();
+        
+        //ensure object disbaled by object instance
+        Check.IsDisable(objectInstance.gameObject);
+        
+        //manually enable object
+        objectInstance.gameObject.SetActive(true);
+
+        //check for enabled by component type
+        WaitObjectEnabled<DisabledAtStart>();
+
+        //check for enabled by path in hierarchy
+        WaitObjectEnabled("Object_disabled_at_start");
+
+    }
     
     //[UnityTest]
     public IEnumerator WaitForStaff()

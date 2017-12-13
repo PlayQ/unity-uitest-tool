@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using NUnit.Framework;
 using System.Linq;
+using System.Text;
 using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools
@@ -383,6 +384,108 @@ namespace PlayQ.UITestTools
 
     public static class Check
     {
+        public static string GameObjectFullPath(GameObject gObj)
+        {
+            if (gObj == null)
+            {
+                throw new NullReferenceException("given object is null!");
+            }
+            
+            GameObject upwise = gObj;
+            
+            StringBuilder sb = new StringBuilder();
+
+            while (upwise)
+            {
+                sb.Insert(0, upwise.name);
+                if (upwise.transform.parent != null)
+                {
+                    sb.Insert(0, '/');
+                    upwise = upwise.transform.parent.gameObject;
+                }
+                else
+                {
+                    break;   
+                }
+            }
+
+            return sb.ToString();
+        }
+        
+        public static GameObject FindAnyGameObject<T>(String path) where T: Component
+        {
+            if (String.IsNullOrEmpty(path))
+            {
+                return null;
+            }
+            
+            var objects = Resources.FindObjectsOfTypeAll<T>();
+
+            if (objects == null || objects.Length == 0)
+            {
+                return null;
+            }
+
+            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
+            if (objectsOnScene == null || objectsOnScene.Length == 0)
+            {
+                return null;
+            }
+
+           
+            var result = objectsOnScene.FirstOrDefault(obj =>
+            {
+                return GameObjectFullPath(obj.gameObject).EndsWith(path);
+            });
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            return result.gameObject;
+
+        }
+
+        public static GameObject FindAnyGameObject(string path)
+        {
+            var objectsOnScene = Resources.FindObjectsOfTypeAll<GameObject>();
+
+            if (objectsOnScene.Length == 0)
+            {
+                return null;
+            }
+            
+            return objectsOnScene.FirstOrDefault(gObj =>
+            {
+                if (gObj.name == "Object_disabled_at_start")
+                {
+                    var test = GameObjectFullPath(gObj);
+                    
+                    Debug.Log(test);
+                }
+                return gObj.scene != null && GameObjectFullPath(gObj).EndsWith(path);
+            });
+        }
+        
+        public static T FindAnyGameObject<T>() where T : Component
+        {
+            var objects = Resources.FindObjectsOfTypeAll<T>();
+
+            if (objects == null || objects.Length == 0)
+            {
+                return null;
+            }
+
+            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
+            if (objectsOnScene == null || objectsOnScene.Length == 0)
+            {
+                return null;
+            }
+
+            return objectsOnScene.FirstOrDefault();
+        }
+
         public static void TextEquals(string path, string expectedText)
         {
             var go = GameObject.Find(path);
@@ -431,28 +534,43 @@ namespace PlayQ.UITestTools
 
         public static void IsEnable(string path)
         {
-            var go = GameObject.Find(path);
+            var go = FindAnyGameObject(path);
+            
             if (go == null)
             {
-                Assert.Fail("Game Object " + path + " does not exist or disabled");
+                Assert.Fail("IsEnable: with path "+path+" Game Object does not exist");
+            } 
+            else if(!go.gameObject.activeInHierarchy)
+            {
+                Assert.Fail("IsEnable: with path "+path+" Game Object disabled");
             }
         }
 
-        public static void IsEnable<T>(string name) where T : Component
+        public static void IsEnable<T>(string path) where T : Component
         {
-            T go = Object.FindObjectsOfType<T>().First(x => x.name == name);
-            if (go == null || go.gameObject.activeInHierarchy)
+            var go = FindAnyGameObject<T>(path);
+
+            if (go == null)
             {
-                Assert.Fail("Game Object " + name + " does not exist or disabled");
+                Assert.Fail("IsEnable<"+typeof(T)+">: with path "+path+" Game Object does not exist");
+            } 
+            else if(!go.gameObject.activeInHierarchy)
+            {
+                Assert.Fail("IsEnable<"+typeof(T)+">: with path "+path+" Game Object disabled");
             }
         }
 
         public static void IsEnable<T>() where T : Component
         {
-            var go = Object.FindObjectOfType<T>();
-            if (go == null || !go.gameObject.activeInHierarchy)
+            var go = FindAnyGameObject<T>();
+            
+            if (go == null)
             {
-                Assert.Fail("Game Object does not exist or disabled");
+                Assert.Fail("IsEnable<"+typeof(T)+">: Game Object does not exist.");
+            }
+            else if (!go.gameObject.activeInHierarchy)
+            {
+                Assert.Fail("IsEnable<"+typeof(T)+">: Game Object is disabled");
             }
         }
 
@@ -460,144 +578,156 @@ namespace PlayQ.UITestTools
         {
             if (!go.activeInHierarchy)
             {
-                Assert.Fail("Game Object " + go.name + " does not exist or disabled");
+                Assert.Fail("IsEnable by object instance: Game Object " + GameObjectFullPath(go) + " disabled.");
             }
         }
 
-        public static void IsDisable(string name)
+        public static void IsDisable(string path)
         {
-            var go = Object.FindObjectsOfType<GameObject>().First(x => x.name == name);
+            var go = FindAnyGameObject(path);
+            
             if (go == null)
             {
-                Assert.Fail("Game Object " + name + " does not exist");
-            }
-            if (go.activeInHierarchy)
+                Assert.Fail("IsDisable: with path "+path+" Game Object does not exist");
+            } 
+            else if(go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("Game Object " + name + " is enable");
+                Assert.Fail("IsDisable: with path "+path+" Game Object enabled");
             }
         }
 
-        public static void IsDisable<T>(string name) where T : Component
+        public static void IsDisable<T>(string path) where T : Component
         {
-            var go = Object.FindObjectsOfType<T>().First(x => x.name == name);
+            var go = FindAnyGameObject<T>(path);
+            
             if (go == null)
             {
-                Assert.Fail("Game Object " + name + " does not exist");
-            }
-            if (go.gameObject.activeInHierarchy)
+                Assert.Fail("IsDisable<"+typeof(T)+">: with path "+path+" Game Object does not exist");
+            } 
+            else if(go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("Game Object " + name + " is enable");
+                Assert.Fail("IsDisable<"+typeof(T)+">: with path "+path+" Game Object enabled");
             }
         }
 
         public static void IsDisable<T>() where T : Component
         {
-            var go = Object.FindObjectOfType<T>();
+            var go = FindAnyGameObject<T>();
+            
             if (go == null)
             {
-                Assert.Fail("Game Object does not exist");
-            }
-            if (go.gameObject.activeInHierarchy)
+                Assert.Fail("IsDisable<"+typeof(T)+">: Game Object does not exist");
+            } 
+            else if(go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("Game Object " + go.name + " is enable");
+                Assert.Fail("IsDisable<"+typeof(T)+">: Game Object enabled");
             }
         }
 
         public static void IsDisable(GameObject go)
         {
-            if (go.gameObject.activeInHierarchy)
+            if (go.activeInHierarchy)
             {
-                Assert.Fail("Game Object " + go.name + " is enable");
+                Assert.Fail("IsDisable by object instance: Game Object " + GameObjectFullPath(go) + " enabled.");
             }
         }
 
-//todo change all names to paths
-        public static void IsExist(string name)
+        public static void IsExist(string path)
         {
-            var go = Object.FindObjectsOfType<GameObject>().First(x => x.name == name);
+            var go = FindAnyGameObject(path);
+            
             if (go == null)
             {
-                Assert.Fail("Object " + name + " does not exist.");
+                Assert.Fail("IsExist: Object with path " + path + " does not exist.");
             }
         }
 
-        public static void IsExist<T>(string name) where T : Component
+        public static void IsExist<T>(string path) where T : Component
         {
-            var go = Object.FindObjectsOfType<T>().First(x => x.name == name);
+            var go = FindAnyGameObject<T>(path);
+            
             if (go == null)
             {
-                Assert.Fail("Object " + name + " does not exist.");
+                Assert.Fail("IsExist<"+typeof(T)+">: Object with path " + path + " does not exist.");
             }
         }
 
         public static void IsExist<T>() where T : Component
         {
-            var go = Object.FindObjectOfType<T>();
+            var go = FindAnyGameObject<T>();
+            
             if (go == null)
             {
-                Assert.Fail("Object does not exist.");
+                Assert.Fail("IsExist<"+typeof(T)+">: Object does not exist.");
+            }
+        }
+        
+        public static void IsNotExist(string path)
+        {
+            var go = FindAnyGameObject(path);
+            
+            if (go != null)
+            {
+                Assert.Fail("IsNotExist: Object with path " + path + " exists.");
             }
         }
 
-        public static void IsNotExist(string name)
+        public static void IsNotExist<T>(string path) where T : Component
         {
-            var go = Object.FindObjectsOfType<GameObject>().First(x => x.name == name);
+            var go = FindAnyGameObject<T>(path);
+            
             if (go != null)
             {
-                Assert.Fail("Object " + name + " is exist.");
-            }
-        }
-
-        public static void IsNotExist<T>(string name) where T : Component
-        {
-            var go = Object.FindObjectsOfType<T>().First(x => x.name == name);
-            if (go != null)
-            {
-                Assert.Fail("Object " + name + " is exist.");
+                Assert.Fail("IsNotExist<"+typeof(T)+">: Object with path " + path + " exists.");
             }
         }
 
         public static void IsNotExist<T>() where T : Component
         {
-            var go = Object.FindObjectOfType<T>();
+            var go = FindAnyGameObject<T>();
+            
             if (go != null)
             {
-                Assert.Fail("Object is exist.");
+                Assert.Fail("IsNotExist<"+typeof(T)+">: Object exists.");
             }
         }
 
+      
+
         public static void IsToggle(string path)
         {
-            var go = GameObject.Find(path);
+            var go = FindAnyGameObject(path);
             if (go == null)
             {
-                Assert.Fail("Toggle " + path + " not exist.");
+                Assert.Fail("IsToggle: toggle " + path + " not exist.");
             }
+            
             Toggle toggle = go.GetComponent<Toggle>();
             if (toggle == null)
             {
-                Assert.Fail("Game object " + path + " has no Toggle component.");
+                Assert.Fail("IsToggle: Game object " + path + " has no Toggle component.");
             }
             if (!toggle.isOn)
             {
-                Assert.Fail("Toggle " + path + " is disabled.");
+                Assert.Fail("IsToggle: Toggle " + path + " is disabled.");
             }
         }
         public static void IsNotToggle(string path)
         {
-            var go = GameObject.Find(path);
+            var go = FindAnyGameObject(path);
             if (go == null)
             {
-                Assert.Fail("Toggle " + path + " not exist.");
+                Assert.Fail("IsNotToggle: toggle " + path + " not exist.");
             }
+            
             Toggle toggle = go.GetComponent<Toggle>();
             if (toggle == null)
             {
-                Assert.Fail("Game object " + path + " has no Toggle component.");
+                Assert.Fail("IsNotToggle: Game object " + path + " has no Toggle component.");
             }
             if (toggle.isOn)
             {
-                Assert.Fail("Toggle " + path + " is enabled.");
+                Assert.Fail("IsNotToggle: toggle " + path + " is enabled.");
             }
         }
     }
