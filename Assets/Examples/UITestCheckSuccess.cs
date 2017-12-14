@@ -283,6 +283,53 @@ public class UITestCheckSuccess : UITestBase
         }
     }
 
+    [UnityTest]
+    public IEnumerator CheckTextEquals()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        Check.TextEquals("container/Text 1", "Text 1");
+        Check.TextNotEquals("container/Text 2", "Text 1");
+        
+        
+        
+        try {
+            Check.TextEquals("container/Text 1", "Text 2");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("text dont't match")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.TextEquals("container/child_enabled", "Text 1");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("no Text attached")) {
+                throw ex;
+            }
+        }
+        
+        
+        try {
+            Check.TextNotEquals("container/Text 1", "Text 1");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("text matches but must not")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            Check.TextNotEquals("container/child_enabled", "Text 1");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("no Text attached")) {
+                throw ex;
+            }
+        }
+    }
+
+    
+
 }
 
  

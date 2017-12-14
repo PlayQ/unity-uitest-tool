@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using UnityEditor;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -17,7 +18,7 @@ namespace PlayQ.UITestTools
         static void Init()
         {
             // Get existing open window or if none, make a new one:
-            UITestToolsHelper window = (UITestToolsHelper) EditorWindow.GetWindow(typeof(UITestToolsHelper));
+            UITestToolsHelper window = (UITestToolsHelper) EditorWindow.GetWindow(typeof(UITestToolsHelper), false, "UI tool");
             window.Show();
         }
 
@@ -42,27 +43,83 @@ namespace PlayQ.UITestTools
             GameObject go = Selection.gameObjects[0];
 
             EditorGUILayout.LabelField("Selected object: ", go.name, EditorStyles.boldLabel);
-
+            
             EditorGUILayout.Space();
-
+            
             string path = "\"" + GetPath(go.transform) + "\"";
             bool isClicable = IsClickable(go);
             bool isText = IsText(go);
             bool isToggle = IsToggle(go);
+            bool isRectTransform = go.transform is RectTransform; 
 
             DrawLabel("Path:", path);
 
             //Interaction
             EditorGUILayout.Space();
+
+
+            if (isRectTransform)
+            {
+                var rectTransform = go.transform as RectTransform;
+                Vector3[] worldCoreners = new Vector3[4];
+                rectTransform.GetWorldCorners(worldCoreners);
+                
+                var anyCamera = UITestTools.FindAnyGameObject<Camera>();
+                if (anyCamera == null)
+                {
+                    EditorGUILayout.LabelField("No camera in scene - can't find screen coordinates",
+                        EditorStyles.boldLabel);
+                }
+                else
+                {
+                    Canvas canvas = null;
+                    var root = rectTransform;
+                    
+                    while (root)
+                    {
+                        canvas = root.GetComponent<Canvas>();
+                        root = root.parent as RectTransform;
+                    }
+
+                    if (canvas != null)
+                    {
+                        if (Camera.main != null)
+                        {
+                            anyCamera = Camera.main;
+                        }
+                        if (canvas.worldCamera != null)
+                        {
+                            anyCamera = canvas.worldCamera;
+                        }
+
+                        if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                        {
+                            anyCamera = null;
+                        }
+                    
+                        var screenCorners = worldCoreners.Select(worldPoint =>
+                        {
+                            return RectTransformUtility.WorldToScreenPoint(anyCamera, worldPoint);
+                        
+                        }).ToArray();
+
+                        DrawLabel("Coordinates", "bottom-left point: x=" + screenCorners[0].x +
+                                                 " y=" + screenCorners[0].y + " with=" +
+                                                 (screenCorners[3].x - screenCorners[0].x) +
+                                                 " height=" + (screenCorners[1].y - screenCorners[0].y));       
+                    }
+                }
+            }
+            
             if (isClicable)
             {
-                DrawLabel("Click", "Click(" + path + ");");
+                DrawLabel("Click:", "Click(" + path + ");");
             }
             if (isText)
             {
-                DrawLabel("SetText", "SetText(" + path + ", \"Text\");");
+                DrawLabel("SetText:", "SetText(" + path + ", \"Text\");");
             }
-            DrawLabel("FindObject", "FindObject(" + path + ");");
+            DrawLabel("FindObject:", "FindObject(" + path + ");");
             //Wait
             EditorGUILayout.Space();
 

@@ -316,10 +316,7 @@ namespace PlayQ.UITestTools
         protected void SetText(string path, string text)
         {
             GameObject go = UITestTools.FindAnyGameObject(path);
-            if (go == null)
-            {
-                Assert.Fail("Cannot set text to object " + path + ", couse there are not exist.");
-            }
+            
             SetText(go, text);
         }
 
@@ -335,11 +332,8 @@ namespace PlayQ.UITestTools
 
         protected void AppendText(string path, string text)
         {
-            GameObject go = UITestTools.FindAnyGameObject(path);
-            if (go == null)
-            {
-                Assert.Fail("Cannot set text to object " + path + ", couse there are not exist.");
-            }
+            GameObject go = Check.IsExist(path);
+            
             AppendText(go, text);
         }
 
@@ -515,11 +509,11 @@ namespace PlayQ.UITestTools
             var t = go.GetComponent<Text>();
             if (t == null)
             {
-                Assert.Fail("Label object " + go.name + " has no Text attached");
+                Assert.Fail("TextEquals: Label object " + go.name + " has no Text attached");
             }
             if (t.text != expectedText)
             {
-                Assert.Fail("Label " + go.name + "\n text expected: " + expectedText + ",\n actual: " + t.text);
+                Assert.Fail("TextEquals: Label " + go.name + " actual text: " + t.text + ", expected "+expectedText+", text dont't match");
             }
         }
 
@@ -528,21 +522,18 @@ namespace PlayQ.UITestTools
             var t = go.GetComponent<Text>();
             if (t == null)
             {
-                Assert.Fail("Label object " + go.name + " has no Text attached");
+                Assert.Fail("TextNotEquals: Label object " + go.name + " has no Text attached");
             }
             if (t.text == expectedText)
             {
-                Assert.Fail("Label " + go.name + "\n text expected not: " + expectedText + ",\n but it is.");
+                Assert.Fail("TextNotEquals: Label " + go.name + " actual text: " + expectedText + " text matches but must not");
             }
         }
 
         public static void TextNotEquals(string path, string expectedText)
         {
-            var go = GameObject.Find(path);
-            if (go == null)
-            {
-                Assert.Fail("Label object " + path + " does not exist or disabled");
-            }
+            var go = IsExist(path);
+            
             TextNotEquals(go, expectedText);
         }
 

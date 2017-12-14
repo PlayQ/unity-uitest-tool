@@ -55,6 +55,17 @@ public class UITestSuccess : UITestBase
         Assert.IsNotNull(obj);
         Assert.AreEqual(obj.name, "Image");
     }
+    
+    [UnityTest]
+    public IEnumerator ClickOnObject()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+
+        yield return WaitFrame();
+
+        ClickPixels(500, 600);
+    }
 
     [UnityTest]
     public IEnumerator WaitForObjectOnScene()
@@ -138,7 +149,49 @@ public class UITestSuccess : UITestBase
 
     }
 
+    [UnityTest]
+    public IEnumerator WaitForButtonAccesible()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+
+        var button = UITestTools.FindAnyGameObject("container/Button");
+        yield return ButtonAccessible(button);
+    }
+
+    [UnityTest]
+    public IEnumerator CheckAppendText()
+    {
+        //Wait for scene loading
+        yield return LoadScene("1");
+        
+        AppendText("container/InputField", "appednend text");
+        
+        SetText("container/InputField", "appednend text");
+        
+        
+        try {
+            SetText("container/Text 1", "appednend text");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("have not InputField component.")) {
+                throw ex;
+            }
+        }
+        
+        try {
+            AppendText("container/Text 1", "appednend text");
+        } catch (AssertionException ex) {
+            if(!ex.Message.EndsWith("have not InputField component.")) {
+                throw ex;
+            }
+        }
+    }
+
+   
+
     
+
+
 
 }
 
