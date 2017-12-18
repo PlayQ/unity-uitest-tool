@@ -8,9 +8,6 @@ using Object = UnityEngine.Object;
 
 public class UITestCheckSuccess : UITestBase
 {
-  
-
-
     [UnityTest]
     public IEnumerator CheckObjectDisabled()
     {

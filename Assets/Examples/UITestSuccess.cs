@@ -54,7 +54,7 @@ public class UITestSuccess : UITestBase
         Assert.IsNotNull(obj);
         Assert.AreEqual(obj.name, "Image");
     }
-    
+
     [UnityTest]
     public IEnumerator ClickOnObject()
     {
@@ -90,8 +90,6 @@ public class UITestSuccess : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
-
-
 
         //manually search for object in scene
         var objectInstance = UITestTools.FindAnyGameObject<ObjectThatWillBeDestroyed>().gameObject;
@@ -163,25 +161,33 @@ public class UITestSuccess : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
-        
+
         AppendText("container/InputField", "appednend text");
-        
+
         SetText("container/InputField", "appednend text");
-        
-        
-        try {
+
+
+        try
+        {
             SetText("container/Text 1", "appednend text");
-        } catch (AssertionException ex) {
-            if(!ex.Message.EndsWith("have not InputField component.")) {
-                throw ex;
+        }
+        catch (AssertionException ex)
+        {
+            if (!ex.Message.EndsWith("have not InputField component."))
+            {
+                throw;
             }
         }
-        
-        try {
+
+        try
+        {
             AppendText("container/Text 1", "appednend text");
-        } catch (AssertionException ex) {
-            if(!ex.Message.EndsWith("have not InputField component.")) {
-                throw ex;
+        }
+        catch (AssertionException ex)
+        {
+            if (!ex.Message.EndsWith("have not InputField component."))
+            {
+                throw;
             }
         }
     }
@@ -195,7 +201,8 @@ public class UITestSuccess : UITestBase
         //get manual reference to the object
         yield return WaitFrame(1);
 
-        yield return DragPercents("container/Scroll View/Scrollbar Vertical", new Vector2(0.9f, 0f), 10f);
+        yield return DragPercents("container/Scroll View/Scrollbar Vertical/Sliding Area/Handle", new Vector2(0.9f, 0f),
+            10f);
     }
 }
 

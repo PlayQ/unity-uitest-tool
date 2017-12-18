@@ -6,10 +6,12 @@ namespace PlayQ.UITestTools
 {
     public class UnitTestMethod
     {
+        private const float DEFAULT_TIME_OUT = 30000f;
+        
         public readonly string FullName;
         public readonly bool Sync;
         public readonly MethodInfo Method;
-        public readonly float TimeOut = PlayModeTestRunner.DEFAULT_TIME_OUT;
+        public readonly float TimeOut = DEFAULT_TIME_OUT;
         public readonly bool IsIgnored;
 
         public UnitTestMethod(MethodInfo methodInfo, bool sync)
@@ -32,7 +34,6 @@ namespace PlayQ.UITestTools
                     IsIgnored = true;
                 }
             }
-
         }
     }
 }

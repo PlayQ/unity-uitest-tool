@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
-    public class PlayModeLogger
+    public class NUnitLogger
     {
         public const string TC_DATE_FORMAT = "yyyy-MM-ddThh:mm:ss.fff";
         public const string FILE_DATE_FORMAT = "yyyy-MM-ddThh.mm.ss.fff";

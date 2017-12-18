@@ -13,168 +13,6 @@ using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools
 {
-    public static class UITestTools
-    {
-        public static string GameObjectFullPath(GameObject gObj)
-        {
-            if (gObj == null)
-            {
-                throw new NullReferenceException("given object is null!");
-            }
-
-            GameObject upwise = gObj;
-
-            StringBuilder sb = new StringBuilder();
-
-            while (upwise)
-            {
-                sb.Insert(0, upwise.gameObject.name);
-                if (upwise.transform.parent != null)
-                {
-                    sb.Insert(0, '/');
-                    upwise = upwise.transform.parent.gameObject;
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-            return sb.ToString();
-        }
-
-        public static GameObject FindAnyGameObject<T>(String path) where T : Component
-        {
-            if (String.IsNullOrEmpty(path))
-            {
-                return null;
-            }
-
-            var objects = Resources.FindObjectsOfTypeAll<T>();
-
-            if (objects == null || objects.Length == 0)
-            {
-                return null;
-            }
-
-            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
-            if (objectsOnScene == null || objectsOnScene.Length == 0)
-            {
-                return null;
-            }
-
-
-            var result = objectsOnScene.FirstOrDefault(obj =>
-            {
-                var fullPath = GameObjectFullPath(obj.gameObject);
-                var resultComparsion = fullPath.EndsWith(path, StringComparison.Ordinal);
-                return resultComparsion;
-            });
-
-            if (result == null)
-            {
-                return null;
-            }
-
-            return result.gameObject;
-        }
-
-        public static GameObject FindAnyGameObject(string path)
-        {
-            var objectsOnScene = Resources.FindObjectsOfTypeAll<GameObject>();
-
-            if (objectsOnScene.Length == 0)
-            {
-                return null;
-            }
-
-            for (int i = 0; i < objectsOnScene.Length; i++)
-            {
-                if (objectsOnScene[i].scene != null && GameObjectFullPath(objectsOnScene[i]).EndsWith(path))
-                {
-                    return objectsOnScene[i];
-                }
-            }
-            return null;
-        }
-
-        public static T FindAnyGameObject<T>() where T : Component
-        {
-            var objects = Resources.FindObjectsOfTypeAll<T>();
-
-            if (objects == null || objects.Length == 0)
-            {
-                return null;
-            }
-
-            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
-            if (objectsOnScene == null || objectsOnScene.Length == 0)
-            {
-                return null;
-            }
-
-            return objectsOnScene[0];
-        }
-
-        public static Vector2 CenterPointOfObject(RectTransform transform)
-        {
-            Vector2[] points = ScreenVerticesOfObject(transform);
-            Vector2 middlePoint = new Vector2();
-            foreach (var point in points)
-            {
-                middlePoint.x += point.x;
-                middlePoint.y += point.y;
-            }
-
-            middlePoint.x /= points.Length;
-            middlePoint.y /= points.Length;
-
-            return middlePoint;
-
-        }
-
-        public static Vector2[] ScreenVerticesOfObject(RectTransform transform)
-        {
-            Vector3[] worldCoreners = new Vector3[4];
-            transform.GetWorldCorners(worldCoreners);
-
-            var anyCamera = FindAnyGameObject<Camera>();
-            if (anyCamera != null)
-            {
-                Canvas canvas = null;
-                var root = transform;
-
-                while (root)
-                {
-                    canvas = root.GetComponent<Canvas>();
-                    root = root.parent as RectTransform;
-                }
-
-                if (canvas != null)
-                {
-                    switch (canvas.renderMode)
-                    {
-                        case RenderMode.ScreenSpaceCamera:
-                            anyCamera = canvas.worldCamera ?? Camera.main;
-                            break;
-                        case RenderMode.WorldSpace:
-                            anyCamera = Camera.main;
-                            break;
-                    }
-
-                    var screenCorners = worldCoreners.Select(worldPoint =>
-                    {
-                        return RectTransformUtility.WorldToScreenPoint(anyCamera, worldPoint);
-
-                    }).ToArray();
-
-                    return screenCorners;
-                }
-            }
-            return null;
-        }
-    }
-
     public abstract class UITestBase
     {
         protected EventSystem FindCurrentEventSystem()
@@ -217,13 +55,13 @@ namespace PlayQ.UITestTools
             if (!Application.isMobilePlatform)
             {
                 name = new StringBuilder().Append(Application.persistentDataPath).Append(Path.DirectorySeparatorChar)
-                    .Append(name).Append('-').Append(DateTime.UtcNow.ToString(PlayModeLogger.FILE_DATE_FORMAT))
+                    .Append(name).Append('-').Append(DateTime.UtcNow.ToString(NUnitLogger.FILE_DATE_FORMAT))
                     .Append(".png").ToString();
             }
             else
             {
                 name = new StringBuilder().Append(name).Append('-')
-                    .Append(DateTime.UtcNow.ToString(PlayModeLogger.FILE_DATE_FORMAT))
+                    .Append(DateTime.UtcNow.ToString(NUnitLogger.FILE_DATE_FORMAT))
                     .Append(".png").ToString();
             }
             Application.CaptureScreenshot(name);
@@ -314,7 +152,7 @@ namespace PlayQ.UITestTools
                 Assert.Fail("Cannot grag object from pixels [" + from.x + ";" + from.y +
                             "], couse there are no objects.");
             }
-            yield return DragPixels(go, from, to, time);
+            yield return DragPixels(go, to, from, time);
         }
 
         protected IEnumerator DragPercents(Vector2 from, Vector2 to, float time = 1)
@@ -331,7 +169,7 @@ namespace PlayQ.UITestTools
             {
                 Assert.Fail("Can't find rect transform on object \"{0}\"", go.name);
             }
-            yield return DragPixels(go, UITestTools.CenterPointOfObject(rectTransform), to, time);
+            yield return DragPixels(go, to, null, time);
         }
 
         protected IEnumerator DragPercents(GameObject go, Vector2 to, bool useRaycasts = false, float time = 1)
@@ -339,32 +177,53 @@ namespace PlayQ.UITestTools
             yield return DragPixels(go, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
         }
 
-        protected IEnumerator DragPixels(GameObject go, Vector2 from, Vector2 to, float time = 1)
+        protected IEnumerator DragPixels(GameObject go, Vector2 to, Vector2? from = null, float time = 1)
         {
             if (!go.activeInHierarchy)
             {
                 Assert.Fail("Trying to click to " + go.name + " but it disabled");
             }
-            
-            var initialize = new PointerEventData(EventSystem.current);
-            ExecuteEvents.Execute(go, initialize, ExecuteEvents.initializePotentialDrag);
 
+            var finded = false;
+            var selectable = go.GetComponent<Selectable>();
+            if (selectable == null)
+            {
+                var parentSelectables = go.GetComponentsInParent<Selectable>();
+                foreach (var parentSelectable in parentSelectables)
+                {
+                    if (parentSelectable.targetGraphic.gameObject == go)
+                    {
+                        selectable = parentSelectable;
+                        finded = true;
+                        break;
+                    }
+                }
+                if (!finded)
+                {
+                    Assert.Fail("Can't find selectable object for \"{0}\"", go.name);
+                }
+            }
+
+            var fromPos = from ?? UITestTools.CenterPointOfObject(selectable.targetGraphic.rectTransform);
+            var initialize = new PointerEventData(EventSystem.current);
+            ExecuteEvents.Execute(selectable.gameObject, initialize, ExecuteEvents.initializePotentialDrag);
+            
             var currentTime = 0f;
             while (currentTime <= time)
             {
                 yield return null;
-                var targetPos = Vector2.Lerp(from, to, currentTime / time);
+                var targetPos = Vector2.Lerp(fromPos, to, currentTime / time);
                 var drag = new PointerEventData(EventSystem.current);
                 drag.button = PointerEventData.InputButton.Left;
                 drag.position = targetPos;
-                ExecuteEvents.Execute(go, drag, ExecuteEvents.dragHandler);
+                ExecuteEvents.Execute(selectable.gameObject, drag, ExecuteEvents.dragHandler);
                 currentTime += Time.deltaTime;
             }
 
             var finalDrag = new PointerEventData(EventSystem.current);
             finalDrag.button = PointerEventData.InputButton.Left;
             finalDrag.position = to;
-            ExecuteEvents.Execute(go, finalDrag, ExecuteEvents.dragHandler);
+            ExecuteEvents.Execute(selectable.gameObject, finalDrag, ExecuteEvents.dragHandler);
         }
 
         protected IEnumerator DragPixels(string path, Vector2 to, float time = 1)
@@ -650,7 +509,7 @@ namespace PlayQ.UITestTools
         {
             if (!go.activeInHierarchy)
             {
-                Assert.Fail("IsEnable by object instance: with path " + UITestTools.GameObjectFullPath(go) + " Game Object disabled");
+                Assert.Fail("IsEnable by object instance: with path " + UITestTools.GetGameObjectFullPath(go) + " Game Object disabled");
             }
         }
 
@@ -689,7 +548,7 @@ namespace PlayQ.UITestTools
         {
             if (go.activeInHierarchy)
             {
-                Assert.Fail("IsDisable by object instance: Game Object " + UITestTools.GameObjectFullPath(go) + " enabled");
+                Assert.Fail("IsDisable by object instance: Game Object " + UITestTools.GetGameObjectFullPath(go) + " enabled");
             }
         }
 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
  using NUnit.Framework;
+ using UnityEditorInternal;
  using UnityEngine;
  using UnityEngine.TestTools;
  using Debug = UnityEngine.Debug;
@@ -22,27 +23,31 @@ namespace PlayQ.UITestTools
         public static Action OnStartProcessingTests;
 
         public const string TEST_NAME_SCENE = "RuntimeTestScene.unity";
-        public const float DEFAULT_TIME_OUT = 30000f;
         private const string LOG_FILE_NAME = "runtimeTests.txt";
 
         private static List<UnitTestClass> classesForTest;
 
-        private bool currentTestFailed;
-        private bool currentTestSuccess;
-        private Coroutine cachedCoroutine;
-        private PlayModeLogger logger;
-        private LogSaver logSaver;
-        private PlayModeTestRunnerGUI guiDrawer;
+        private enum TestState
+        {
+            NotInited,
+            InProgress,
+            Failed,
+            Success
+        }
         
-        // Mono behaviour 
+        private TestState currentTestState;
+        private Coroutine currentTestCoroutine;
+        private NUnitLogger nUnitLogger;
+        private LogSaver logSaver;
+        private PlayModeTestRunnerGUI screenGUIDrawer;
+        
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
-            logger = new PlayModeLogger();
-            guiDrawer = new PlayModeTestRunnerGUI();
+            nUnitLogger = new NUnitLogger();
+            screenGUIDrawer = new PlayModeTestRunnerGUI();
             logSaver = new LogSaver(Path.Combine(Application.persistentDataPath, LOG_FILE_NAME));
             classesForTest = GetTestClasses();
-
             StartProcessingTests();
         }
 
@@ -58,10 +63,9 @@ namespace PlayQ.UITestTools
                     yield break;
                 }
                 method.Method.Invoke(method.Method.IsStatic ? null : instance, null);
-                currentTestSuccess = true;
+                currentTestState = TestState.Success;
                 yield break;
             }
-
 
             if (returnedType != typeof(IEnumerable) && returnedType != typeof(IEnumerator))
             {
@@ -79,7 +83,7 @@ namespace PlayQ.UITestTools
                 {
                     yield return yieldInstruction;
                 }
-                currentTestSuccess = true;
+                currentTestState = TestState.Success;
                 yield break;
             }
 
@@ -90,16 +94,15 @@ namespace PlayQ.UITestTools
                 {
                     yield return enumerator.Current;
                 }
-                currentTestSuccess = true;
+                currentTestState = TestState.Success;
                 yield break;
             }
         }
 
         private IEnumerator InvokeTestMethod(object instance, UnitTestMethod method)
         {
-            currentTestFailed = false;
-            currentTestSuccess = false;
-            cachedCoroutine = StartCoroutine(InvokeMethod(instance, method));
+            currentTestState = TestState.InProgress;
+            currentTestCoroutine = StartCoroutine(InvokeMethod(instance, method));
 
             var currentTimer = 0f;
             var timeOut = method.TimeOut / 1000;
@@ -114,7 +117,7 @@ namespace PlayQ.UITestTools
                     yield break;
                 }
                 // wait for done
-            } while (!currentTestFailed && !currentTestSuccess);
+            } while (currentTestState == TestState.InProgress);
         }
 
         private void StartProcessingTests()
@@ -129,11 +132,11 @@ namespace PlayQ.UITestTools
             logSaver.Write(condition, stackTrace);
             if (logType == LogType.Exception || logType == LogType.Error)
             {
-                if (cachedCoroutine != null)
+                if (currentTestCoroutine != null)
                 {
-                    StopCoroutine(cachedCoroutine);
+                    StopCoroutine(currentTestCoroutine);
                 }
-                currentTestFailed = true;
+                currentTestState = TestState.Failed;
             }
         }
 
@@ -148,9 +151,10 @@ namespace PlayQ.UITestTools
             {
                 foreach (var method in testClass.TestMethods)
                 {
+                    currentTestState = TestState.NotInited;
                     if (method.IsIgnored)
                     {
-                        logger.IgnoreLog(method.FullName);
+                        nUnitLogger.IgnoreLog(method.FullName);
                         if (OnTestIgnored != null)
                         {
                             OnTestIgnored(method.Method);
@@ -159,8 +163,8 @@ namespace PlayQ.UITestTools
                     }
 
                     object testInstance = null;
-                    guiDrawer.SetCurrentTest(method.FullName);
-                    logger.StartLog(method.FullName);
+                    screenGUIDrawer.SetCurrentTest(method.FullName);
+                    nUnitLogger.StartLog(method.FullName);
 
                     try
                     {
@@ -198,9 +202,9 @@ namespace PlayQ.UITestTools
                         continue;
                     }
 
-                    if (!currentTestFailed)
+                    if (currentTestState == TestState.Success)
                     {
-                        logger.SuccessLog(method.FullName);
+                        nUnitLogger.SuccessLog(method.FullName);
                         if (OnTestPassed != null)
                         {
                             OnTestPassed(method.Method);
@@ -217,8 +221,8 @@ namespace PlayQ.UITestTools
 
         private void ProcessTestFail(UnitTestMethod method)
         {
-            logger.FailLog(method.FullName);
-            guiDrawer.AddFailedTest(method.FullName);
+            nUnitLogger.FailLog(method.FullName);
+            screenGUIDrawer.AddFailedTest(method.FullName);
             if (OnTestFailed != null)
             {
                 OnTestFailed(method.Method);
@@ -234,13 +238,6 @@ namespace PlayQ.UITestTools
 #else
             Application.Quit();
             #endif
-        }
-
-        private void Quit()
-        {
-#if !UNITY_EDITOR
-           Application.Quit();
-#endif
         }
 
         private void RunMethods(List<MethodInfo> methods, object testInstance)
@@ -264,12 +261,10 @@ namespace PlayQ.UITestTools
             var assetsIndex = testScenePath.IndexOf("Assets", StringComparison.Ordinal);
             return testScenePath.Remove(0, assetsIndex);
         }
-        
-        // GUI
 
         private void OnGUI()
         {
-            guiDrawer.Draw();
+            screenGUIDrawer.Draw();
         }
 
         public static List<UnitTestClass> GetTestClasses()
