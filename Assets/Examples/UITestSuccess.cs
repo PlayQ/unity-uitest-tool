@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using UnityEngine.TestTools;
 using PlayQ.UITestTools;
+using UnityEngine;
 using Object = UnityEngine.Object;
 
 public class UITestSuccess : UITestBase
