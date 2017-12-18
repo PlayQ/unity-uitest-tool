@@ -64,9 +64,12 @@ public class UITestFail : UITestBase
         //Wait for scene loading
         yield return LoadScene("1");
 
+        var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+        Object.DestroyImmediate(testObject);
+        
         //search for object with name "child_enabled" in parent object "container"
         //if object is not found - waits for object appearing for duration
-        yield return WaitForObject("non_exist");
+        yield return WaitForObject("container");
     }
     
     [UnityTest]
@@ -74,7 +77,10 @@ public class UITestFail : UITestBase
     {
         yield return LoadScene("1");
         
-        yield return WaitForObject<NonExist>();
+        var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+        Object.DestroyImmediate(testObject);
+        
+        yield return WaitForObject<TestObject>();
     }
     
     [UnityTest]
@@ -82,7 +88,10 @@ public class UITestFail : UITestBase
     {
         yield return LoadScene("1");
         
-        yield return WaitForObject<NonExist>("non_exist");
+        var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+        Object.DestroyImmediate(testObject);
+        
+        yield return WaitForObject<TestObject>("container");
     }
     
     [UnityTest]
@@ -92,7 +101,7 @@ public class UITestFail : UITestBase
         yield return LoadScene("1");
         
         //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-        yield return WaitForDestroy<ObjectThatWillBeDestroyed>(1);
+        yield return WaitForDestroy<TestObject>(1);
     }
     
     [UnityTest]
@@ -101,7 +110,7 @@ public class UITestFail : UITestBase
         //Wait for scene loading
         yield return LoadScene("1");
         
-        var objectInstance = UITestTools.FindAnyGameObject<ObjectThatWillBeDestroyed>().gameObject;
+        var objectInstance = UITestTools.FindAnyGameObject<TestObject>().gameObject;
         
         //wait during interval for object destraction by object instance
         yield return WaitForDestroy(objectInstance);
@@ -112,9 +121,9 @@ public class UITestFail : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
-     
+        
         //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
-        yield return WaitForDestroy("Object_that_will_be_destroyed");
+        yield return WaitForDestroy("container");
     }
 
     [UnityTest]
@@ -136,7 +145,7 @@ public class UITestFail : UITestBase
         yield return LoadScene("1");
         
         //check for disabled
-        yield return WaitObjectDisabled<EnabledAtStart>();
+        yield return WaitObjectDisabled<TestObject>();
 
     }
     
@@ -146,8 +155,11 @@ public class UITestFail : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
+        
+        var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+        testObject.SetActive(false);
         //check for enabled by component type
-        yield return WaitObjectEnabled<DisabledAtStart>();
+        yield return WaitObjectEnabled<TestObject>();
 
     }
     
@@ -156,9 +168,12 @@ public class UITestFail : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
+        
+        var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+        testObject.SetActive(false);
 
         //check for enabled by path in hierarchy
-        yield return WaitObjectEnabled("Object_disabled_at_start");
+        yield return WaitObjectEnabled("container");
 
     }
 
@@ -168,7 +183,7 @@ public class UITestFail : UITestBase
         //Wait for scene loading
         yield return LoadScene("1");
 
-        var button = UITestTools.FindAnyGameObject("non_exist");
+        var button = UITestTools.FindAnyGameObject("container");
         yield return ButtonAccessible(button);
     }
 

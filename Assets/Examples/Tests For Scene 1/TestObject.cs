@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NonExist : MonoBehaviour {
-
+public class TestObject : MonoBehaviour 
+{
 
 }

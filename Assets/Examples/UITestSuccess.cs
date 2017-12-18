@@ -74,15 +74,15 @@ public class UITestSuccess : UITestBase
 
         //search for object with name "child_enabled" in parent object "container"
         //if object is not found - waits for object appearing for duration
-        yield return WaitForObject("container/child_enabled");
+        yield return WaitForObject("container");
 
         //search for object with component "Child" on it"
         //if object is not found - waits for object appearing for duration
-        yield return WaitForObject<Child>();
+        yield return WaitForObject<TestObject>();
 
         //search for object with component "Child" on it and hierarchy "container/child_enabled" 
         //if object is not found - waits for object appearing for duration
-        yield return WaitForObject<Child>("container/child_with_component");
+        yield return WaitForObject<TestObject>("container");
     }
 
     [UnityTest]
@@ -92,14 +92,14 @@ public class UITestSuccess : UITestBase
         yield return LoadScene("1");
 
         //manually search for object in scene
-        var objectInstance = UITestTools.FindAnyGameObject<ObjectThatWillBeDestroyed>().gameObject;
+        var objectInstance = UITestTools.FindAnyGameObject<TestObject>().gameObject;
         Object.Destroy(objectInstance);
 
         //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-        yield return WaitForDestroy<ObjectThatWillBeDestroyed>(10);
+        yield return WaitForDestroy<TestObject>();
 
         //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
-        yield return WaitForDestroy("Object_that_will_be_destroyed");
+        yield return WaitForDestroy("container");
 
         //wait during interval for object destraction by object instance
         yield return WaitForDestroy(objectInstance);
@@ -112,16 +112,16 @@ public class UITestSuccess : UITestBase
         yield return LoadScene("1");
 
         //get manual reference to the object
-        var objectInstance = UITestTools.FindAnyGameObject<EnabledAtStart>();
+        var objectInstance = UITestTools.FindAnyGameObject<TestObject>();
 
         //manually disable object
         objectInstance.gameObject.SetActive(false);
 
         //check for disabled
-        yield return WaitObjectDisabled("Object_enabled_at_start");
+        yield return WaitObjectDisabled("container");
 
         //check for disabled
-        yield return WaitObjectDisabled<EnabledAtStart>();
+        yield return WaitObjectDisabled<TestObject>();
 
     }
 
@@ -133,16 +133,16 @@ public class UITestSuccess : UITestBase
         yield return LoadScene("1");
 
         //get manual reference to the object
-        var objectInstance = UITestTools.FindAnyGameObject<DisabledAtStart>();
+        var objectInstance = UITestTools.FindAnyGameObject<TestObject>();
 
         //manually enable object
         objectInstance.gameObject.SetActive(true);
 
         //check for enabled by component type
-        yield return WaitObjectEnabled<DisabledAtStart>();
+        yield return WaitObjectEnabled<TestObject>();
 
         //check for enabled by path in hierarchy
-        yield return WaitObjectEnabled("Object_disabled_at_start");
+        yield return WaitObjectEnabled("container");
 
     }
 
@@ -169,7 +169,7 @@ public class UITestSuccess : UITestBase
 
         try
         {
-            SetText("container/Text 1", "appednend text");
+            SetText("container/Text", "appednend text");
         }
         catch (AssertionException ex)
         {
@@ -181,7 +181,7 @@ public class UITestSuccess : UITestBase
 
         try
         {
-            AppendText("container/Text 1", "appednend text");
+            AppendText("container/Text", "appednend text");
         }
         catch (AssertionException ex)
         {
