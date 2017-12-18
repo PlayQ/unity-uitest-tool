@@ -21,9 +21,9 @@ namespace PlayQ.UITestTools
             {
                 throw new NullReferenceException("given object is null!");
             }
-            
+
             GameObject upwise = gObj;
-            
+
             StringBuilder sb = new StringBuilder();
 
             while (upwise)
@@ -36,20 +36,20 @@ namespace PlayQ.UITestTools
                 }
                 else
                 {
-                    break;   
+                    break;
                 }
             }
 
             return sb.ToString();
         }
-        
-        public static GameObject FindAnyGameObject<T>(String path) where T: Component
+
+        public static GameObject FindAnyGameObject<T>(String path) where T : Component
         {
             if (String.IsNullOrEmpty(path))
             {
                 return null;
             }
-            
+
             var objects = Resources.FindObjectsOfTypeAll<T>();
 
             if (objects == null || objects.Length == 0)
@@ -63,11 +63,11 @@ namespace PlayQ.UITestTools
                 return null;
             }
 
-           
+
             var result = objectsOnScene.FirstOrDefault(obj =>
             {
-                var fullPath = GameObjectFullPath(obj.gameObject); 
-                var resultComparsion =  fullPath.EndsWith(path, StringComparison.Ordinal);
+                var fullPath = GameObjectFullPath(obj.gameObject);
+                var resultComparsion = fullPath.EndsWith(path, StringComparison.Ordinal);
                 return resultComparsion;
             });
 
@@ -77,7 +77,6 @@ namespace PlayQ.UITestTools
             }
 
             return result.gameObject;
-
         }
 
         public static GameObject FindAnyGameObject(string path)
@@ -88,19 +87,17 @@ namespace PlayQ.UITestTools
             {
                 return null;
             }
-            
-            return objectsOnScene.FirstOrDefault(gObj =>
+
+            for (int i = 0; i < objectsOnScene.Length; i++)
             {
-                if (gObj.name == "Object_disabled_at_start")
+                if (objectsOnScene[i].scene != null && GameObjectFullPath(objectsOnScene[i]).EndsWith(path))
                 {
-                    var test = GameObjectFullPath(gObj);
-                    
-                    Debug.Log(test);
+                    return objectsOnScene[i];
                 }
-                return gObj.scene != null && GameObjectFullPath(gObj).EndsWith(path);
-            });
+            }
+            return null;
         }
-        
+
         public static T FindAnyGameObject<T>() where T : Component
         {
             var objects = Resources.FindObjectsOfTypeAll<T>();
@@ -116,7 +113,7 @@ namespace PlayQ.UITestTools
                 return null;
             }
 
-            return objectsOnScene.FirstOrDefault();
+            return objectsOnScene[0];
         }
 
         public static Vector2 CenterPointOfObject(RectTransform transform)
@@ -135,18 +132,18 @@ namespace PlayQ.UITestTools
             return middlePoint;
 
         }
-        
+
         public static Vector2[] ScreenVerticesOfObject(RectTransform transform)
         {
             Vector3[] worldCoreners = new Vector3[4];
             transform.GetWorldCorners(worldCoreners);
-            
+
             var anyCamera = FindAnyGameObject<Camera>();
             if (anyCamera != null)
             {
                 Canvas canvas = null;
                 var root = transform;
-                
+
                 while (root)
                 {
                     canvas = root.GetComponent<Canvas>();
@@ -155,34 +152,29 @@ namespace PlayQ.UITestTools
 
                 if (canvas != null)
                 {
-                    if (Camera.main != null)
+                    switch (canvas.renderMode)
                     {
-                        anyCamera = Camera.main;
-                    }
-                    if (canvas.worldCamera != null)
-                    {
-                        anyCamera = canvas.worldCamera;
+                        case RenderMode.ScreenSpaceCamera:
+                            anyCamera = canvas.worldCamera ?? Camera.main;
+                            break;
+                        case RenderMode.WorldSpace:
+                            anyCamera = Camera.main;
+                            break;
                     }
 
-                    if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
-                    {
-                        anyCamera = null;
-                    }
-                
                     var screenCorners = worldCoreners.Select(worldPoint =>
                     {
                         return RectTransformUtility.WorldToScreenPoint(anyCamera, worldPoint);
-                    
+
                     }).ToArray();
 
                     return screenCorners;
                 }
             }
-
             return null;
         }
     }
-    
+
     public abstract class UITestBase
     {
         protected EventSystem FindCurrentEventSystem()
@@ -314,56 +306,80 @@ namespace PlayQ.UITestTools
             Click(go);
         }
 
-        protected void DragPixels(Vector2 start, Vector2 end, float time = 1)
+        protected IEnumerator DragPixels(Vector2 from, Vector2 to, float time = 1)
         {
-            GameObject go = FindObjectByPixels(start.x, start.y);
+            GameObject go = FindObjectByPixels(from.x, from.y);
             if (go == null)
             {
-                Assert.Fail("Cannot grag object from pixels [" + start.x + ";" + start.y +
+                Assert.Fail("Cannot grag object from pixels [" + from.x + ";" + from.y +
                             "], couse there are no objects.");
             }
-            DragPixels(go, end - start, time);
+            yield return DragPixels(go, from, to, time);
         }
 
-        protected void DragPercents(Vector2 start, Vector2 end, float time = 1)
+        protected IEnumerator DragPercents(Vector2 from, Vector2 to, float time = 1)
         {
-            GameObject go = FindObjectByPercents(start.x, start.y);
-            if (go == null)
+            var startPixel = new Vector2(Screen.width * from.x, Screen.height * from.y);
+            var endPixel = new Vector2(Screen.width * to.x, Screen.height * to.y);
+            yield return DragPixels(startPixel, endPixel, time);
+        }
+
+        protected IEnumerator DragPixels(GameObject go, Vector2 to, float time = 1)
+        {
+            var rectTransform = go.transform as RectTransform;
+            if (rectTransform == null)
             {
-                Assert.Fail("Cannot grag object from percents [" + start.x + ";" + start.y +
-                            "], couse there are no objects.");
+                Assert.Fail("Can't find rect transform on object \"{0}\"", go.name);
             }
-            DragPercents(go, end - start, time);
+            yield return DragPixels(go, UITestTools.CenterPointOfObject(rectTransform), to, time);
         }
 
-        protected void DragPixels(GameObject go, Vector2 direction, float time = 1)
+        protected IEnumerator DragPercents(GameObject go, Vector2 to, bool useRaycasts = false, float time = 1)
         {
-            throw new NotImplementedException();
+            yield return DragPixels(go, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
         }
 
-        protected void DragPixels(string path, Vector2 direction, float time = 1)
+        protected IEnumerator DragPixels(GameObject go, Vector2 from, Vector2 to, float time = 1)
+        {
+            if (!go.activeInHierarchy)
+            {
+                Assert.Fail("Trying to click to " + go.name + " but it disabled");
+            }
+            
+            var initialize = new PointerEventData(EventSystem.current);
+            ExecuteEvents.Execute(go, initialize, ExecuteEvents.initializePotentialDrag);
+
+            var currentTime = 0f;
+            while (currentTime <= time)
+            {
+                yield return null;
+                var targetPos = Vector2.Lerp(from, to, currentTime / time);
+                var drag = new PointerEventData(EventSystem.current);
+                drag.button = PointerEventData.InputButton.Left;
+                drag.position = targetPos;
+                ExecuteEvents.Execute(go, drag, ExecuteEvents.dragHandler);
+                currentTime += Time.deltaTime;
+            }
+
+            var finalDrag = new PointerEventData(EventSystem.current);
+            finalDrag.button = PointerEventData.InputButton.Left;
+            finalDrag.position = to;
+            ExecuteEvents.Execute(go, finalDrag, ExecuteEvents.dragHandler);
+        }
+
+        protected IEnumerator DragPixels(string path, Vector2 to, float time = 1)
         {
             GameObject go = UITestTools.FindAnyGameObject(path);
             if (go == null)
             {
                 Assert.Fail("Cannot grag object " + path + ", couse there are not exist.");
             }
-            DragPixels(go, direction, time);
+            yield return DragPixels(go, to, time);
         }
 
-        protected void DragPercents(GameObject go, Vector2 direction, float time = 1)
+        protected IEnumerator DragPercents(string path, Vector2 to, float time = 1)
         {
-            throw new NotImplementedException();
-        }
-
-        protected void DragPercents(string path, Vector2 direction, float time = 1)
-        {
-            GameObject go = UITestTools.FindAnyGameObject(path);
-            if (go == null)
-            {
-                Assert.Fail("Cannot grag object " + path + ", couse there are not exist.");
-            }
-            DragPercents(go, direction, time);
+            yield return DragPixels(path, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
         }
 
         protected void SetText(GameObject go, string text)
