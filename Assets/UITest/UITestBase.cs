@@ -118,6 +118,69 @@ namespace PlayQ.UITestTools
 
             return objectsOnScene.FirstOrDefault();
         }
+
+        public static Vector2 CenterPointOfObject(RectTransform transform)
+        {
+            Vector2[] points = ScreenVerticesOfObject(transform);
+            Vector2 middlePoint = new Vector2();
+            foreach (var point in points)
+            {
+                middlePoint.x += point.x;
+                middlePoint.y += point.y;
+            }
+
+            middlePoint.x /= points.Length;
+            middlePoint.y /= points.Length;
+
+            return middlePoint;
+
+        }
+        
+        public static Vector2[] ScreenVerticesOfObject(RectTransform transform)
+        {
+            Vector3[] worldCoreners = new Vector3[4];
+            transform.GetWorldCorners(worldCoreners);
+            
+            var anyCamera = FindAnyGameObject<Camera>();
+            if (anyCamera != null)
+            {
+                Canvas canvas = null;
+                var root = transform;
+                
+                while (root)
+                {
+                    canvas = root.GetComponent<Canvas>();
+                    root = root.parent as RectTransform;
+                }
+
+                if (canvas != null)
+                {
+                    if (Camera.main != null)
+                    {
+                        anyCamera = Camera.main;
+                    }
+                    if (canvas.worldCamera != null)
+                    {
+                        anyCamera = canvas.worldCamera;
+                    }
+
+                    if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                    {
+                        anyCamera = null;
+                    }
+                
+                    var screenCorners = worldCoreners.Select(worldPoint =>
+                    {
+                        return RectTransformUtility.WorldToScreenPoint(anyCamera, worldPoint);
+                    
+                    }).ToArray();
+
+                    return screenCorners;
+                }
+            }
+
+            return null;
+        }
     }
     
     public abstract class UITestBase

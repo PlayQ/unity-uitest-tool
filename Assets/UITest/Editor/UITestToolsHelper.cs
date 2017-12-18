@@ -50,7 +50,7 @@ namespace PlayQ.UITestTools
             bool isClicable = IsClickable(go);
             bool isText = IsText(go);
             bool isToggle = IsToggle(go);
-            bool isRectTransform = go.transform is RectTransform; 
+            RectTransform rectTransform = go.transform as RectTransform; 
 
             DrawLabel("Path:", path);
 
@@ -58,56 +58,29 @@ namespace PlayQ.UITestTools
             EditorGUILayout.Space();
 
 
-            if (isRectTransform)
+            if (rectTransform != null)
             {
-                var rectTransform = go.transform as RectTransform;
-                Vector3[] worldCoreners = new Vector3[4];
-                rectTransform.GetWorldCorners(worldCoreners);
-                
-                var anyCamera = UITestTools.FindAnyGameObject<Camera>();
-                if (anyCamera == null)
+                var points = UITestTools.ScreenVerticesOfObject(rectTransform);
+
+                if (points != null)
                 {
-                    EditorGUILayout.LabelField("No camera in scene - can't find screen coordinates",
-                        EditorStyles.boldLabel);
-                }
-                else
-                {
-                    Canvas canvas = null;
-                    var root = rectTransform;
+                    DrawLabel("Bounds", "bottom-left:" + points[0] +
+                                             " top-left: " + points[1] +
+                                             " top-right: " + points[2] +
+                                             " bottom-right: " + points[3]);
                     
-                    while (root)
+                    Vector2 centerPoint = new Vector2();
+                    foreach (var point in points)
                     {
-                        canvas = root.GetComponent<Canvas>();
-                        root = root.parent as RectTransform;
+                        centerPoint.x += point.x;
+                        centerPoint.y += point.y;
                     }
 
-                    if (canvas != null)
-                    {
-                        if (Camera.main != null)
-                        {
-                            anyCamera = Camera.main;
-                        }
-                        if (canvas.worldCamera != null)
-                        {
-                            anyCamera = canvas.worldCamera;
-                        }
-
-                        if (canvas.renderMode == RenderMode.ScreenSpaceOverlay)
-                        {
-                            anyCamera = null;
-                        }
+                    centerPoint.x /= points.Length;
+                    centerPoint.y /= points.Length;
                     
-                        var screenCorners = worldCoreners.Select(worldPoint =>
-                        {
-                            return RectTransformUtility.WorldToScreenPoint(anyCamera, worldPoint);
-                        
-                        }).ToArray();
-
-                        DrawLabel("Coordinates", "bottom-left point: x=" + screenCorners[0].x +
-                                                 " y=" + screenCorners[0].y + " with=" +
-                                                 (screenCorners[3].x - screenCorners[0].x) +
-                                                 " height=" + (screenCorners[1].y - screenCorners[0].y));       
-                    }
+                    DrawLabel("Object center", centerPoint.ToString());
+                    
                 }
             }
             
