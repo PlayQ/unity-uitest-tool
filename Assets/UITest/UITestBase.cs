@@ -147,13 +147,13 @@ namespace PlayQ.UITestTools
 
         protected IEnumerator DragPixels(Vector2 from, Vector2 to, float time = 1)
         {
-            GameObject go = FindObjectByPixels(from.x, from.y);
+            var go = FindObjectByPixels(from.x, from.y);
             if (go == null)
             {
                 Assert.Fail("Cannot grag object from pixels [" + from.x + ";" + from.y +
                             "], couse there are no objects.");
             }
-            yield return DragPixels(go, to, from, time);
+            yield return DragPixels(go, from, to, time);
         }
 
         protected IEnumerator DragPercents(Vector2 from, Vector2 to, float time = 1)
@@ -163,6 +163,8 @@ namespace PlayQ.UITestTools
             yield return DragPixels(startPixel, endPixel, time);
         }
 
+
+
         protected IEnumerator DragPixels(GameObject go, Vector2 to, float time = 1)
         {
             var rectTransform = go.transform as RectTransform;
@@ -170,15 +172,15 @@ namespace PlayQ.UITestTools
             {
                 Assert.Fail("Can't find rect transform on object \"{0}\"", go.name);
             }
-            yield return DragPixels(go, to, null, time);
+            yield return DragPixels(go, null, to, time);
         }
 
-        protected IEnumerator DragPercents(GameObject go, Vector2 to, bool useRaycasts = false, float time = 1)
+        protected IEnumerator DragPercents(GameObject go, Vector2 to, float time = 1)
         {
             yield return DragPixels(go, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
         }
 
-        protected IEnumerator DragPixels(GameObject go, Vector2 to, Vector2? from = null, float time = 1)
+        protected IEnumerator DragPixels(GameObject go, Vector2? from, Vector2 to, float time = 1)
         {
             if (!go.activeInHierarchy)
             {
