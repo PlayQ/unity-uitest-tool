@@ -9,6 +9,7 @@ using UnityEngine.SceneManagement;
 using NUnit.Framework;
 using System.Linq;
 using System.Text;
+using NUnit.Framework.Constraints;
 using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools
@@ -184,46 +185,83 @@ namespace PlayQ.UITestTools
                 Assert.Fail("Trying to click to " + go.name + " but it disabled");
             }
 
-            var finded = false;
-            var selectable = go.GetComponent<Selectable>();
-            if (selectable == null)
+            var fromPos = new Vector2();
+            var scrollElement = GetScrollElement(go, ref fromPos);
+
+            if (scrollElement == null)
             {
-                var parentSelectables = go.GetComponentsInParent<Selectable>();
-                foreach (var parentSelectable in parentSelectables)
-                {
-                    if (parentSelectable.targetGraphic.gameObject == go)
-                    {
-                        selectable = parentSelectable;
-                        finded = true;
-                        break;
-                    }
-                }
-                if (!finded)
-                {
-                    Assert.Fail("Can't find selectable object for \"{0}\"", go.name);
-                }
+                Assert.Fail("Can't find draggable object for \"{0}\"", go.name);
             }
 
-            var fromPos = from ?? UITestTools.CenterPointOfObject(selectable.targetGraphic.rectTransform);
+            if (from != null)
+            {
+                fromPos = from.Value;
+            }
+
             var initialize = new PointerEventData(EventSystem.current);
-            ExecuteEvents.Execute(selectable.gameObject, initialize, ExecuteEvents.initializePotentialDrag);
-            
+            ExecuteEvents.Execute(scrollElement, initialize, ExecuteEvents.initializePotentialDrag);
+
             var currentTime = 0f;
             while (currentTime <= time)
             {
                 yield return null;
                 var targetPos = Vector2.Lerp(fromPos, to, currentTime / time);
-                var drag = new PointerEventData(EventSystem.current);
-                drag.button = PointerEventData.InputButton.Left;
-                drag.position = targetPos;
-                ExecuteEvents.Execute(selectable.gameObject, drag, ExecuteEvents.dragHandler);
+                var drag = new PointerEventData(EventSystem.current)
+                {
+                    button = PointerEventData.InputButton.Left,
+                    position = targetPos
+                };
+                ExecuteEvents.Execute(scrollElement, drag, ExecuteEvents.dragHandler);
                 currentTime += Time.deltaTime;
             }
 
-            var finalDrag = new PointerEventData(EventSystem.current);
-            finalDrag.button = PointerEventData.InputButton.Left;
-            finalDrag.position = to;
-            ExecuteEvents.Execute(selectable.gameObject, finalDrag, ExecuteEvents.dragHandler);
+            var finalDrag = new PointerEventData(EventSystem.current)
+            {
+                button = PointerEventData.InputButton.Left,
+                position = to
+            };
+            ExecuteEvents.Execute(scrollElement, finalDrag, ExecuteEvents.dragHandler);
+        }
+
+        private GameObject GetScrollElement(GameObject go, ref Vector2 handlePosition)
+        {
+            var selectable = go.GetComponent<Selectable>();
+            if (selectable == null)
+            {
+                var parentSelectable = go.GetComponentInParent<Selectable>();
+                if (parentSelectable != null)
+                {
+                    handlePosition = parentSelectable.targetGraphic.gameObject == go
+                        ? UITestTools.CenterPointOfObject(parentSelectable.targetGraphic.rectTransform)
+                        : UITestTools.CenterPointOfObject(go.transform as RectTransform);
+
+                    return parentSelectable.gameObject;
+                }
+            }
+            else
+            {
+                handlePosition = UITestTools.CenterPointOfObject(selectable.targetGraphic.rectTransform);
+                return selectable.gameObject;
+            }
+
+            var scrollRect = go.GetComponent<ScrollRect>();
+            if (scrollRect == null)
+            {
+                var parentScrollRect = go.GetComponentInParent<ScrollRect>();
+                if (parentScrollRect != null)
+                {
+                    handlePosition = parentScrollRect.content.gameObject == go ? 
+                        UITestTools.CenterPointOfObject(parentScrollRect.content) :
+                        UITestTools.CenterPointOfObject(go.transform as RectTransform);
+                    return parentScrollRect.gameObject;
+                }
+            }
+            else
+            {
+                handlePosition = UITestTools.CenterPointOfObject(scrollRect.content);
+                return scrollRect.gameObject;
+            }
+            return null;
         }
 
         protected IEnumerator DragPixels(string path, Vector2 to, float time = 1)
@@ -617,8 +655,6 @@ namespace PlayQ.UITestTools
                 Assert.Fail("IsNotExist<"+typeof(T)+">: Object exists.");
             }
         }
-
-      
 
         public static void IsToggleOn(string path)
         {

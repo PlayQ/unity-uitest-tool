@@ -1,8 +1,10 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿
 using UnityEngine;
 
-public class TestObject : MonoBehaviour 
+namespace PlayQ.UITestTools.Tests
 {
+    public class TestObject : MonoBehaviour
+    {
 
+    }
 }

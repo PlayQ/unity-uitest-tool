@@ -3,6 +3,8 @@
 [Oo]bj/
 [Bb]uild/
 [Bb]uilds/
+ProjectSettings/
+*/Plugins/*
 Assets/AssetStoreTools*
 Assets/InitTestScene*
 
@@ -35,3 +37,4 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+/.gitignore
