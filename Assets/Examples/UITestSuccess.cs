@@ -9,7 +9,7 @@ public class UITestSuccess : UITestBase
     [SetUp]
     public void Init()
     {
-       // LoadSceneForSetUp("TestableGameScene");
+        // LoadSceneForSetUp("TestableGameScene");
     }
 
     [UnityTest]
@@ -24,7 +24,7 @@ public class UITestSuccess : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
-        
+
         MakeScreenShot("some path");
     }
 
@@ -33,7 +33,7 @@ public class UITestSuccess : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
-        
+
         yield return WaitFrame();
         
         var obj = FindObjectByPixels(598, 583);
@@ -70,11 +70,11 @@ public class UITestSuccess : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
-     
+
         //search for object with name "child_enabled" in parent object "container"
         //if object is not found - waits for object appearing for duration
         yield return WaitForObject("container/child_enabled");
-        
+
         //search for object with component "Child" on it"
         //if object is not found - waits for object appearing for duration
         yield return WaitForObject<Child>();
@@ -83,25 +83,25 @@ public class UITestSuccess : UITestBase
         //if object is not found - waits for object appearing for duration
         yield return WaitForObject<Child>("container/child_with_component");
     }
-    
+
     [UnityTest]
     public IEnumerator WaitForObjectDestraction()
     {
         //Wait for scene loading
         yield return LoadScene("1");
-     
-      
-        
+
+
+
         //manually search for object in scene
-         var objectInstance = UITestTools.FindAnyGameObject<ObjectThatWillBeDestroyed>().gameObject;
+        var objectInstance = UITestTools.FindAnyGameObject<ObjectThatWillBeDestroyed>().gameObject;
         Object.Destroy(objectInstance);
-        
+
         //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
         yield return WaitForDestroy<ObjectThatWillBeDestroyed>(10);
-        
+
         //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
         yield return WaitForDestroy("Object_that_will_be_destroyed");
-        
+
         //wait during interval for object destraction by object instance
         yield return WaitForDestroy(objectInstance);
     }
@@ -111,10 +111,10 @@ public class UITestSuccess : UITestBase
     {
         //Wait for scene loading
         yield return LoadScene("1");
-        
+
         //get manual reference to the object
         var objectInstance = UITestTools.FindAnyGameObject<EnabledAtStart>();
-        
+
         //manually disable object
         objectInstance.gameObject.SetActive(false);
 
@@ -125,8 +125,8 @@ public class UITestSuccess : UITestBase
         yield return WaitObjectDisabled<EnabledAtStart>();
 
     }
-    
-    
+
+
     [UnityTest]
     public IEnumerator WaitForObjectEnabled()
     {
@@ -135,7 +135,7 @@ public class UITestSuccess : UITestBase
 
         //get manual reference to the object
         var objectInstance = UITestTools.FindAnyGameObject<DisabledAtStart>();
-        
+
         //manually enable object
         objectInstance.gameObject.SetActive(true);
 
@@ -185,12 +185,17 @@ public class UITestSuccess : UITestBase
         }
     }
 
-   
+    [UnityTest]
+    public IEnumerator DragPixels()
+    {
+        //Wait for scene loading
+        yield return LoadScene("2");
 
-    
+        //get manual reference to the object
+        yield return WaitFrame(1);
 
-
-
+        yield return DragPercents("container/Scroll View/Scrollbar Vertical", new Vector2(0.9f, 0f), 10f);
+    }
 }
 
  
