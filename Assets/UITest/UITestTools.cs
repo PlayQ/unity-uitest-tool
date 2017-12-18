@@ -13,18 +13,16 @@ namespace PlayQ.UITestTools
             {
                 throw new NullReferenceException("given object is null!");
             }
-//todo remove upwise
-            GameObject upwise = gameObject;
 
             StringBuilder sb = new StringBuilder();
 
-            while (upwise)
+            while (gameObject)
             {
-                sb.Insert(0, upwise.gameObject.name);
-                if (upwise.transform.parent != null)
+                sb.Insert(0, gameObject.name);
+                if (gameObject.transform.parent != null)
                 {
                     sb.Insert(0, '/');
-                    upwise = upwise.transform.parent.gameObject;
+                    gameObject = gameObject.transform.parent.gameObject;
                 }
                 else
                 {
@@ -48,9 +46,10 @@ namespace PlayQ.UITestTools
             {
                 return null;
             }
-            //todo fix it
-            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
-            if (objectsOnScene == null || objectsOnScene.Length == 0)
+            
+            
+            var objectsOnScene = objects.Where(obj => obj.gameObject.scene.isLoaded).ToArray();
+            if (objectsOnScene.Length == 0)
             {
                 return null;
             }
@@ -81,8 +80,7 @@ namespace PlayQ.UITestTools
 
             for (int i = 0; i < objectsOnScene.Length; i++)
             {
-                //todo fix it
-                if (objectsOnScene[i].scene != null && GetGameObjectFullPath(objectsOnScene[i]).EndsWith(path))
+                if (objectsOnScene[i].scene.isLoaded && GetGameObjectFullPath(objectsOnScene[i]).EndsWith(path))
                 {
                     return objectsOnScene[i];
                 }
@@ -99,9 +97,9 @@ namespace PlayQ.UITestTools
                 return null;
             }
 
-            //todo fix it
-            var objectsOnScene = objects.Where(obj => obj.gameObject.scene != null).ToArray();
-            if (objectsOnScene == null || objectsOnScene.Length == 0)
+            
+            var objectsOnScene = objects.Where(obj => obj.gameObject.scene.isLoaded).ToArray();
+            if (objectsOnScene.Length == 0)
             {
                 return null;
             }

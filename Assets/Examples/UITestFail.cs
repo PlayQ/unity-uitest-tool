@@ -16,7 +16,7 @@ public class UITestFail : UITestBase
     public IEnumerator LoadScene()
     {
         //Wait for scene loading
-        yield return LoadScene("2");
+        yield return LoadScene("non exist scene");
     }
 
    
