@@ -36,7 +36,7 @@ public class UITestSuccess : UITestBase
         yield return LoadScene("1");
 
         yield return WaitFrame();
-        
+
         var obj = FindObjectByPixels(598, 583);
         Assert.IsNotNull(obj);
         Assert.AreEqual(obj.name, "Image");
@@ -49,7 +49,7 @@ public class UITestSuccess : UITestBase
         yield return LoadScene("1");
 
         yield return WaitFrame();
-        
+
         var obj = FindObjectByPercents(598f / UnityEngine.Screen.width, 583f / UnityEngine.Screen.height);
         Assert.IsNotNull(obj);
         Assert.AreEqual(obj.name, "Image");
@@ -201,8 +201,7 @@ public class UITestSuccess : UITestBase
         //get manual reference to the object
         yield return WaitFrame(1);
 
-        yield return DragPercents("container/Scroll View/Scrollbar Vertical/Sliding Area/Handle", new Vector2(0.9f, 0f),
-            10f);
+        yield return DragPercents("Container/Scroll View/Viewport/Content/Image", new Vector2(0.5f, 2f), 10f);
     }
 }
 
