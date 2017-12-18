@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Child : MonoBehaviour {
+namespace PlayQ.UITestTools.Tests
+{
+    public class Child : MonoBehaviour
+    {
 
+    }
 }

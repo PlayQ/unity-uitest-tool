@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DisabledAtStart : MonoBehaviour
-{
 
-	
+namespace PlayQ.UITestTools.Tests
+{
+	public class DisabledAtStart : MonoBehaviour
+	{
+
+
+	}
 }

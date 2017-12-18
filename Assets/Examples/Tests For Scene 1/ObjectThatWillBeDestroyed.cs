@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class ObjectThatWillBeDestroyed : MonoBehaviour {
+namespace PlayQ.UITestTools.Tests
+{
+    public class ObjectThatWillBeDestroyed : MonoBehaviour
+    {
 
+    }
 }

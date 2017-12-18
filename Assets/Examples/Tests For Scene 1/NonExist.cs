@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NonExist : MonoBehaviour {
+namespace PlayQ.UITestTools.Tests
+{
+    public class NonExist : MonoBehaviour
+    {
 
 
+    }
 }

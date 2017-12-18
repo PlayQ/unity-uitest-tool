@@ -2,15 +2,22 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnabledAtStart : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+namespace PlayQ.UITestTools.Tests
+{
+	public class EnabledAtStart : MonoBehaviour
+	{
+
+		// Use this for initialization
+		void Start()
+		{
+
+		}
+
+		// Update is called once per frame
+		void Update()
+		{
+
+		}
 	}
 }
