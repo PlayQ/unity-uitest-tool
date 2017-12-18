@@ -204,7 +204,7 @@ namespace PlayQ.UITestTools.Tests
             //get manual reference to the object
             yield return WaitFrame(1);
 
-            yield return DragPercents("Container/Scroll View/Viewport/Content/Image", new Vector2(0.5f, 2f), 10f);
+            yield return DragPercents("Container/Slider/Image", new Vector2(1f, 0.5f), 10f);
         }
     }
 }
