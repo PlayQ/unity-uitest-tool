@@ -145,6 +145,9 @@ namespace PlayQ.UITestTools
             Click(go);
         }
 
+
+
+        
         protected IEnumerator DragPixels(Vector2 from, Vector2 to, float time = 1)
         {
             var go = FindObjectByPixels(from.x, from.y);
@@ -155,6 +158,8 @@ namespace PlayQ.UITestTools
             }
             yield return DragPixels(go, from, to, time);
         }
+      
+        
 
         protected IEnumerator DragPercents(Vector2 from, Vector2 to, float time = 1)
         {

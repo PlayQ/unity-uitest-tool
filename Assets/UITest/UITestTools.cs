@@ -135,11 +135,11 @@ namespace PlayQ.UITestTools
                 Canvas canvas = null;
                 var root = transform;
 
-                while (root)
+                    while (root)
                 {
                     canvas = root.GetComponent<Canvas>();
                     root = root.parent as RectTransform;
-                }
+                } 
 
                 if (canvas != null)
                 {
@@ -151,6 +151,10 @@ namespace PlayQ.UITestTools
                         case RenderMode.WorldSpace:
                             anyCamera = Camera.main;
                             break;
+                        case RenderMode.ScreenSpaceOverlay:
+                            anyCamera = null;
+                            break;
+                            
                     }
 
                     var screenCorners = worldCoreners.Select(worldPoint =>

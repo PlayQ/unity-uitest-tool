@@ -3,7 +3,8 @@ using NUnit.Framework;
 using UnityEngine.TestTools;
 using PlayQ.UITestTools;
 using UnityEngine;
-using Object = UnityEngine.Object;
+ using UnityEngine.UI;
+ using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools.Tests
 {
@@ -206,6 +207,73 @@ namespace PlayQ.UITestTools.Tests
 
             yield return DragPercents("Container/Slider/Image", new Vector2(1f, 0.5f), 10f);
         }
+
+        [UnityTest]
+        public IEnumerator DragPixelsByCoords()
+        {
+            //Wait for scene loading
+            yield return LoadScene("2");
+
+            //get manual reference to the object
+            yield return WaitFrame();
+
+            Vector2 from = new Vector2(45, 384);
+            Vector2 to = new Vector2(979, 384);
+            yield return DragPixels(from, to);
+
+            var handle = UITestTools.FindAnyGameObject("Handle");
+
+            var center = UITestTools.CenterPointOfObject(handle.transform as RectTransform);
+
+            Assert.AreEqual(center.x, to.x, 0.1f);
+            Assert.AreEqual(center.y, to.y, 0.1f);
+        }
+        
+        
+        [UnityTest]
+        public IEnumerator DragByPercents()
+        {
+            //Wait for scene loading
+            yield return LoadScene("2");
+
+            //get manual reference to the object
+            yield return WaitFrame();
+
+            Vector2 from = new Vector2(45f / UnityEngine.Screen.width, 384f / UnityEngine.Screen.height);
+            Vector2 to = new Vector2(979f / UnityEngine.Screen.width, 384f / UnityEngine.Screen.height);
+            yield return DragPercents(from, to);
+
+            var handle = UITestTools.FindAnyGameObject("Handle");
+
+            var center = UITestTools.CenterPointOfObject(handle.transform as RectTransform);
+
+            Assert.AreEqual(center.x, to.x * UnityEngine.Screen.width, 0.1f);
+            Assert.AreEqual(center.y, to.y * UnityEngine.Screen.height, 0.1f);
+        }
+        
+        
+        [UnityTest]
+        public IEnumerator DragGameobjectByPercents()
+        {
+            //Wait for scene loading
+            yield return LoadScene("2");
+
+            //get manual reference to the object
+            yield return WaitFrame();
+
+            var handle = UITestTools.FindAnyGameObject("Handle");
+            
+            Vector2 to = new Vector2(979f / UnityEngine.Screen.width, 384f / UnityEngine.Screen.height);
+            yield return DragPercents(handle, to);
+
+            var center = UITestTools.CenterPointOfObject(handle.transform as RectTransform);
+
+
+            Assert.AreEqual(center.x, to.x * UnityEngine.Screen.width, 0.1f);
+            Assert.AreEqual(center.y, to.y * UnityEngine.Screen.height, 0.1f);
+        }
+
+        
     }
 
 }
