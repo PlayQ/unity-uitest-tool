@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 using PlayQ.UITestTools;
-using UnityEngine;
 using Object = UnityEngine.Object;
 
 public class UITestSuccess : UITestBase
@@ -38,7 +36,7 @@ public class UITestSuccess : UITestBase
         
         yield return WaitFrame();
         
-        var obj = FindObjectByPixels(UnityEngine.Screen.width / 2f, UnityEngine.Screen.height / 2f);
+        var obj = FindObjectByPixels(598, 583);
         Assert.IsNotNull(obj);
         Assert.AreEqual(obj.name, "Image");
     }
@@ -51,7 +49,7 @@ public class UITestSuccess : UITestBase
 
         yield return WaitFrame();
         
-        var obj = FindObjectByPercents(0.5f, 0.5f);
+        var obj = FindObjectByPercents(598f / UnityEngine.Screen.width, 583f / UnityEngine.Screen.height);
         Assert.IsNotNull(obj);
         Assert.AreEqual(obj.name, "Image");
     }
@@ -64,7 +62,7 @@ public class UITestSuccess : UITestBase
 
         yield return WaitFrame();
 
-        ClickPixels(500, 600);
+        ClickPixels(598, 583);
     }
 
     [UnityTest]
@@ -121,10 +119,10 @@ public class UITestSuccess : UITestBase
         objectInstance.gameObject.SetActive(false);
 
         //check for disabled
-        WaitObjectDisabled("Object_enabled_at_start");
+        yield return WaitObjectDisabled("Object_enabled_at_start");
 
         //check for disabled
-        WaitObjectDisabled<EnabledAtStart>();
+        yield return WaitObjectDisabled<EnabledAtStart>();
 
     }
     
@@ -142,10 +140,10 @@ public class UITestSuccess : UITestBase
         objectInstance.gameObject.SetActive(true);
 
         //check for enabled by component type
-        WaitObjectEnabled<DisabledAtStart>();
+        yield return WaitObjectEnabled<DisabledAtStart>();
 
         //check for enabled by path in hierarchy
-        WaitObjectEnabled("Object_disabled_at_start");
+        yield return WaitObjectEnabled("Object_disabled_at_start");
 
     }
 
