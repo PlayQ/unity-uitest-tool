@@ -1,22 +1,14 @@
-﻿﻿using System.Collections;
+﻿﻿using System;
+ using System.Collections;
 using NUnit.Framework;
 using UnityEngine.TestTools;
-using PlayQ.UITestTools;
-using UnityEngine;
- using UnityEngine.UI;
+ using UnityEngine;
  using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools.Tests
 {
-
     public class UITestSuccess : UITestBase
     {
-        [SetUp]
-        public void Init()
-        {
-            // LoadSceneForSetUp("TestableGameScene");
-        }
-
         [UnityTest]
         public IEnumerator LoadScene()
         {
@@ -34,6 +26,7 @@ namespace PlayQ.UITestTools.Tests
         }
 
         [UnityTest]
+        [TargetResolution(1024, 768)]
         public IEnumerator FindObjectByPixels()
         {
             //Wait for scene loading
@@ -41,33 +34,22 @@ namespace PlayQ.UITestTools.Tests
 
             yield return WaitFrame();
 
-            var obj = FindObjectByPixels(598, 583);
+            var obj = FindObjectByPixels(630.0f, 325.0f);
             Assert.IsNotNull(obj);
             Assert.AreEqual(obj.name, "Image");
         }
 
         [UnityTest]
-        public IEnumerator FindObjectByPercents()
-        {
-            //Wait for scene loading
-            yield return LoadScene("1");
-
-            yield return WaitFrame();
-
-            var obj = FindObjectByPercents(598f / UnityEngine.Screen.width, 583f / UnityEngine.Screen.height);
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(obj.name, "Image");
-        }
-
-        [UnityTest]
+        [TargetResolution(1024, 768)]
         public IEnumerator ClickOnObject()
         {
             //Wait for scene loading
             yield return LoadScene("1");
-
             yield return WaitFrame();
 
-            ClickPixels(598, 583);
+            ClickPixels(512f, 41f);
+            var openedWindow = UITestTools.FindAnyGameObject("Window");
+            Assert.IsTrue(openedWindow.activeInHierarchy);
         }
 
         [UnityTest]
@@ -197,83 +179,88 @@ namespace PlayQ.UITestTools.Tests
         }
 
         [UnityTest]
-        public IEnumerator DragPixels()
+        [TargetResolution(1024, 768)]
+        public IEnumerator DragByCoords()
         {
             //Wait for scene loading
-            yield return LoadScene("2");
+            yield return LoadScene("1");
+            yield return WaitFrame();
 
-            //get manual reference to the object
-            yield return WaitFrame(1);
+            Vector2 from = new Vector2(45, 526);
+            Vector2 delta = new Vector2(934, 0);
+            yield return DragPixels(from, delta);
 
-            yield return DragPercents("Container/Slider/Image", new Vector2(1f, 0.5f), 10f);
+            var handle = UITestTools.FindAnyGameObject("Handle");
+            var center = UITestTools.CenterPointOfObject(handle.transform as RectTransform);
+
+            Assert.AreEqual(center.x, 967, 0.1f);
+            Assert.AreEqual(center.y, 526, 0.1f);
         }
 
         [UnityTest]
-        public IEnumerator DragPixelsByCoords()
+        [TargetResolution(1024, 768)]
+        public IEnumerator DragByReference()
         {
             //Wait for scene loading
-            yield return LoadScene("2");
-
-            //get manual reference to the object
+            yield return LoadScene("1");
             yield return WaitFrame();
 
-            Vector2 from = new Vector2(45, 384);
-            Vector2 to = new Vector2(979, 384);
-            yield return DragPixels(from, to);
+            Vector2 delta = new Vector2(934, 0);
 
             var handle = UITestTools.FindAnyGameObject("Handle");
-
+            yield return DragPixels(handle, delta);
             var center = UITestTools.CenterPointOfObject(handle.transform as RectTransform);
 
-            Assert.AreEqual(center.x, to.x, 0.1f);
-            Assert.AreEqual(center.y, to.y, 0.1f);
+            Assert.AreEqual(center.x, 967, 0.1f);
+            Assert.AreEqual(center.y, 526, 0.1f);
         }
-        
-        
+
         [UnityTest]
-        public IEnumerator DragByPercents()
+        [TargetResolution(1024, 768)]
+        public IEnumerator DragByPath()
         {
             //Wait for scene loading
-            yield return LoadScene("2");
-
-            //get manual reference to the object
+            yield return LoadScene("1");
             yield return WaitFrame();
 
-            Vector2 from = new Vector2(45f / UnityEngine.Screen.width, 384f / UnityEngine.Screen.height);
-            Vector2 to = new Vector2(979f / UnityEngine.Screen.width, 384f / UnityEngine.Screen.height);
-            yield return DragPercents(from, to);
+            Vector2 delta = new Vector2(934, 0);
 
             var handle = UITestTools.FindAnyGameObject("Handle");
-
+            yield return DragPixels("container/Slider/Handle Slide Area/Handle", delta);
             var center = UITestTools.CenterPointOfObject(handle.transform as RectTransform);
 
-            Assert.AreEqual(center.x, to.x * UnityEngine.Screen.width, 0.1f);
-            Assert.AreEqual(center.y, to.y * UnityEngine.Screen.height, 0.1f);
+            Assert.AreEqual(center.x, 967, 0.1f);
+            Assert.AreEqual(center.y, 526, 0.1f);
         }
-        
-        
+
         [UnityTest]
-        public IEnumerator DragGameobjectByPercents()
+        [TargetResolution(1024, 768)]
+        public IEnumerator ClickOnObjectFail()
         {
             //Wait for scene loading
-            yield return LoadScene("2");
+            yield return LoadScene("1");
 
-            //get manual reference to the object
             yield return WaitFrame();
 
-            var handle = UITestTools.FindAnyGameObject("Handle");
-            
-            Vector2 to = new Vector2(979f / UnityEngine.Screen.width, 384f / UnityEngine.Screen.height);
-            yield return DragPercents(handle, to);
-
-            var center = UITestTools.CenterPointOfObject(handle.transform as RectTransform);
-
-
-            Assert.AreEqual(center.x, to.x * UnityEngine.Screen.width, 0.1f);
-            Assert.AreEqual(center.y, to.y * UnityEngine.Screen.height, 0.1f);
+            try
+            {
+                ClickPixels(20, 20);
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex.Message.Contains("Cannot click to pixels"));
+            }
         }
 
-        
+        [UnityTest]
+        [TargetResolution(1024, 768)]
+        public IEnumerator FindObjectByPixelsFail()
+        {
+            //Wait for scene loading
+            yield return LoadScene("1");
+            yield return WaitFrame();
+            var obj = FindObjectByPixels(20, 20);
+            Assert.IsNull(obj);
+        }
     }
-
 }

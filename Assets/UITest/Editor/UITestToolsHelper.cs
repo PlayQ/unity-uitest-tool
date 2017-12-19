@@ -64,11 +64,11 @@ namespace PlayQ.UITestTools
 
                 if (points != null)
                 {
-                    DrawLabel("Bounds", "bottom-left:" + points[0] +
-                                             " top-left: " + points[1] +
-                                             " top-right: " + points[2] +
-                                             " bottom-right: " + points[3]);
-                    
+                    DrawLabel("Bounds", "bottom-left:" + Vector2ToString(points[0]) +
+                                        " top-left: " + Vector2ToString(points[1]) +
+                                        " top-right: " + Vector2ToString(points[2]) +
+                                        " bottom-right: " + Vector2ToString(points[3]));
+
                     Vector2 centerPoint = new Vector2();
                     foreach (var point in points)
                     {
@@ -78,12 +78,11 @@ namespace PlayQ.UITestTools
 
                     centerPoint.x /= points.Length;
                     centerPoint.y /= points.Length;
-                    
-                    DrawLabel("Object center", centerPoint.ToString());
-                    
+
+                    DrawLabel("Object center", Vector2ToString(centerPoint));
                 }
             }
-            
+
             if (isClicable)
             {
                 DrawLabel("Click:", "Click(" + path + ");");
@@ -115,6 +114,11 @@ namespace PlayQ.UITestTools
             {
                 DrawLabel("Toggle:", "Check.Toggle(" + path + ", \"True\");");
             }
+        }
+
+        private static string Vector2ToString(Vector2 vector)
+        {
+            return string.Format("({0}, {1})", vector.x, vector.y);
         }
 
         private static void DrawLabel(string name, string value)

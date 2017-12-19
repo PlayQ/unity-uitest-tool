@@ -168,5 +168,25 @@ namespace PlayQ.UITestTools
             }
             return null;
         }
+
+        public static Vector2 PercentsToPixels(Vector2 percents)
+        {
+            return new Vector2(percents.x * Screen.width, percents.y * Screen.height);
+        }
+        
+        public static Vector2 PercentsToPixels(float x, float y)
+        {
+            return new Vector2(x* Screen.width, y * Screen.height);
+        }
+        
+        public static float WidthPercentsToPixels(float x)
+        {
+            return x * Screen.width;
+        }
+        
+        public static float HeightPercentsToPixels(float y)
+        {
+            return y * Screen.height;
+        }
     }
 }

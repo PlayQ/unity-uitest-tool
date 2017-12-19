@@ -9,7 +9,7 @@ using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools.Tests
 {
-    public class UITestCheckSuccess : UITestBase
+    public class UITestCheck : UITestBase
     {
         [UnityTest]
         public IEnumerator CheckObjectDisabled()

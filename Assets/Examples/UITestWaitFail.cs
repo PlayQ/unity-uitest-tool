@@ -6,58 +6,13 @@ using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools.Tests
 {
-    public class UITestFail : UITestBase
+    public class UITestWaitFail : UITestBase
     {
-        [SetUp]
-        public void Init()
-        {
-            // LoadSceneForSetUp("TestableGameScene");
-        }
-
         [UnityTest]
-        public IEnumerator LoadScene()
+        public IEnumerator WaitForLoadScene()
         {
             //Wait for scene loading
             yield return LoadScene("non exist scene");
-        }
-
-
-
-        [UnityTest]
-        public IEnumerator FindObjectByPixels()
-        {
-            //Wait for scene loading
-            yield return LoadScene("1");
-
-            yield return WaitFrame();
-
-            var obj = FindObjectByPixels(20, 20);
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(obj.name, "Image");
-        }
-
-        [UnityTest]
-        public IEnumerator FindObjectByPercents()
-        {
-            //Wait for scene loading
-            yield return LoadScene("1");
-
-            yield return WaitFrame();
-
-            var obj = FindObjectByPercents(20f / UnityEngine.Screen.width, 20f / UnityEngine.Screen.height);
-            Assert.IsNotNull(obj);
-            Assert.AreEqual(obj.name, "Image");
-        }
-
-        [UnityTest]
-        public IEnumerator ClickOnObject()
-        {
-            //Wait for scene loading
-            yield return LoadScene("1");
-
-            yield return WaitFrame();
-
-            ClickPixels(20, 20);
         }
 
         [UnityTest]

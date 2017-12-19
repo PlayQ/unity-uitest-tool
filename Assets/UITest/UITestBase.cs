@@ -9,18 +9,44 @@ using UnityEngine.SceneManagement;
 using NUnit.Framework;
 using System.Linq;
 using System.Text;
-using NUnit.Framework.Constraints;
 using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools
 {
     public abstract class UITestBase
     {
+
+        [SetUp]
+        protected void IgnoreUnsuitableResolutions()
+        {
+            if (PlayModeTestRunner.IsRunning)
+            {
+                return;
+            }
+            
+            var type = GetType();
+            var method = type.GetMethod(TestContext.CurrentContext.Test.Name);
+            var attrs = method.GetCustomAttributes(true);
+            var targetAttr = attrs.FirstOrDefault(attr => attr is TargetResolutionAttribute);
+            if (targetAttr != null)
+            {
+                var attr = (TargetResolutionAttribute) targetAttr;
+                if (attr.Width != Screen.width || attr.Height != Screen.height)
+                {
+#if UNITY_EDITOR
+                    GameViewResizer.SetResolution(attr.Width, attr.Height);
+#else
+                    Assert.Ignore();
+#endif
+                }
+            }
+        }
+
         protected EventSystem FindCurrentEventSystem()
         {
             return GameObject.FindObjectOfType<EventSystem>();
         }
-        
+
         protected void LoadSceneForSetUp(string sceneName)
         {
             SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
@@ -68,7 +94,6 @@ namespace PlayQ.UITestTools
             Application.CaptureScreenshot(name);
         }
 
-
         protected IEnumerator WaitFrame(int count = 1)
         {
             while (count > 0)
@@ -82,16 +107,10 @@ namespace PlayQ.UITestTools
         {
             var pointerData = new PointerEventData(EventSystem.current);
             var resultsData = new List<RaycastResult>();
-            pointerData.position = new Vector2(x ,y);
-            
+            pointerData.position = new Vector2(x, y);
+
             EventSystem.current.RaycastAll(pointerData, resultsData);
-
             return resultsData.Count > 0 ? resultsData[0].gameObject : null;
-        }
-
-        protected GameObject FindObjectByPercents(float x, float y)
-        {
-            return FindObjectByPixels(Screen.width * x, Screen.height * y);
         }
 
         private IEnumerator WaitFor(Func<bool> condition, float timeout, string testInfo)
@@ -124,6 +143,11 @@ namespace PlayQ.UITestTools
 
         #region Interactions
 
+        protected void ClickPixels(Vector2 pos)
+        {
+            ClickPixels(pos.x, pos.y);
+        }
+
         protected void ClickPixels(float x, float y)
         {
             GameObject go = FindObjectByPixels(x, y);
@@ -134,21 +158,7 @@ namespace PlayQ.UITestTools
             Click(go);
         }
 
-        protected void ClickPercents(float x, float y)
-        {
-            GameObject go = FindObjectByPercents(x, y);
-            if (go == null)
-            {
-                Assert.Fail("Cannot click to percents [" + x + ";" + y +
-                            "], couse there are no objects.");
-            }
-            Click(go);
-        }
-
-
-
-        
-        protected IEnumerator DragPixels(Vector2 from, Vector2 to, float time = 1)
+        protected IEnumerator DragPixels(Vector2 from, Vector2 distance, float time = 1)
         {
             var go = FindObjectByPixels(from.x, from.y);
             if (go == null)
@@ -156,69 +166,70 @@ namespace PlayQ.UITestTools
                 Assert.Fail("Cannot grag object from pixels [" + from.x + ";" + from.y +
                             "], couse there are no objects.");
             }
-            yield return DragPixels(go, from, to, time);
-        }
-      
-        
+            
+            var fromPos = new Vector2();
+            var scrollElement = GetObjectForExecutingDrag(go, ref fromPos);
 
-        protected IEnumerator DragPercents(Vector2 from, Vector2 to, float time = 1)
+            if (scrollElement == null)
+            {
+                Assert.Fail("Can't find draggable object for \"{0}\"", go.name);
+            }
+            
+            yield return DragPixels(scrollElement, from, distance, time);
+        }
+
+        protected IEnumerator DragPixels(string path, Vector2 distance, float time = 1)
         {
-            var startPixel = new Vector2(Screen.width * from.x, Screen.height * from.y);
-            var endPixel = new Vector2(Screen.width * to.x, Screen.height * to.y);
-            yield return DragPixels(startPixel, endPixel, time);
+            var go = UITestTools.FindAnyGameObject(path);
+            if (go == null)
+            {
+                Assert.Fail("Cannot grag object " + path + ", couse there are not exist.");
+            }
+            yield return DragPixels(go, distance, time);
         }
 
-
-
-        protected IEnumerator DragPixels(GameObject go, Vector2 to, float time = 1)
+        protected IEnumerator DragPixels(GameObject go, Vector2 distance, float time = 1)
         {
             var rectTransform = go.transform as RectTransform;
             if (rectTransform == null)
             {
                 Assert.Fail("Can't find rect transform on object \"{0}\"", go.name);
             }
-            yield return DragPixels(go, null, to, time);
-        }
-
-        protected IEnumerator DragPercents(GameObject go, Vector2 to, float time = 1)
-        {
-            yield return DragPixels(go, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
-        }
-
-        protected IEnumerator DragPixels(GameObject go, Vector2? from, Vector2 to, float time = 1)
-        {
-            if (!go.activeInHierarchy)
-            {
-                Assert.Fail("Trying to click to " + go.name + " but it disabled");
-            }
 
             var fromPos = new Vector2();
-            var scrollElement = GetScrollElement(go, ref fromPos);
+            var scrollElement = GetObjectForExecutingDrag(go, ref fromPos);
 
             if (scrollElement == null)
             {
                 Assert.Fail("Can't find draggable object for \"{0}\"", go.name);
             }
 
-            if (from != null)
+            yield return DragPixels(scrollElement, fromPos, distance, time);
+        }
+
+        protected IEnumerator DragPixels(GameObject go, Vector2 from, Vector2 distance, float time = 1)
+        {
+            if (!go.activeInHierarchy)
             {
-                fromPos = from.Value;
+                Assert.Fail("Trying to click to " + go.name + " but it disabled");
             }
 
+            var to = from + distance;
+
             var initialize = new PointerEventData(EventSystem.current);
-            ExecuteEvents.Execute(scrollElement, initialize, ExecuteEvents.initializePotentialDrag);
+            ExecuteEvents.Execute(go, initialize, ExecuteEvents.initializePotentialDrag);
 
             var currentTime = 0f;
             while (currentTime <= time)
             {
                 yield return null;
-                var targetPos = Vector2.Lerp(fromPos, to, currentTime / time);
+                var targetPos = Vector2.Lerp(from, to, currentTime / time);
                 var drag = new PointerEventData(EventSystem.current)
                 {
                     button = PointerEventData.InputButton.Left,
                     position = targetPos
                 };
-                ExecuteEvents.Execute(scrollElement, drag, ExecuteEvents.dragHandler);
+                ExecuteEvents.Execute(go, drag, ExecuteEvents.dragHandler);
                 currentTime += Time.deltaTime;
             }
 
@@ -227,10 +238,10 @@ namespace PlayQ.UITestTools
                 button = PointerEventData.InputButton.Left,
                 position = to
             };
-            ExecuteEvents.Execute(scrollElement, finalDrag, ExecuteEvents.dragHandler);
+            ExecuteEvents.Execute(go, finalDrag, ExecuteEvents.dragHandler);
         }
 
-        private GameObject GetScrollElement(GameObject go, ref Vector2 handlePosition)
+        private GameObject GetObjectForExecutingDrag(GameObject go, ref Vector2 handlePosition)
         {
             var selectable = go.GetComponent<Selectable>();
             if (selectable == null)
@@ -269,21 +280,6 @@ namespace PlayQ.UITestTools
                 return scrollRect.gameObject;
             }
             return null;
-        }
-
-        protected IEnumerator DragPixels(string path, Vector2 to, float time = 1)
-        {
-            GameObject go = UITestTools.FindAnyGameObject(path);
-            if (go == null)
-            {
-                Assert.Fail("Cannot grag object " + path + ", couse there are not exist.");
-            }
-            yield return DragPixels(go, to, time);
-        }
-
-        protected IEnumerator DragPercents(string path, Vector2 to, float time = 1)
-        {
-            yield return DragPixels(path, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
         }
 
         protected void SetText(GameObject go, string text)

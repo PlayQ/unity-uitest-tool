@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
  using NUnit.Framework;
- using UnityEditorInternal;
  using UnityEngine;
  using UnityEngine.TestTools;
  using Debug = UnityEngine.Debug;
@@ -22,6 +21,11 @@ namespace PlayQ.UITestTools
         public static Action<MethodInfo> OnTestFailed;
         public static Action OnStartProcessingTests;
 
+        public static bool IsRunning
+        {
+            get { return isRunning; }
+        }
+        
         public const string TEST_NAME_SCENE = "RuntimeTestScene.unity";
         private const string LOG_FILE_NAME = "runtimeTests.txt";
 
@@ -34,13 +38,14 @@ namespace PlayQ.UITestTools
             Failed,
             Success
         }
-        
+
         private TestState currentTestState;
         private Coroutine currentTestCoroutine;
         private NUnitLogger nUnitLogger;
         private LogSaver logSaver;
         private PlayModeTestRunnerGUI screenGUIDrawer;
-        
+        private static bool isRunning;
+
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
@@ -122,6 +127,8 @@ namespace PlayQ.UITestTools
 
         private void StartProcessingTests()
         {
+            isRunning = true;
+            
             logSaver.StartWrite();
             Application.logMessageReceived += ApplicationOnLogMessageReceived;
             StartCoroutine(ProcessTestQueue());
@@ -160,6 +167,25 @@ namespace PlayQ.UITestTools
                             OnTestIgnored(method.Method);
                         }
                         continue;
+                    }
+
+                    if (method.TargetResolution != null)
+                    {
+                        if (method.TargetResolution.Width != Screen.width ||
+                            method.TargetResolution.Height != Screen.height)
+                        {
+#if UNITY_EDITOR
+                            GameViewResizer.SetResolution(method.TargetResolution.Width,
+                                method.TargetResolution.Height);
+#else
+                            nUnitLogger.IgnoreLog(method.FullName);
+                            if (OnTestIgnored != null)
+                            {
+                                OnTestIgnored(method.Method);
+                            }
+                            continue;
+#endif
+                        }
                     }
 
                     object testInstance = null;
@@ -232,7 +258,7 @@ namespace PlayQ.UITestTools
         private void FinalizeTest()
         {
             logSaver.Close();
-
+            isRunning = false;
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
 #else
