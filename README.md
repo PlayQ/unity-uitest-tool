@@ -17,6 +17,7 @@ Content
 	* [Wait class](#wait-class)
 	* [Check class](#check-class)
 	* [Interact class](#interact-class)
+	* [UITestUtils class](#uitestutils-class)
 
 
 About
@@ -72,7 +73,7 @@ Launch game in editor, press `start record` button, perform any actions you need
 ##### Custom Test Runner
 Is required to perform tests on mobile devices, because build-in unity test runner can perform tests only in editor. To open  `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
-<img src="documentation/images/play-mode-test-runner.png" width="600">
+<img src="documentation/images/play-mode-testrunner.png" width="600">
 
 `Custom Test Runner` searches for all methods with custom attribute `[UnityTest]` and shows them like a folding list.
 You can select test that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. When you run tests on mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` is not exists - all tests are executed.
@@ -561,6 +562,77 @@ Checks if `GameObject` has `InputField` component. Fails if not. Then appends gi
 public static void AppendText(string path, string text)
 ```
 Appends text to `GameObject` by path with `InputField` component.
+
+
+##### UITestUtils class
+This class contains helper methods to work with `GameObjects` 
+
+```c#
+public static string LogHierarchy()
+```
+Prins in console log with a list of path to all GameObject on scene.
+
+
+```c#
+public static GameObject FindObjectByPixels(float x, float y, HashSet<string> ignoreNames = null)
+```
+Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. `ignoreNames` - set of names of object, that are ignored.
+
+
+```c#
+public static GameObject FindObjectByPercents(float x, float y)
+```
+Get pixels coords from percent coords. Then Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click.
+
+
+```c#
+public static GameObject FindGameObjectWithComponentInParents<TComponent>(GameObject go)
+```
+Checks if given `GameObject` has `TComponent` component on it. If not - checks it's parent recursively. Retusn `GameObject` with give component, or null.
+
+
+```c#
+public static TComponent FindComponentInParents<TComponent>(GameObject go)
+```
+Checks if given `GameObject` has `TComponent` component on it. If not - checks it's parent recursively. Retusn `TComponent` instance, or null.
+
+```c#
+public static string GetGameObjectFullPath(GameObject gameObject)
+```
+Returns full path in hierarchy of given `GameObject`.
+
+
+```c#
+public static GameObject FindAnyGameObject<T>(String path) where T : Component
+```
+Searches for `GameObject` that has component of `T` and by path in hierarchy. Searches for active and non-active `GameObjects`.
+
+
+```c#
+public static GameObject FindAnyGameObject(string path)
+```
+Searches for `GameObject` by path in hierarchy. Searches for active and non-active `GameObjects`.
+
+
+```c#
+public static T FindAnyGameObject<T>() where T : Component
+```
+Searches for `GameObject` that has component of `T`. Searches for active and non-active `GameObjects`.
+
+```c#
+public static Vector2 CenterPointOfObject(RectTransform transform)
+```
+Return center point of given `RectTransform`.
+
+
+```c#
+public static Vector2[] ScreenVerticesOfObject(RectTransform transform)
+```
+Returns array of coords of screen rectangle of given RectTransform.
+
+
+
+
 
 
 
