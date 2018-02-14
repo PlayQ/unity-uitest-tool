@@ -16,6 +16,7 @@ Content
 * [API methods](#api-methods)
 	* [Wait class](#wait-class)
 	* [Check class](#check-class)
+	* [Interact class](#interact-class)
 
 
 About
@@ -71,7 +72,7 @@ Launch game in editor, press `start record` button, perform any actions you need
 ##### Custom Test Runner
 Is required to perform tests on mobile devices, because build-in unity test runner can perform tests only in editor. To open  `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
-<img src="documentation/images/play-mode-test-runner" width="600">
+<img src="documentation/images/play-mode-test-runner.png" width="600">
 
 `Custom Test Runner` searches for all methods with custom attribute `[UnityTest]` and shows them like a folding list.
 You can select test that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. When you run tests on mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` is not exists - all tests are executed.
@@ -371,7 +372,7 @@ Checks `GameObject` is active in hierarchy.
 ```c#
 public static void CheckAverageFPS(float targetFPS)
 ```
-Checks average fps since moment user last time called [ResetFPS()](#resets fps) method or since game started.
+Checks average fps since moment user last time called [ResetFPS()](#public-static-void-resetFPS) method or since game started.
 
 
 ```c#
@@ -464,6 +465,103 @@ Checks thart `GameObject` by given path has `Toggle` component and it's `isOn` v
 public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout)
 ```
 Seraches for `GameObject` by given path with `Animator` component. Waits during given timeOut until animation state with given name becames active.
+
+
+##### Interact class
+
+```c#
+public static IEnumerator LoadScene(string sceneName, float waitTimeout = 2f)
+```
+Loads scene by given name. Fails it loading lasts longer than timeout.
+
+
+```c#
+public static void MakeScreenShot(string name)
+```
+Makes screenshot. Saves it to persistant data path.
+
+
+```c#
+public static IEnumerator MakeScreenshotAndCompare(string screenShotName, string referenceName, Vector2 size, float treshold = 1)
+```
+Saves screenshot by `screenShotName` then loads screenshot by `referenceName`, and compares it pixel to pixel. 
+
+`Vector2 size` - size of saved screenshot. This parameter will be removed later.
+
+`float treshold` - percentage of missmatches during pisex comparison. If for example this value is set to `1` - every pixel must match to referense, otherwise method fails. If values is set to 0.5f - at least 50% of all pixels must match. 
+
+
+```c#
+public static void ResetFPS()
+```
+FPS counter counts average fps, minimum and maximum FPS since the moment this method is called.
+
+
+```c#
+public static void SetTimescale(float scale)
+```
+Sets timescale.
+
+
+```c#
+public static void Click(string path)
+```
+Emulates click on `Unity UI` element by path.
+
+
+```c#
+public static void Click(GameObject go)
+```
+Emulates click on `Unity UI` GameObject.
+
+
+```c#
+public static IEnumerator WaitDelayAndClick(string path, float delay, float timeOut)
+```
+Waits until `GameObject` by path is present on scene, active in hierarchy, the delay durin `delay`, then emulate click. Fails on timeout.
+
+
+```c#
+public static IEnumerator WaitDelayAndClickIfPossible(string path, float delay, float timeOut)
+```
+Waits until `GameObject` by path is present on scene, active in hierarchy, the delay durin `delay`, then emulate click. Doesn't fail on timeout.
+
+
+```c#
+public static void ClickPixels(int x, int y)
+```
+Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform click on it.
+
+
+```c#
+public static void ClickPercents(float x, float y)
+```
+First find pixel coordinates by screen percents. Then uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform click on it.
+
+
+```c#
+public static void SetText(GameObject go, string text)
+```
+Checks if `GameObject` has `Text` component, fail if it has not. If not fail, then set `text` variable of `Text` to given value.
+
+
+```c#
+public static void SetText(string path, string text)
+```
+Finds `GameObject` by path, checks if `GameObject` has `Text` component, fail if it has not. If not fail, then set `text` variable of `Text` to given value.
+
+
+```c#
+public static void AppendText(GameObject go, string text)
+```
+Checks if `GameObject` has `InputField` component. Fails if not. Then appends given `text` to `text` variable of `InputField`
+
+
+```c#
+public static void AppendText(string path, string text)
+```
+Appends text to `GameObject` by path with `InputField` component.
+
 
 
 
