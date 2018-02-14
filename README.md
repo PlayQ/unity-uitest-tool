@@ -15,6 +15,7 @@ Content
 	* [Helper custom attribute](#helper-custom-attribute)
 * [API methods](#api-methods)
 	* [Wait class](#wait-class)
+	* [Check class](#check-class)
 
 
 About
@@ -32,7 +33,7 @@ Just copy folder `UITestTools` and past wherever you want in `Assets` folder of 
 
 To use test recorder navigate to `Window => Ui test tools => Flow recorder`. Or press `Ctrl+T`.
 
-<img src="documentation/images/recorder-interface.png" width="400">
+<img src="documentation/images/recorder-interface.png" width="600">
 
 `Start Record` button - enables recording mode, user's click would be recorded as actions, you can select necessary assertation for this actions.
 
@@ -48,7 +49,7 @@ To use test recorder navigate to `Window => Ui test tools => Flow recorder`. Or 
 
 `Generate Code and copy` - generate code from recorded user actions.
 
-<img src="documentation/images/action-item.png" width="400">
+<img src="documentation/images/action-item.png" width="600">
 
 Recorded users actions are visually displayed as a list, each item of list contains next information:
 1. `Assertation Type` - there is a drop down menu with a list of assertation types. Each assertation has its own list of require arguments.
@@ -70,7 +71,7 @@ Launch game in editor, press `start record` button, perform any actions you need
 ##### Custom Test Runner
 Is required to perform tests on mobile devices, because build-in unity test runner can perform tests only in editor. To open  `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
-![alt text](https://github.com/PlayQ/tg-unity-uitest/tree/master/documentation/images/play-mode-test-runner.png "Play Mode Test Runner")
+<img src="documentation/images/play-mode-test-runner" width="600">
 
 `Custom Test Runner` searches for all methods with custom attribute `[UnityTest]` and shows them like a folding list.
 You can select test that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. When you run tests on mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` is not exists - all tests are executed.
@@ -137,39 +138,39 @@ public static class Check
 {
 	//custom attribute ShowInEditor links method TextEquals to class helper CheckTextEquals.
 	[ShowInEditor(typeof(CheckTextEquals), "Text equals")] 
-    public static void TextEquals(string path, string expectedText) //Assertation method
-    {
-    	CheckextEquals.CheckEquals(path, expectedText);
-    }
+	public static void TextEquals(string path, string expectedText) //Assertation method
+	{
+		CheckextEquals.CheckEquals(path, expectedText);
+	}
 
 	//class helper
- 	private static class CheckInputTextEquals
-    {
-    	// Method that finds gameObject by its path
-        // and checks that it has
-    	public static void CheckEquals(string path, string expectedText)
-  		{
-  			var go = UITestUtils.FindAnyGameObject(path); // UITestUtils is util class with helpfull methods
-  			Assert.AreEqual(null, go, "CheckEquals: Object " + path + " is not exist"); 
-  			TextEquals(go, expectedText);
-  		}
+	private static class CheckInputTextEquals
+	{
+		// Method that finds gameObject by its path
+		// and checks that it has
+		public static void CheckEquals(string path, string expectedText)
+		{
+			var go = UITestUtils.FindAnyGameObject(path); // UITestUtils is util class with helpfull methods
+			Assert.AreEqual(null, go, "CheckEquals: Object " + path + " is not exist"); 
+			TextEquals(go, expectedText);
+		}
 
 
-  		public static bool IsAvailable(GameObject go)
-  		{
-  			return go.GetComponent<Text>() != null; //GameObject has to have Text component on it
-  		}
-
+		public static bool IsAvailable(GameObject go)
+		{
+			return go.GetComponent<Text>() != null; //GameObject has to have Text component on it
+		}
+		
 		// out assertation method requires text as an additional param
-        //that's why GetDefautParams extracts this value from GameObject
- 		// and returns it
- 		public static List<object> GetDefautParams(GameObject go)
-  		{
-  			List<object> result = new List<object>();
-  			var labelText = go.GetComponent<Text>();
-  			result.Add(labelText.text);
-  			return result;              
-  		}
+		//that's why GetDefautParams extracts this value from GameObject
+		// and returns it
+		public static List<object> GetDefautParams(GameObject go)
+		{
+			List<object> result = new List<object>();
+			var labelText = go.GetComponent<Text>();
+			result.Add(labelText.text);
+			return result;              
+		}
 	}
 }
 ```
@@ -292,6 +293,183 @@ Waits for seconds.
 public static IEnumerator SceneLoaded(string sceneName, float waitTimeout = 2f)
 ```
 Waits until scene with given name is loaded. Fails by timout.
+
+
+##### Check class
+
+```c#
+public static void TextEquals(string path, string expectedText)
+```
+Checks `GameObject` by given path has `Text` component and it's variable `text` is equals to expected text.
+
+```c#
+public static void TextNotEquals(string path, string expectedText)
+```
+Checks `GameObject` by given path has `Text` component and it's variable `text` is not equals to expected text.
+
+
+```c#
+public static void TextEquals(GameObject go, string expectedText)
+```
+Checks `GameObject` has `Text` component and it's variable `text` is equals to expected text.
+
+
+```c#
+public static void TextNotEquals(GameObject go, string expectedText)
+```
+Checks `GameObject` has `Text` component and it's variable `text` is not equals to expected text.
+
+
+```c#
+public static void InputEquals(GameObject go, string expectedText)
+```
+Checks `GameObject` has `InputField` component and it's variable `text` is equals to expected text.
+
+
+```c#
+public static void InputNotEquals(GameObject go, string expectedText)
+```
+Checks `GameObject` has `InputField` component and it's variable `text` is not equals to expected text.
+
+
+```c#
+public static void InputEquals(string path, string expectedText)
+```
+Checks `GameObject` by given path has `InputField` component and it's variable `text` is equals to expected text.
+
+
+```c#
+public static void InputNotEquals(string path, string expectedText)
+```
+Checks `GameObject` by given path has `InputField` component and it's variable `text` is not equals to expected text.
+
+
+```c#
+public static void IsEnable(string path)
+```
+Checks `Gameobject` by path is present on scene and active in hierarchy.
+
+
+```c#
+public static void IsEnable<T>(string path) where T : Component
+```
+Checks `Gameobject` by path is present on scene, contains component `T` and active in hierarchy.
+
+
+```c#
+public static void IsEnable<T>() where T : Component
+```
+Searches for `Gameobject` with component `T` and checks it is present on scene and active in hierarchy.
+
+
+```c#
+public static void IsEnable(GameObject go)
+```
+Checks `GameObject` is active in hierarchy.
+
+
+```c#
+public static void CheckAverageFPS(float targetFPS)
+```
+Checks average fps since moment user last time called [ResetFPS()](#resets fps) method or since game started.
+
+
+```c#
+public static void CheckMinFPS(float targetFPS)
+```
+Checks minimal fps since moment user last time called [ResetFPS()](#resets fps) method or since game started.
+
+
+
+```c#
+public static void IsDisable(string path)
+```
+Checks `Gameobject` by path is present on scene and not active in hierarchy.
+
+
+```c#
+public static void IsDisable<T>(string path) where T : Component
+```
+Checks `Gameobject` by path is present on scene, contains component `T` and not active in hierarchy.
+
+
+
+```c#
+public static void IsDisable<T>() where T : Component
+```
+Searches for `Gameobject` with component `T` and checks it is present on scene and not active in hierarchy.
+
+
+```c#
+public static void IsDisable(GameObject go)
+```
+Checks `GameObject` is not active in hierarchy.
+
+
+```c#
+public static void CheckEnabled(string path, bool state = true)
+```
+Checks `Gameobject` by path is present on scene and it's active in hierarchy flag is equals `state` variable.
+
+
+```c#
+public static GameObject IsExist(string path)
+```
+Checks `GameObject` by give path is present on scene.
+
+
+```c#
+public static GameObject IsExist<T>(string path) where T : Component
+```
+Checks `GameObject` by give path is present on scene and contains component `T`.
+
+
+```c#
+public static GameObject IsExist<T>() where T : Component
+```
+Searches for `GameObject` with component `T` on scene.
+
+
+```c#
+public static void IsNotExist(string path)
+```
+Checks `GameObject` by give path is not present on scene.
+
+
+```c#
+public static void IsNotExist<T>(string path) where T : Component
+```
+Checks `GameObject` by give path and component `T` is not present on scene.
+
+
+```c#
+public static void IsNotExist<T>() where T : Component
+```
+Searches for any `GameObject` on scene with component `T`. Fails if found one.
+
+
+```c#
+public static void CheckToggle(GameObject go, bool expectedIsOn)
+```
+Checks thart `GameObject` has `Toggle` component and it's `isOn` value is equals to expected.
+
+
+```c#
+public static void CheckToggle(string path, bool state)
+```
+Checks thart `GameObject` by given path has `Toggle` component and it's `isOn` value is equals to expected.
+
+
+```c#
+public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout)
+```
+Seraches for `GameObject` by given path with `Animator` component. Waits during given timeOut until animation state with given name becames active.
+
+
+
+
+
+
 
 
 
