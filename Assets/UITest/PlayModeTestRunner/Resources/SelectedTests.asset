@@ -1,0 +1,95 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 825c94a0152363f46a14ee91221566d3, type: 3}
+  m_Name: SelectedTests
+  m_EditorClassIdentifier: 
+  TestsInfo:
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25472
+    ClassName: CKTestSuites.TestSuiteLevelProgression
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25473
+    ClassName: CKTestSuites.TestSuiteLevelProgression
+  - IsSelected: 1
+    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25474
+    ClassName: CKTestSuites.TestSuiteLevelProgression
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25475
+    ClassName: CKTestSuites.TestSuiteLevelProgression
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25476
+    ClassName: CKTestSuites.TestSuiteLevelProgression
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25477
+    ClassName: CKTestSuites.TestSuiteLevelProgression
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteAccessPoints.TSAPC26186
+    ClassName: CKTestSuites.TestSuiteAccessPoints
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25455
+    ClassName: CKTestSuites.TestSuiteLives
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25456
+    ClassName: CKTestSuites.TestSuiteLives
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25457
+    ClassName: CKTestSuites.TestSuiteLives
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25458
+    ClassName: CKTestSuites.TestSuiteLives
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25459
+    ClassName: CKTestSuites.TestSuiteLives
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteSettings.TSSettingsC25421
+    ClassName: CKTestSuites.TestSuiteSettings
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteSettings.TSSettingsC25422
+    ClassName: CKTestSuites.TestSuiteSettings
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteSettings.TSSettingsC25423
+    ClassName: CKTestSuites.TestSuiteSettings
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25412
+    ClassName: CKTestSuites.TestSuiteUsingPreexistingGold
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25413
+    ClassName: CKTestSuites.TestSuiteUsingPreexistingGold
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25415
+    ClassName: CKTestSuites.TestSuiteUsingPreexistingGold
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteFTUE.TSFTUEC26195
+    ClassName: CKTestSuites.TestSuiteFTUE
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteFTUE.TSFTUEC26196
+    ClassName: CKTestSuites.TestSuiteFTUE
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25416
+    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25417
+    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25418
+    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25420
+    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteFTUE.TSFTUEC26194
+    ClassName: CKTestSuites.TestSuiteFTUE
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25419
+    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25414
+    ClassName: CKTestSuites.TestSuiteUsingPreexistingGold

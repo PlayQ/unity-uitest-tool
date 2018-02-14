@@ -50,7 +50,7 @@ namespace PlayQ.UITestTools
 
 		private static MethodInfo FindMethod(Type defineType, string name)
 		{
-			return defineType.GetMethod(name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+			return defineType.GetMethod(name, BindingFlags.Static |BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 		}
 
 		public static void SetResolution(int width, int height)

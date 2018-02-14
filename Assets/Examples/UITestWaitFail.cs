@@ -6,91 +6,84 @@ using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools.Tests
 {
-    public class UITestWaitFail : UITestBase
+    public class UITestWaitFail
     {
-        [UnityTest]
-        public IEnumerator WaitForLoadScene()
-        {
-            //Wait for scene loading
-            yield return LoadScene("non exist scene");
-        }
-
         [UnityTest]
         public IEnumerator WaitForObjectByName()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
-            var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+            var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.DestroyImmediate(testObject);
 
             //search for object with name "child_enabled" in parent object "container"
             //if object is not found - waits for object appearing for duration
-            yield return WaitForObject("container");
+            yield return Wait.ObjectInstantiated("container");
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectByComponent()
         {
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
-            var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+            var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.DestroyImmediate(testObject);
 
-            yield return WaitForObject<TestObject>();
+            yield return Wait.ObjectInstantiated<TestObject>();
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectByComponentAndName()
         {
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
-            var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+            var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.DestroyImmediate(testObject);
 
-            yield return WaitForObject<TestObject>("container");
+            yield return Wait.ObjectInstantiated<TestObject>("container");
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectDestractionByComponent()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
             //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-            yield return WaitForDestroy<TestObject>(1);
+            yield return Wait.ObjectDestroy<TestObject>(1);
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectDestractionByInstance()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
-            var objectInstance = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+            var objectInstance = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
 
             //wait during interval for object destraction by object instance
-            yield return WaitForDestroy(objectInstance);
+            yield return Wait.ObjectDestroy(objectInstance);
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectDestractionByName()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
             //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
-            yield return WaitForDestroy("container");
+            yield return Wait.ObjectDestroy("container");
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectDisabledByName()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
             //check for disabled
-            yield return WaitObjectDisabled("Object_enabled_at_start");
+            yield return Wait.ObjectDisabled("Object_enabled_at_start");
 
         }
 
@@ -99,10 +92,10 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectDisabledByComponent()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
             //check for disabled
-            yield return WaitObjectDisabled<TestObject>();
+            yield return Wait.ObjectDisabled<TestObject>();
 
         }
 
@@ -111,12 +104,12 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectEnabledByComponent()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
-            var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+            var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             testObject.SetActive(false);
             //check for enabled by component type
-            yield return WaitObjectEnabled<TestObject>();
+            yield return Wait.ObjectEnabled<TestObject>();
 
         }
 
@@ -124,13 +117,13 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectEnabledByName()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
-            var testObject = UITestTools.FindAnyGameObject<TestObject>().gameObject;
+            var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             testObject.SetActive(false);
 
             //check for enabled by path in hierarchy
-            yield return WaitObjectEnabled("container");
+            yield return Wait.ObjectEnabled("container");
 
         }
 
@@ -138,10 +131,10 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForButtonAccesible()
         {
             //Wait for scene loading
-            yield return LoadScene("1");
+            yield return Interact.LoadScene("1");
 
-            var button = UITestTools.FindAnyGameObject("container");
-            yield return ButtonAccessible(button);
+            var button = UITestUtils.FindAnyGameObject("container");
+            yield return Wait.ButtonAccessible(button);
         }
 
     }

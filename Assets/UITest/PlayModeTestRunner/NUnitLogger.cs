@@ -1,48 +1,39 @@
-﻿﻿using System;
+﻿using System;
+using NUnit.Framework;
+using NUnit.Framework.Interfaces;
 using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
-    public class NUnitLogger
+    public class NUnitLogger : ITestLogger
     {
-        public const string TC_DATE_FORMAT = "yyyy-MM-ddThh:mm:ss.fff";
-        public const string FILE_DATE_FORMAT = "yyyy-MM-ddThh.mm.ss.fff";
+        private const string TC_DATE_FORMAT = "yyyy-MM-ddThh:mm:ss.fff";
 
-        private const string DELIMETER =
-            "===================================================================================";
-
-        public void IgnoreLog(string methodName)
+        public void LogTestStart()
         {
-            Debug.Log(DELIMETER);
-            Debug.LogFormat("\"{0}\" ignored.", methodName);
-            Debug.LogFormat("##teamcity[testIgnored timestamp='{0}' name='{1}']",
-                DateTime.UtcNow.ToString(TC_DATE_FORMAT), methodName);
-            Debug.Log(DELIMETER);
+            Debug.Log(string.Format("##teamcity[testStarted timestamp='{0}' name='{1}']",
+                DateTime.UtcNow.ToString(TC_DATE_FORMAT), TestContext.CurrentContext.Test.FullName));
         }
 
-        public void StartLog(string methodName)
+        public void LogTestEnd()
         {
-            Debug.Log(DELIMETER);
-            Debug.LogFormat("\"{0}\" setup", methodName);
-            Debug.LogFormat("##teamcity[testStarted timestamp='{0}' name='{1}']",
-                DateTime.UtcNow.ToString(TC_DATE_FORMAT), methodName);
-        }
-
-        public void SuccessLog(string methodName)
-        {
-            Debug.LogFormat("##teamcity[testFinished timestamp='{0}' name='{1}']",
-                DateTime.UtcNow.ToString(TC_DATE_FORMAT), methodName);
-            Debug.LogFormat("\"{0}\" success", methodName);
-            Debug.Log(DELIMETER);
-        }
-
-        public void FailLog(string methodName)
-        {
-            Debug.LogFormat("##teamcity[testFailed timestamp='{0}' name='{1}']",
+            if (TestContext.CurrentContext.Result.Outcome == ResultState.Ignored)
+            {
+                Debug.Log(string.Format("##teamcity[testIgnored timestamp='{0}' name='{1}']",
+                    DateTime.UtcNow.ToString(TC_DATE_FORMAT),
+                    TestContext.CurrentContext.Test.FullName));
+                return;
+            }
+            if (TestContext.CurrentContext.Result.Outcome == ResultState.Success)
+            {
+                Debug.Log(string.Format("##teamcity[testFinished timestamp='{0}' name='{1}']",
+                    DateTime.UtcNow.ToString(TC_DATE_FORMAT),
+                    TestContext.CurrentContext.Test.FullName));
+                return;
+            }
+            Debug.Log(string.Format("##teamcity[testFailed timestamp='{0}' name='{1}']",
                 DateTime.UtcNow.ToString(TC_DATE_FORMAT),
-                methodName);
-            Debug.LogFormat("\"{0}\" fail", methodName);
-            Debug.Log(DELIMETER);
+                TestContext.CurrentContext.Test.FullName));
         }
     }
 }

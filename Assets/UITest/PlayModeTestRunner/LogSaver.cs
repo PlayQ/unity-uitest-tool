@@ -20,7 +20,7 @@ namespace PlayQ.UITestTools
 
         public void Write(string log, string stacktrace)
         {
-            writer.WriteLine(DateTime.UtcNow.ToString(NUnitLogger.TC_DATE_FORMAT) + ": " + log);
+            writer.WriteLine(DateTime.UtcNow.ToString(PlayModeLogger.TC_DATE_FORMAT) + ": " + log);
             writer.WriteLine(stacktrace);
         }
 

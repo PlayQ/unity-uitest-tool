@@ -13,14 +13,17 @@ using UnityEditor;
 #endif
 
 namespace PlayQ.UITestTools
-{
+{   
     public class PlayModeTestRunner : MonoBehaviour
     {
+        public const string PLAY_ONLY_SELECTED_TESTS = "playOnlySelectedTests";
+        public const string QUIT_APP_AFTER_TESTS = "QuitAferComplete";
+        
         public static Action<MethodInfo> OnTestPassed;
         public static Action<MethodInfo> OnTestIgnored;
         public static Action<MethodInfo> OnTestFailed;
         public static Action OnStartProcessingTests;
-
+        
         public static bool IsRunning
         {
             get { return isRunning; }
@@ -31,31 +34,80 @@ namespace PlayQ.UITestTools
 
         private static List<UnitTestClass> classesForTest;
 
-        private enum TestState
+        public enum TestState
         {
             NotInited,
             InProgress,
             Failed,
-            Success
+            Success,
+            Ignored
         }
 
-        private TestState currentTestState;
+        public static MethodInfo CurrentMethodInfo
+        {
+            get { return currentMethodInfo; }
+        }
+        public static TestState CurrentTestState
+        {
+            get { return currentTestState; }
+        }
+
+        private static MethodInfo currentMethodInfo;
+        private static TestState currentTestState;
         private Coroutine currentTestCoroutine;
-        private NUnitLogger nUnitLogger;
+        private PlayModeLogger playModeLogger;
         private LogSaver logSaver;
         private PlayModeTestRunnerGUI screenGUIDrawer;
         private static bool isRunning;
-
+        private SelectedTestsSerializable selectedTests;
+        
         public void Awake()
         {
             DontDestroyOnLoad(gameObject);
-            nUnitLogger = new NUnitLogger();
+            playModeLogger = new PlayModeLogger();
             screenGUIDrawer = new PlayModeTestRunnerGUI();
             logSaver = new LogSaver(Path.Combine(Application.persistentDataPath, LOG_FILE_NAME));
+            
+            selectedTests = SelectedTestsSerializable.Load();
             classesForTest = GetTestClasses();
+            RemoveUnselectedTests();
             StartProcessingTests();
         }
 
+        private void RemoveUnselectedTests()
+        {
+            if (!selectedTests || (PlayerPrefs.HasKey(PLAY_ONLY_SELECTED_TESTS) && 
+                PlayerPrefs.GetInt(PLAY_ONLY_SELECTED_TESTS) == 0))
+            {
+                PlayerPrefs.DeleteKey(PLAY_ONLY_SELECTED_TESTS);
+                return;
+            }
+            var filteredClassesForTests = new List<UnitTestClass>();
+            foreach(var classForTest in classesForTest)
+            {
+                var newClassForTest = new UnitTestClass(classForTest.Type);
+                newClassForTest.SetUpMethods = classForTest.SetUpMethods;
+                newClassForTest.TearDownMethods = classForTest.TearDownMethods;
+                newClassForTest.TestMethods = new List<UnitTestMethod>();
+                foreach (var methodForTest in classForTest.TestMethods)
+                {
+                    if (!selectedTests.TestInfoToMethodName.ContainsKey(methodForTest.FullName))
+                    {
+                        newClassForTest.TestMethods.Add(methodForTest);
+                    }
+                    else if (selectedTests.TestInfoToMethodName[methodForTest.FullName].IsSelected)
+                    {
+                        newClassForTest.TestMethods.Add(methodForTest);
+                    }
+                }
+                if (newClassForTest.TestMethods.Count > 0)
+                {
+                    filteredClassesForTests.Add(newClassForTest);
+                }
+            }
+            classesForTest = filteredClassesForTests;
+        }
+        
         private IEnumerator InvokeMethod(object instance, UnitTestMethod method)
         {
             var returnedType = method.Method.ReturnType;
@@ -161,7 +213,8 @@ namespace PlayQ.UITestTools
                     currentTestState = TestState.NotInited;
                     if (method.IsIgnored)
                     {
-                        nUnitLogger.IgnoreLog(method.FullName);
+                        currentTestState = TestState.Ignored;
+                        playModeLogger.IgnoreLog(method.FullName);
                         if (OnTestIgnored != null)
                         {
                             OnTestIgnored(method.Method);
@@ -178,7 +231,7 @@ namespace PlayQ.UITestTools
                             GameViewResizer.SetResolution(method.TargetResolution.Width,
                                 method.TargetResolution.Height);
 #else
-                            nUnitLogger.IgnoreLog(method.FullName);
+                            playModeLogger.IgnoreLog(method.FullName);
                             if (OnTestIgnored != null)
                             {
                                 OnTestIgnored(method.Method);
@@ -189,8 +242,9 @@ namespace PlayQ.UITestTools
                     }
 
                     object testInstance = null;
+                    currentMethodInfo = method.Method;
                     screenGUIDrawer.SetCurrentTest(method.FullName);
-                    nUnitLogger.StartLog(method.FullName);
+                    playModeLogger.StartLog(method.FullName);
 
                     try
                     {
@@ -230,7 +284,7 @@ namespace PlayQ.UITestTools
 
                     if (currentTestState == TestState.Success)
                     {
-                        nUnitLogger.SuccessLog(method.FullName);
+                        playModeLogger.SuccessLog(method.FullName);
                         if (OnTestPassed != null)
                         {
                             OnTestPassed(method.Method);
@@ -247,7 +301,7 @@ namespace PlayQ.UITestTools
 
         private void ProcessTestFail(UnitTestMethod method)
         {
-            nUnitLogger.FailLog(method.FullName);
+            playModeLogger.FailLog(method.FullName);
             screenGUIDrawer.AddFailedTest(method.FullName);
             if (OnTestFailed != null)
             {
@@ -261,6 +315,11 @@ namespace PlayQ.UITestTools
             isRunning = false;
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
+            if(PlayerPrefs.HasKey(QUIT_APP_AFTER_TESTS) && PlayerPrefs.GetInt(QUIT_APP_AFTER_TESTS) == 1)
+            {
+                PlayerPrefs.DeleteKey(QUIT_APP_AFTER_TESTS);
+                EditorApplication.Exit(0);
+            }
 #else
             Application.Quit();
             #endif
