@@ -1,4 +1,4 @@
-New DocumentUI Test Tool
+UI Test Tool
 ====================================
 Content
 ----
@@ -373,13 +373,13 @@ Checks `GameObject` is active in hierarchy.
 ```c#
 public static void CheckAverageFPS(float targetFPS)
 ```
-Checks average fps since moment user last time called [ResetFPS()](#public-static-void-resetFPS) method or since game started.
+Checks average fps since moment user last time called [ResetFPS()](#reset-fps) method or since game started.
 
 
 ```c#
 public static void CheckMinFPS(float targetFPS)
 ```
-Checks minimal fps since moment user last time called [ResetFPS()](#resets fps) method or since game started.
+Checks minimal fps since moment user last time called [ResetFPS()](#reset-fps) method or since game started.
 
 
 
@@ -495,6 +495,7 @@ Saves screenshot by `screenShotName` then loads screenshot by `referenceName`, a
 ```c#
 public static void ResetFPS()
 ```
+###### Reset FPS
 FPS counter counts average fps, minimum and maximum FPS since the moment this method is called.
 
 
