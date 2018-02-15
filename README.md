@@ -7,7 +7,7 @@ Content
 	* [Flow Recorder](#flow-recorder)	
 	* [How Flow Recorder works](#how-flow-recorder-works)	 
 	* [Recording a new test](#recording-a-new-test)	 
-	* [Custom Test Runner](#custom-test-runner)	
+	* [Test Runner](#test-runner)	
 	* [Helper Window](#helper-window)
 * [Extending Test Tool](#extending-test-tool)
 	* [Implementing Assertation method](#implementing-assertation-method)
@@ -18,6 +18,7 @@ Content
 	* [Check class](#check-class)
 	* [Interact class](#interact-class)
 	* [UITestUtils class](#uitestutils-class)
+	* [Screen resolution depending tests](#screen-resolution-depending-tests)
 
 
 About
@@ -75,14 +76,43 @@ Launch the game in editor, press `start record` button, perform any actions you 
 
 We use custom Test Runner to make possible to:
 * Run test on the real devices
-* Run custom set og tests
+* Run custom set of tests
 * Run only tests with `[SmokeTest]` attribute  
+* Run only tests whos target resolution matches mobile device resolution.
+* Change editor Game window resolution to match test target resolution.
 It is needed to perform tests on mobile devices, because build-in unity test runner can perform tests only in editor. To open `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
 <img src="documentation/images/play-mode-testrunner.png" width="600">
 
 `Custom Test Runner` searches for all methods with custom attribute `[UnityTest]` and shows them like a folding list.
 You can select test that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. When you run tests on mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` is not exists - all tests are executed.
+
+##### Screen resolution depending tests
+Sometimes your tests may succeed or fail depending on different screen resolution. For exmple test checks if gameobject located under certain screen pixels. To ensure that test is run only with proper resolution you have to add `[TargetResolutionAttribute]` above test method declaration and set target resolution. For example:
+```c#
+[TargetResolutionAttribute(1920, 1080)]
+[UnityTest]
+public IEnumerator SomeTest()
+{....}
+```
+
+If test is run on mobile device, custom `Test Runner` will ignore with target resolution different from device resolution. If tests is run in editor custom `Test Runner` will chage Unity Game Window resolution to target resolution.
+
+To run custom Test Runner via console use followin command:
+
+```
+Unity.exe -projectPath project_path -buildTarget build_target -executeMethod TestToolBuildScript.Build -runOnlySelectedTests -runOnlySmokeTests -runTests -testBuildPath test_build_path
+```
+`project_path` - absolute path to project folder
+
+`build_target` - platform name, could be `Android` or `IOS`
+
+`-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window.
+
+`-runTests` - optional, runs test in editor.
+
+`-testBuildPath test_build_path` - optional, creates build which starts from test scene and runs tests.
+
 
 
 ### Helper Window
