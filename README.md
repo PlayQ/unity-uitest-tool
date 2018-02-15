@@ -21,15 +21,15 @@ Content
 
 
 About
----
+---------------------
 This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on [NUnit](http://nunit.org) plugin built-in in `Unity`.
 
-##### Instalation
+### Instalation
 
 Just copy folder `UITestTools` and past wherever you want in `Assets` folder of your project. 
 
 
-##### Flow Recorder
+### Flow Recorder
 
 `Flow Recorder` is an Unity Editor extension, which can record user actions and generate test.
 
@@ -63,14 +63,14 @@ Recorded users actions are visually displayed as a list, each item of list conta
 
 User can reorder already recorded actions by drag and drop.
 
-##### How Flow Recorder works
+### How Flow Recorder works
 When user clicks on `GameObject` during in `Unity` playmode `Flow Recorder` takes click coords and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. Then `Flow Recorder` looks through list of all existing `assertations` and checks which `assertation` could be applied to `GameObject`. For example, if user clicks on text - all `assertations` that compares text labels would be available. Common `assertations`, like `Check Object Enabled` or `check object exists` are available for any `GameObject`. By default `Flow Recorder` supports only `Unity UI`, if you want support `GameObjects` that doesn't contain any UI components you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
 
-##### Recording a new test
+### Recording a new test
 Launch game in editor, press `start record` button, perform any actions you need in game, then press `stop record` or exit play mode. Press `Generate code and copy` - to obtain test code. Then you can past generated code to your own test class.
 
 
-##### Custom Test Runner
+### Custom Test Runner
 Is required to perform tests on mobile devices, because build-in unity test runner can perform tests only in editor. To open  `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
 <img src="documentation/images/play-mode-testrunner.png" width="600">
@@ -79,7 +79,7 @@ Is required to perform tests on mobile devices, because build-in unity test runn
 You can select test that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. When you run tests on mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` is not exists - all tests are executed.
 
 
-##### Helper Window
+### Helper Window
 `Test Helper` is an `Unity editor extension`, that shows list of possible assertations for selected `GameObject` in `hierarchy`. If you user `Test Helper` in play mode, you can also obtain list of playing sound clips.
 
 <img src="documentation/images/test-helper.png" width="600">
@@ -93,7 +93,7 @@ Extending Test Tool
 `Test Tool` common features are split in 3 static partial classes: `Check`, `Wait` and `Interact`. Any of these classes contains list of methods which accordingly check state of given object, wait for resolving of specific condition and set state to given object.
 
 
-##### Implementing Assertation method
+### Implementing Assertation method
 Most of `Assertation methods` are working with `GameObjects` that instantiated of will be instantiated on scene. If `assertation method` works with `GameObject`, the first argument has to be `string`, which is path to `GameObject` in `hierarchy`.  If you want to use `assertation method` in `Flow Recorder` you have to pass a corresponding flag to custom method attribute, [described](#helper-custom-attribute) below.
 
 If you want `assertation method` compare some `GameObject` parameters with specific values, you can pass these values as additional arguments to `assertation method`.  If you want to use `assertation method` in `Flow Recorder` you have to describe default values for these arguments in [class helper](#class-helper) described below.
@@ -102,7 +102,7 @@ If you want `assertation method` compare some `GameObject` parameters with speci
 
 `Assertation method` could be show in `Flow Recorder` if it implemented in specific way. In such case you can find your `assertation method` in `Recorder Window` drop down menu of recorded user action.
 
-##### Class Helper
+### Class Helper
 If you want to use `Assertation method` in `Flow Recorder` you have to implement static class helper and custom attribute to your method. Class helper could contain next methods:
 
 ```c#
@@ -140,7 +140,7 @@ public static Camera Camera
 
 When user click on item(button, switch etc) flow recorder takes click coords and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. This works only with unity ui objects. But sometimes user clicks on non ui gameobjects. For such case you have to define property that return specific camera to raycast. If your `assertation method` are developed for unity ui, just skip implementation of this method.
 
-###### Example of implemented Assertation Method
+#### Example of implemented Assertation Method
 ```c#
 public static class Check
 {
@@ -185,7 +185,7 @@ public static class Check
 
 
 
-##### Helper custom attribute
+### Helper custom attribute
 
 To link your `Class Helper` to `assertation method` use custom attribute `[ShowInEditorAttribute]` on your method.
 
@@ -201,7 +201,7 @@ To add more features, which are not common and related only to your project, ext
 API methods
 --------
 
-##### Wait class
+### Wait class
 ```c#
 public static IEnumerator ObjectInstantiated(string path, float waitTimeout = 2f)
 ```
@@ -303,7 +303,7 @@ public static IEnumerator SceneLoaded(string sceneName, float waitTimeout = 2f)
 Waits until scene with given name is loaded. Fails by timout.
 
 
-##### Check class
+### Check class
 
 ```c#
 public static void TextEquals(string path, string expectedText)
@@ -474,7 +474,7 @@ public static IEnumerator AnimatorStateStarted(string path, string stateName, fl
 Seraches for `GameObject` by given path with `Animator` component. Waits during given timeOut until animation state with given name becames active.
 
 
-##### Interact class
+### Interact class
 
 ```c#
 public static IEnumerator LoadScene(string sceneName, float waitTimeout = 2f)
@@ -501,7 +501,7 @@ Saves screenshot by `screenShotName` then loads screenshot by `referenceName`, a
 ```c#
 public static void ResetFPS()
 ```
-###### Reset FPS
+#### Reset FPS
 FPS counter counts average fps, minimum and maximum FPS since the moment this method is called.
 
 
@@ -571,7 +571,7 @@ public static void AppendText(string path, string text)
 Appends text to `GameObject` by path with `InputField` component.
 
 
-##### UITestUtils class
+### UITestUtils class
 This class contains helper methods to work with `GameObjects` 
 
 ```c#
@@ -636,28 +636,3 @@ Return center point of given `RectTransform`.
 public static Vector2[] ScreenVerticesOfObject(RectTransform transform)
 ```
 Returns array of coords of screen rectangle of given RectTransform.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
