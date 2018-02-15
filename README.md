@@ -22,56 +22,58 @@ Content
 
 About
 ---------------------
+
 This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on [NUnit](http://nunit.org) plugin built-in in `Unity`.
+
 
 ### Instalation
 
-Just copy folder `UITestTools` and past wherever you want in `Assets` folder of your project. 
+Just copy `UITestTools` folder and past wherever you want in `Assets` folder of your project. 
 
 
 ### Flow Recorder
 
-`Flow Recorder` is an Unity Editor extension, which can record user actions and generate test.
+`Flow Recorder` is an Unity Editor extension, which can record user actions and generate code of test.
 
 To use test recorder navigate to `Window => Ui test tools => Flow recorder`. Or press `Ctrl+T`.
 
 <img src="documentation/images/recorder-interface.png" width="600">
 
-`Start Record` button - enables recording mode, user's click would be recorded as actions, you can select necessary assertation for this actions.
+* `Start Record` button - enables recording mode, your clicks would be recorded as actions and added to existing action list. You can select necessary assertation and edit params for each actions.
+* `Stop Record` - disables recording mode. All recorded actions are keep safe.
+* `Check` - enables/disables mode, in which clicks on ui buttons don't trigger them. Window will be colored green when check mode is enabled. 
+* `Pause mode` - set time scale to 0 when enabled, useful when it needs to emulate game pause and record things.
+* `Clean` - deletes all recorded actions.
+* `+` button - added new "empty" user action. You can select only assertations, which don't require gameobject to proceed to such action.
+* `Generate Code and Copy` - generate code for test from recorded user actions.
 
-`Stop Record` - disables recording mode. All recorded actions are keep safe.
-
-`Check` - enables mode, in which clicks on ui buttons don't trigger them. It useful to record several assertation for interacting ui.
-
-`Pause mode` - set time scale to 0 when enabled, useful when it needs to emulate game pause and record things.
-
-`Clean` - deletes all recorded actions.
-
-`+` button - added new "empty" user action. You can select only assertations, which don't require gameobject to proceed to such action.
-
-`Generate Code and copy` - generate code from recorded user actions.
+Recorded users actions are visually displayed as a list, each item of list contains next information:
 
 <img src="documentation/images/action-item.png" width="600">
 
-Recorded users actions are visually displayed as a list, each item of list contains next information:
-1. `Assertation Type` - there is a drop down menu with a list of assertation types. Each assertation has its own list of require arguments.
-2. `Description` - add description as a commentary above generated `assertation method`. 
-3. `Path` - path in hierarchy to gameobject user interacts with.
-4. `Delay`, `timeOut` - arguments list specific to selected assertation, values of these arguments could be edited by user. Arguments could be type of `enum`, `int`, `float`, `bool`, `string`.
-5. `►` - this button applies assertation in runtime.
-6. `x` - button removes action from list.
+* `Assertation Type` - there is a drop down menu with a list of assertation types. Each assertation has its own list of require arguments.
+* `Description` - add description as a commentary above generated `assertation method`. 
+* `Path` - path in hierarchy to gameobject user interacts with.
+* `Delay`, `timeOut` - arguments list specific to selected assertation, values of these arguments could be edited by user. Arguments could be type of `enum`, `int`, `float`, `bool`, `string`.
+* `►` - this button applies assertation in runtime.
+* `x` - button removes action from list.
 
-User can reorder already recorded actions by drag and drop.
+You can reorder already recorded actions by drag and drop.
+
 
 ### How Flow Recorder works
-When user clicks on `GameObject` during in `Unity` playmode `Flow Recorder` takes click coords and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. Then `Flow Recorder` looks through list of all existing `assertations` and checks which `assertation` could be applied to `GameObject`. For example, if user clicks on text - all `assertations` that compares text labels would be available. Common `assertations`, like `Check Object Enabled` or `check object exists` are available for any `GameObject`. By default `Flow Recorder` supports only `Unity UI`, if you want support `GameObjects` that doesn't contain any UI components you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
+
+When you clicks on `GameObject` during `Unity` playmode `Flow Recorder` takes click coords and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. Then `Flow Recorder` looks through list of all existing `assertations` and checks which `assertation` could be applied to `GameObject`. For example, if you clicks on text - all `assertations` that compares text labels would be available. Common `assertations`, like `Is Enable` or `Is Exist` are available for any `GameObject`. By default `Flow Recorder` supports only `Unity UI`, if you want support `GameObjects` that doesn't contain any UI components or use custom `assertations` you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
+
 
 ### Recording a new test
-Launch game in editor, press `start record` button, perform any actions you need in game, then press `stop record` or exit play mode. Press `Generate code and copy` - to obtain test code. Then you can past generated code to your own test class.
+
+Launch the game in editor, press `start record` button, perform any actions you need in game, then press `stop record` or exit play mode. Press `Generate code and copy` - to obtain code for test. Then you can paste generated code to your own test class.
 
 
 ### Custom Test Runner
-Is required to perform tests on mobile devices, because build-in unity test runner can perform tests only in editor. To open  `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
+
+It is needed to perform tests on mobile devices, because build-in unity test runner can perform tests only in editor. To open `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
 <img src="documentation/images/play-mode-testrunner.png" width="600">
 
