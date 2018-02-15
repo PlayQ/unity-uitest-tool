@@ -71,8 +71,12 @@ When you clicks on `GameObject` during `Unity` playmode `Flow Recorder` takes cl
 Launch the game in editor, press `start record` button, perform any actions you need in game, then press `stop record` or exit play mode. Press `Generate code and copy` - to obtain code for test. Then you can paste generated code to your own test class.
 
 
-### Custom Test Runner
+### Test Runner
 
+We use custom Test Runner to make possible to:
+* Run test on the real devices
+* Run custom set og tests
+* Run only tests with `[SmokeTest]` attribute  
 It is needed to perform tests on mobile devices, because build-in unity test runner can perform tests only in editor. To open `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
 <img src="documentation/images/play-mode-testrunner.png" width="600">
@@ -82,16 +86,19 @@ You can select test that you want to run and press `Run` button. Also, set of se
 
 
 ### Helper Window
-`Test Helper` is an `Unity editor extension`, that shows list of possible assertations for selected `GameObject` in `hierarchy`. If you user `Test Helper` in play mode, you can also obtain list of playing sound clips.
+
+`Test Helper` is an `Unity Editor Extension`, that shows list of possible assertations for selected `GameObject` in `Hierarchy`. If you use `Test Helper` in play mode, you can also obtain list of playing sound clips.
 
 <img src="documentation/images/test-helper.png" width="600">
 
-`copy` - copyes generated code of assertation.
-`find playing sounds` - searches for playing sound clips.
-`select` - only for sound, focuses on `GameObject` in hierarchy which has `Audio Source` component and it's `sound clip` is playing.
+`Copy` - copyes generated code of assertation.
+`Find playing sounds` - searches for playing sound clips.
+`Select` - only for sound, focuses on `GameObject` in hierarchy which has `Audio Source` component and it's `Sound Clip` is playing.
+
 
 Extending Test Tool
 -----------
+
 `Test Tool` common features are split in 3 static partial classes: `Check`, `Wait` and `Interact`. Any of these classes contains list of methods which accordingly check state of given object, wait for resolving of specific condition and set state to given object.
 
 
