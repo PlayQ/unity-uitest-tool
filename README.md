@@ -80,7 +80,13 @@ You can select test that you want to run and press `Run` button. Also, set of se
 
 
 ##### Helper Window
-This section will be updated soon.
+`Test Helper` is an `Unity editor extension`, that shows list of possible assertations for selected `GameObject` in `hierarchy`. If you user `Test Helper` in play mode, you can also obtain list of playing sound clips.
+
+<img src="documentation/images/test-helper.png" width="600">
+
+`copy` - copyes generated code of assertation.
+`find playing sounds` - searches for playing sound clips.
+`select` - only for sound, focuses on `GameObject` in hierarchy which has `Audio Source` component and it's `sound clip` is playing.
 
 Extending Test Tool
 -----------
