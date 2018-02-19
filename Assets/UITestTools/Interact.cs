@@ -2,40 +2,18 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace PlayQ.UITestTools
 {
     public static partial class Interact
     {
-        public static IEnumerator LoadScene(string sceneName, float waitTimeout = 2f)
-        {
-            SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
-
-            yield return Wait.WaitFor(() =>
-            {
-                int sceneCount = SceneManager.sceneCount;
-                if (sceneCount == 0)
-                {
-                    return false;
-                }
-
-                var loadedScenes = new Scene[sceneCount];
-                for (int i = 0; i < sceneCount; i++)
-                {
-                    loadedScenes[i] = SceneManager.GetSceneAt(i);
-                }
-
-                return loadedScenes.Any(scene => scene.name == sceneName);
-            }, waitTimeout, "LoadScene name: " + sceneName);
-        }
-        
         private static string GenerateScreenshotName(string name)
         {
             name = new StringBuilder()
@@ -56,11 +34,22 @@ namespace PlayQ.UITestTools
                 }
                 name = path + name;
             }
+            else
+            {
+                string path = new StringBuilder()
+                    .Append("Screenshots")
+                    .Append(Path.DirectorySeparatorChar).ToString();
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                name = path + name;
+            }
 
             return name;
         }
         
-        [ShowInEditor(typeof(MakeScreenshot), "MakeScreenShot", false)]
+        [ShowInEditor(typeof(MakeScreenshot), "Make screenshot", false)]
         public static void MakeScreenShot(string name)
         {
             name = GenerateScreenshotName(name);
@@ -76,27 +65,58 @@ namespace PlayQ.UITestTools
                 return result;
             }
         }
+
         
-        
-        //todo remove size
-        [ShowInEditor(typeof(MakeScreenshotAndCompareClass), "MakeScreenShot and compare", false)]
-        public static IEnumerator MakeScreenshotAndCompare(string screenShotName, string referenceName, Vector2 size, float treshold = 1)
+        [ShowInEditor("reset screenshot failed flag", false)]
+        public static void ResetScreenshotFailFlag()
         {
+            MakeScreenshotAndCompareClass.TestFailed = false;
+        }
+        
+        [ShowInEditor("fail test if screenshot failed", false)]
+        public static void FailIfScreenShotsNotEquals()
+        {
+            if (MakeScreenshotAndCompareClass.TestFailed)
+            {
+                MakeScreenshotAndCompareClass.TestFailed = false;
+                Assert.Fail("Screenshot equals failed. Specific screenshot names were logged as warnings.");   
+            }
+        }
+        
+        
+        [ShowInEditor(typeof(MakeScreenshotAndCompareClass), "Make screenshot and compare", false)]
+        public static IEnumerator MakeScreenshotAndCompare(string screenShotName, string referenceName, Vector2 targetResolution, float treshold = 1, bool dontFail = false)
+        {
+            var failMessageInfo = "screenshot " + screenShotName + " doesn't match reference " + referenceName;
             var name = GenerateScreenshotName(screenShotName);
+            var pathToScreenShot = name;
+            if (Application.isMobilePlatform)
+            {
+                pathToScreenShot = Application.persistentDataPath + Path.DirectorySeparatorChar + name;
+            }
             Application.CaptureScreenshot(name);
-            //todo check
+
             yield return Wait.Frame(5);
 
-            var bytes = File.ReadAllBytes(name);
-            var screenshotTexture = new Texture2D((int) size.x, (int) size.y, TextureFormat.ARGB32, false);
+            var bytes = File.ReadAllBytes(pathToScreenShot);
+            var screenshotTexture = new Texture2D((int)targetResolution.x,  (int)targetResolution.y, TextureFormat.ARGB32, false);
             screenshotTexture.LoadImage(bytes);
             screenshotTexture.Apply();            
             var referenceTex = Resources.Load<Texture2D>(referenceName);
-                        
+            
             var pixelsRef = referenceTex.GetPixels32();
             var screenShot = screenshotTexture.GetPixels32();
-            Assert.AreEqual(pixelsRef.Length, screenShot.Length, "screenshots missmatch");
 
+            if (dontFail)
+            {
+                if (pixelsRef.Length != screenShot.Length)
+                {
+                    MakeScreenshotAndCompareClass.TestFailed = true;
+                    Debug.LogWarning(failMessageInfo);
+                    yield break;
+                }
+            }
+            Assert.AreEqual(pixelsRef.Length, screenShot.Length, failMessageInfo);
             var matchedPisels = 0f;
             for (int i = 0; i < pixelsRef.Length; i++)
             {
@@ -109,27 +129,161 @@ namespace PlayQ.UITestTools
                 }
             }
             var actualTreshold = matchedPisels / pixelsRef.Length;
-            Assert.GreaterOrEqual(actualTreshold, treshold);
-            GameObject.DestroyImmediate(screenshotTexture);
-            GameObject.DestroyImmediate(referenceTex);
+
+            if (dontFail)
+            {
+                if (actualTreshold < treshold)
+                {
+                    Debug.LogWarning(failMessageInfo);
+                    MakeScreenshotAndCompareClass.TestFailed = true;
+                    yield break;
+                }
+            }
+            Assert.GreaterOrEqual(actualTreshold, treshold, failMessageInfo);    
+            GameObject.DestroyImmediate(screenshotTexture, true);
+            GameObject.DestroyImmediate(referenceTex, true);
+            
+            File.Delete(pathToScreenShot);
         }
         
         private static class MakeScreenshotAndCompareClass
         {
+            public static bool TestFailed;
             public static List<object> GetDefautParams(GameObject go)
             {
                 List<object> result = new List<object>();
                 result.Add("default_screenshot_name");
                 result.Add("default_reference_name");
                 result.Add(1f);
+                result.Add(false);
                 return result;
             }
         }
 
-        [ShowInEditor(typeof(ResetFPSClass), "Reset FPS", false)]
+        [ShowInEditor(typeof(ResetFPSClass), "FPS/Reset FPS", false)]
         public static void ResetFPS()
         {
             ResetFPSClass.ResetFPS();
+        }
+
+        public static void ClearFPSMEtrics()
+        {
+            if (File.Exists(SaveFPSClass.FPSMettricsFileFullPath))
+            {
+                File.Delete(SaveFPSClass.FPSMettricsFileFullPath);
+            }
+        }
+        
+        [ShowInEditor(typeof(SaveFPSClass), "FPS/Save FPS", false)]
+        public static void SaveFPS(string tag)
+        {
+            string textData = null;
+            if (File.Exists(SaveFPSClass.FPSMettricsFileFullPath))
+            {
+                try
+                {
+                    textData = File.ReadAllText(SaveFPSClass.FPSMettricsFileFullPath);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("file with fps metrics exists but can't be read " + ex.Message);
+                }
+            }
+
+            var  metrics = new SaveFPSClass.FPSMetrics();
+            if (!string.IsNullOrEmpty(textData))
+            {
+                metrics = JObject.Parse(textData).ToObject<SaveFPSClass.FPSMetrics>();
+                if (metrics == null)
+                {
+                    metrics = new SaveFPSClass.FPSMetrics();
+                }
+            }
+            metrics.Build = Application.version;
+            var buildVersion = SaveFPSClass.GetArg("-buildNumber");
+            if (!string.IsNullOrEmpty(buildVersion))
+            {
+                metrics.Build = metrics.Build + ":" + buildVersion;
+            }
+
+            if (metrics.Fps == null)
+            {
+                metrics.Fps = new Dictionary<string, SaveFPSClass.FPSData>();
+            }
+
+            if (metrics.Fps.ContainsKey(tag))
+            {
+                Debug.LogWarning("Tag " + tag + " is already exists in FPS metrics file!");
+                tag = tag + "_" +Time.realtimeSinceStartup;
+            }
+            metrics.Fps.Add(tag, new SaveFPSClass.FPSData
+            {
+                Min = FPSCounter.MixFPS,
+                Avg = FPSCounter.AverageFPS,
+                Max = FPSCounter.MaxFPS
+            });
+
+            textData = JObject.FromObject(metrics).ToString();
+
+            if (!Directory.Exists(SaveFPSClass.FPSMettricsFolder))
+            {
+                Directory.CreateDirectory(SaveFPSClass.FPSMettricsFolder);
+            }
+            
+            File.WriteAllText(SaveFPSClass.FPSMettricsFileFullPath, textData);
+
+        }
+        
+        public static class SaveFPSClass
+        {
+            public const string MetricsFileName = "metrics.json"; 
+            public static string FPSMettricsFolder
+            {
+                get
+                {
+                    return Application.persistentDataPath +
+                           Path.DirectorySeparatorChar + "FPS_metrics";
+                }
+            }
+            public static string FPSMettricsFileFullPath
+            {
+                get
+                {
+                    return FPSMettricsFolder + Path.DirectorySeparatorChar + MetricsFileName;
+                }
+            }
+            
+            public static List<object> GetDefautParams(GameObject go)
+            {
+                List<object> result = new List<object>();
+                result.Add("default_tag");
+                return result;
+            }
+            
+            public static string GetArg(string name)
+            {
+                var args = System.Environment.GetCommandLineArgs();
+                for (int i = 0; i < args.Length; i++)
+                {
+                    if (args[i] == name && args.Length > i + 1)
+                    {
+                        return args[i + 1];
+                    }
+                }
+                return null;
+            }
+
+            public class FPSData
+            {
+                public float Min;
+                public float Avg;
+                public float Max;
+            }
+            public class FPSMetrics
+            {
+                public string Build;
+                public Dictionary<string, FPSData> Fps;
+            }
         }
 
         
@@ -210,14 +364,14 @@ namespace PlayQ.UITestTools
             ButtonClick.Click(go);
         } 
         
-        [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Wait, Delay and Click")]
+        [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Wait, delay and click")]
         public static IEnumerator WaitDelayAndClick(string path, float delay, float timeOut)
         {
             yield return Wait.ObjectEnabledInstantiatedAndDelay(path, delay, timeOut);
             ButtonClick.Click(path);
         }
         
-        [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Wait, Delay, Click if possible")]
+        [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Wait, delay, click if possible")]
         public static IEnumerator WaitDelayAndClickIfPossible(string path, float delay, float timeOut)
         {
             yield return Wait.ObjectEnabledInstantiatedAndDelayIfPossible(path, delay, timeOut);

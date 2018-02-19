@@ -3,6 +3,7 @@
 using NUnit.Framework;
 using UnityEngine.TestTools;
  using UnityEngine;
+ using UnityEngine.SceneManagement;
  using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools.Tests
@@ -12,8 +13,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator Screen()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             Interact.MakeScreenShot("some path");
         }
@@ -22,8 +23,8 @@ namespace PlayQ.UITestTools.Tests
         [TargetResolution(1024, 768)]
         public IEnumerator FindObjectByPixels()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
             yield return Wait.Frame();
 
             var obj = UITestUtils.FindObjectByPixels(630.0f, 325.0f);
@@ -35,8 +36,8 @@ namespace PlayQ.UITestTools.Tests
         [TargetResolution(1024, 768)]
         public IEnumerator ClickOnObject()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
             yield return Wait.Frame();
 
             Interact.ClickPixels(512, 41);
@@ -47,8 +48,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectOnScene()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             //search for object with name "child_enabled" in parent object "container"
             //if object is not found - waits for object appearing for duration
@@ -66,8 +67,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectDestraction()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             //manually search for object in scene
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
@@ -86,8 +87,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectDisabled()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             //get manual reference to the object
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>();
@@ -107,8 +108,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectEnabled()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             //get manual reference to the object
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>();
@@ -127,8 +128,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForButtonAccesible()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var button = UITestUtils.FindAnyGameObject("container/Button");
             yield return Wait.ButtonAccessible(button);
@@ -137,8 +138,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckAppendText()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             Interact.AppendText("container/InputField", "appednend text");
             Interact.SetText("container/InputField", "appednend text");
@@ -174,8 +175,8 @@ namespace PlayQ.UITestTools.Tests
         [TargetResolution(1024, 768)]
         public IEnumerator DragByCoords()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
             yield return Wait.Frame();
 
             Vector2 from = new Vector2(45, 526);
@@ -193,8 +194,8 @@ namespace PlayQ.UITestTools.Tests
         [TargetResolution(1024, 768)]
         public IEnumerator DragByReference()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
             yield return Wait.Frame();
 
             Vector2 delta = new Vector2(934, 0);
@@ -211,8 +212,8 @@ namespace PlayQ.UITestTools.Tests
         [TargetResolution(1024, 768)]
         public IEnumerator DragByPath()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
             yield return Wait.Frame();
 
             Vector2 delta = new Vector2(934, 0);
@@ -229,8 +230,8 @@ namespace PlayQ.UITestTools.Tests
         [TargetResolution(1024, 768)]
         public IEnumerator ClickOnObjectFail()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
             yield return Wait.Frame();
 
             try
@@ -248,8 +249,8 @@ namespace PlayQ.UITestTools.Tests
         [TargetResolution(1024, 768)]
         public IEnumerator FindObjectByPixelsFail()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
             yield return Wait.Frame();
             var obj = UITestUtils.FindObjectByPixels(20, 20);
             Assert.IsNull(obj);

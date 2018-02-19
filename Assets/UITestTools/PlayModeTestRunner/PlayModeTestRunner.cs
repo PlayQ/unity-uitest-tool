@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
+ using System.Linq;
+ using System.Reflection;
  using NUnit.Framework;
  using UnityEngine;
  using UnityEngine.TestTools;
@@ -16,8 +17,9 @@ namespace PlayQ.UITestTools
 {   
     public class PlayModeTestRunner : MonoBehaviour
     {
-        public const string PLAY_ONLY_SELECTED_TESTS = "playOnlySelectedTests";
-        public const string QUIT_APP_AFTER_TESTS = "QuitAferComplete";
+        private const string PLAY_ONLY_SELECTED_TESTS = "playOnlySelectedTests";
+        private const string PLAY_ONLY_SMOKE_TESTS = "playOnlySmokeTests";
+        private const string QUIT_APP_AFTER_TESTS = "QuitAferComplete";
         
         public static Action<MethodInfo> OnTestPassed;
         public static Action<MethodInfo> OnTestIgnored;
@@ -70,18 +72,129 @@ namespace PlayQ.UITestTools
             
             selectedTests = SelectedTestsSerializable.Load();
             classesForTest = GetTestClasses();
-            RemoveUnselectedTests();
+            
+            DiscardUnselectedTests();
             StartProcessingTests();
         }
 
-        private void RemoveUnselectedTests()
+#if UNITY_EDITOR
+        private static void ClearEditorPrefs()
         {
-            if (!selectedTests || (PlayerPrefs.HasKey(PLAY_ONLY_SELECTED_TESTS) && 
-                PlayerPrefs.GetInt(PLAY_ONLY_SELECTED_TESTS) == 0))
+            EditorPrefs.DeleteKey(QUIT_APP_AFTER_TESTS);
+            EditorPrefs.DeleteKey(PLAY_ONLY_SMOKE_TESTS);
+            EditorPrefs.DeleteKey(PLAY_ONLY_SELECTED_TESTS);
+        }
+
+        public static bool QuitAppAfterCompleteTests
+        {
+            set
             {
-                PlayerPrefs.DeleteKey(PLAY_ONLY_SELECTED_TESTS);
+                EditorPrefs.SetInt(QUIT_APP_AFTER_TESTS, value ? 1 : 0);
+            }
+            get
+            {
+                return EditorPrefs.HasKey(QUIT_APP_AFTER_TESTS) && EditorPrefs.GetInt(QUIT_APP_AFTER_TESTS) == 1;
+            }
+        }
+
+        public static bool RunOnlySmokeTests
+        {
+            set
+            {
+                EditorPrefs.SetInt(PLAY_ONLY_SMOKE_TESTS, value ? 1 : 0);
+            }
+            get
+            {
+                return EditorPrefs.HasKey(PLAY_ONLY_SMOKE_TESTS) && EditorPrefs.GetInt(PLAY_ONLY_SMOKE_TESTS) == 1;
+            }
+        }
+        
+        public static bool RunOnlySelectedTests
+        {
+            set
+            {
+                EditorPrefs.SetInt(PLAY_ONLY_SELECTED_TESTS, value ? 1 : 0);
+            }
+            get
+            {
+                return EditorPrefs.HasKey(PLAY_ONLY_SELECTED_TESTS) && EditorPrefs.GetInt(PLAY_ONLY_SELECTED_TESTS) == 1;
+            }
+        }
+      
+
+        public static void AdjustSelectedTestsForBuild()
+        {
+            if (RunOnlySelectedTests && RunOnlySmokeTests)
+            {
+                Debug.LogWarning("you have selected both runOnlySelected abd runOnlySmoke option, " +
+                                 "you must choose one of them. Only selected test will be included in test build");
+            }
+            
+            var selectedTests = SelectedTestsSerializable.CreateOrLoad();
+            classesForTest = GetTestClasses();
+            Dictionary<string, SelectedTestsSerializable.TestInfo> testAddedToBuild = 
+                new Dictionary<string, SelectedTestsSerializable.TestInfo>(); 
+            
+            foreach (var classForTest in classesForTest)
+            {
+                foreach (var testMethod in classForTest.TestMethods)
+                {
+                    var attributes = testMethod.Method.GetCustomAttributes(false);
+                    var isMethodSmoke = attributes.Any(attr => attr.GetType() == typeof(SmokeTestAttribute));
+                    var isSelectedMethod =
+                        selectedTests.TestInfoToMethodName.ContainsKey(testMethod.FullName)
+                            ? selectedTests.TestInfoToMethodName[testMethod.FullName].IsSelected
+                            : false;
+
+                    if (RunOnlySelectedTests && isSelectedMethod ||
+                        RunOnlySmokeTests && isMethodSmoke ||
+                        !RunOnlySelectedTests && !RunOnlySmokeTests)
+                    {
+                        
+                        testAddedToBuild[testMethod.FullName] = new SelectedTestsSerializable.TestInfo
+                        {
+                            ClassName = classForTest.Type.FullName,
+                            IsSelected = true,
+                            MethodName = testMethod.FullName
+                        };
+                    }
+                }
+            }
+
+            selectedTests.TestInfoToMethodName = testAddedToBuild;
+            AssetDatabase.SaveAssets();
+            ClearEditorPrefs();
+        }
+        
+#endif
+        
+        private void DiscardUnselectedTests()
+        {
+            if (!selectedTests)
+            {
                 return;
             }
+
+            bool runOnlySmokeTests = false;
+            bool runOnlySelectedTests = false;
+      
+#if UNITY_EDITOR
+            runOnlySmokeTests = RunOnlySmokeTests;
+            runOnlySelectedTests = RunOnlySelectedTests;
+#endif
+          
+            if (!runOnlySmokeTests && !runOnlySelectedTests)
+            {
+                return;
+            }
+
+            if (runOnlySmokeTests && runOnlySelectedTests)
+            {
+                Debug.LogWarning("you have selected both runOnlySelected abd runOnlySmoke option, " +
+                                 "you must choose one of them. Only selected test will be runned");
+            }
+            
+            
             var filteredClassesForTests = new List<UnitTestClass>();
             foreach(var classForTest in classesForTest)
             {
@@ -89,13 +202,16 @@ namespace PlayQ.UITestTools
                 newClassForTest.SetUpMethods = classForTest.SetUpMethods;
                 newClassForTest.TearDownMethods = classForTest.TearDownMethods;
                 newClassForTest.TestMethods = new List<UnitTestMethod>();
+                
                 foreach (var methodForTest in classForTest.TestMethods)
                 {
-                    if (!selectedTests.TestInfoToMethodName.ContainsKey(methodForTest.FullName))
-                    {
-                        newClassForTest.TestMethods.Add(methodForTest);
-                    }
-                    else if (selectedTests.TestInfoToMethodName[methodForTest.FullName].IsSelected)
+                    var attributes = methodForTest.Method.GetCustomAttributes(false);
+                    var isMethodSmoke = attributes.Any(attr => attr.GetType() == typeof(SmokeTestAttribute));
+                    var isMethodSelected = selectedTests.TestInfoToMethodName.ContainsKey(methodForTest.FullName) &&
+                                           selectedTests.TestInfoToMethodName[methodForTest.FullName].IsSelected;
+
+                    if (isMethodSelected && runOnlySelectedTests ||
+                        isMethodSmoke && runOnlySmokeTests)
                     {
                         newClassForTest.TestMethods.Add(methodForTest);
                     }
@@ -107,6 +223,7 @@ namespace PlayQ.UITestTools
             }
             classesForTest = filteredClassesForTests;
         }
+
         
         private IEnumerator InvokeMethod(object instance, UnitTestMethod method)
         {
@@ -315,14 +432,16 @@ namespace PlayQ.UITestTools
             isRunning = false;
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
-            if(PlayerPrefs.HasKey(QUIT_APP_AFTER_TESTS) && PlayerPrefs.GetInt(QUIT_APP_AFTER_TESTS) == 1)
+            
+            if(QuitAppAfterCompleteTests)
             {
-                PlayerPrefs.DeleteKey(QUIT_APP_AFTER_TESTS);
+                ClearEditorPrefs();
                 EditorApplication.Exit(0);
             }
 #else
             Application.Quit();
-            #endif
+#endif
+            
         }
 
         private void RunMethods(List<MethodInfo> methods, object testInstance)

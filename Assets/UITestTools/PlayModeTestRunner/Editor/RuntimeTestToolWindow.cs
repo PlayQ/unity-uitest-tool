@@ -269,14 +269,7 @@ namespace PlayQ.UITestTools
             testInfo.Clear();
             Repaint();
         }
-        
-        private const BindingFlags staticFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
-        private object CallStaticMethod(Type targetType, string methodName, params object[] methodParams)
-        {
-            var method = targetType.GetMethod(methodName, staticFlags);
-            return method.Invoke(null, methodParams);
-        }
-        
+
         private void OnGUI()
         {
             scrollPosition = GUILayout.BeginScrollView(scrollPosition);
@@ -284,8 +277,12 @@ namespace PlayQ.UITestTools
             DrawStatistics();
             DrawClasses();
             GUILayout.EndScrollView();
-            
-            var isDirty = selectedTests && (bool)CallStaticMethod(typeof(EditorUtility), "IsDirty", selectedTests.GetInstanceID());
+
+            var methods = typeof(EditorUtility).GetMethods(BindingFlags.Static | BindingFlags.NonPublic);
+            var isDirtyMethod = methods.First(method => method.Name == "IsDirty");
+
+            var isDirtyFlag = (bool)isDirtyMethod.Invoke(null, new object[] { selectedTests.GetInstanceID()});
+            var isDirty = selectedTests && isDirtyFlag;
             if (isDirty)
             {
                 var style = new GUIStyle(EditorStyles.boldLabel);
@@ -490,7 +487,7 @@ namespace PlayQ.UITestTools
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Playmode tests: ", EditorStyles.boldLabel);
             
-            if (GUILayout.Button(isAllSelected ? "Deselect all" : "Select all", GUILayout.Width(120)/*EditorStyles.miniButton*/))
+            if (GUILayout.Button(isAllSelected ? "Deselect all" : "Select all", GUILayout.Width(120)))
             {
                 isAllSelected = !isAllSelected;
                 
@@ -501,7 +498,8 @@ namespace PlayQ.UITestTools
                 selectedTests.SerializeData();
             }
             
-            if (GUILayout.Button("Run", GUILayout.Width(60)/*EditorStyles.miniButton*/))
+            
+            if (GUILayout.Button("Run all", GUILayout.Width(80)))
             {
                 var scenePath = PlayModeTestRunner.GetTestScenePath();
                 if (scenePath == null)
@@ -510,6 +508,37 @@ namespace PlayQ.UITestTools
                     return;
                 }
                 EditorSceneManager.OpenScene(scenePath);
+                PlayModeTestRunner.RunOnlySelectedTests = false;
+                PlayModeTestRunner.RunOnlySmokeTests = false;
+                EditorApplication.isPlaying = true;
+            }
+            
+            
+            if (GUILayout.Button("Run selected", GUILayout.Width(100)))
+            {
+                var scenePath = PlayModeTestRunner.GetTestScenePath();
+                if (scenePath == null)
+                {
+                    Debug.LogError("Cant find test scene");
+                    return;
+                }
+                EditorSceneManager.OpenScene(scenePath);
+                PlayModeTestRunner.RunOnlySelectedTests = true;
+                PlayModeTestRunner.RunOnlySmokeTests = false;
+                EditorApplication.isPlaying = true;
+            }
+            
+            if (GUILayout.Button("Run smoke", GUILayout.Width(100)))
+            {
+                var scenePath = PlayModeTestRunner.GetTestScenePath();
+                if (scenePath == null)
+                {
+                    Debug.LogError("Cant find test scene");
+                    return;
+                }
+                EditorSceneManager.OpenScene(scenePath);
+                PlayModeTestRunner.RunOnlySelectedTests = false;
+                PlayModeTestRunner.RunOnlySmokeTests = true;
                 EditorApplication.isPlaying = true;
             }
             EditorGUILayout.EndHorizontal();

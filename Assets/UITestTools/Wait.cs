@@ -258,7 +258,7 @@ namespace PlayQ.UITestTools
             yield return new WaitForSeconds(seconds);
         }
         
-        public static IEnumerator SceneLoaded(string sceneName, float waitTimeout = 2f)
+        public static IEnumerator SceneLeaded(string sceneName, float waitTimeout = 2f)
         {
             yield return WaitFor(() =>
             {

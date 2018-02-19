@@ -18,7 +18,7 @@ MonoBehaviour:
   - IsSelected: 0
     MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25473
     ClassName: CKTestSuites.TestSuiteLevelProgression
-  - IsSelected: 1
+  - IsSelected: 0
     MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25474
     ClassName: CKTestSuites.TestSuiteLevelProgression
   - IsSelected: 0
@@ -93,3 +93,9 @@ MonoBehaviour:
   - IsSelected: 0
     MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25414
     ClassName: CKTestSuites.TestSuiteUsingPreexistingGold
+  - IsSelected: 1
+    MethodName: CKTestSuites.TestSuiteAccessPoints.TSAPC26185
+    ClassName: CKTestSuites.TestSuiteAccessPoints
+  - IsSelected: 0
+    MethodName: CKTestSuites.TestSuiteUILocalization.TSUILLevel1Tutorial
+    ClassName: CKTestSuites.TestSuiteUILocalization

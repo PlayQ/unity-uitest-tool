@@ -1,28 +1,43 @@
-﻿using System;
+﻿#if UNITY_EDITOR
+using System.Collections.Generic;
 using System.Linq;
 using PlayQ.UITestTools;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.SceneManagement;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 
-	//Unity.exe -projectPath C:\WORK\CharmKing -executeMethod TestToolBuildScript.Build -playOnlySelectedTests false -buildTarget Android
-	//-playOnlySelectedTests - optional, if not set all tests will be executed
-	//-buildPath - optional, if set - android build will be created
-
-	public static class TestToolBuildScript
+	public class TestToolBuildScript : IPreprocessBuild
 	{
 
-		public static void Build()
+		//don't user it it's only for test purpose
+		private static void TestBuild()
 		{
-			var scenePath = PlayModeTestRunner.GetTestScenePath();
+			List<string> scenePaths = new List<string>();
+
+			foreach (var scene in EditorBuildSettings.scenes)
+			{
+				if (scene.enabled)
+				{
+					scenePaths.Add(scene.path);
+				}
+			}
+
+			BuildPipeline.BuildPlayer(scenePaths.ToArray(),
+				GetArgValue("-testBuildPath"), BuildTarget.Android, BuildOptions.None);
+		}
+		
+
+		private static void PrepareBuild(out string scenePath)
+		{
+			scenePath = PlayModeTestRunner.GetTestScenePath();
 			if (scenePath == null)
 			{
 				Debug.LogError("Cant find test scene");
 				return;
 			}
-
+			
 			var scenes = EditorBuildSettings.scenes.ToList();
 			if (scenes.Count == 0 || scenes[0].path != scenePath || scenes[0].enabled == false)
 			{
@@ -31,37 +46,38 @@ using Debug = UnityEngine.Debug;
 				{
 					scenes.RemoveAt(index);
 				}
-
 				scenes.Insert(0, new EditorBuildSettingsScene(scenePath, true));
 				EditorBuildSettings.scenes = scenes.ToArray();
 			}
 
-			var buildPath = GetArg("-buildPath");
-			if (!string.IsNullOrEmpty(buildPath))
+			bool runOnlySelected = IsArgExist("-runOnlySelectedTests");
+			bool runOnlySmoke = IsArgExist("-runOnlySmokeTests");
+			
+			
+			PlayModeTestRunner.RunOnlySelectedTests = runOnlySelected;
+			PlayModeTestRunner.RunOnlySmokeTests = runOnlySmoke;
+		}
+		
+		public static void RunPlayModeTests()
+		{
+
+			string scenePath = null;
+			PrepareBuild(out scenePath);
+
+			if (!string.IsNullOrEmpty(scenePath))
 			{
-				BuildPipeline.BuildPlayer(scenes.ToArray(), buildPath, BuildTarget.Android, BuildOptions.None);
-				EditorApplication.Exit(0);
+				EditorSceneManager.OpenScene(scenePath);
+				PlayModeTestRunner.QuitAppAfterCompleteTests = true;
+				EditorApplication.isPlaying = true;
 			}
 			else
 			{
-				EditorSceneManager.OpenScene(scenePath);
-				var ignoreUnselectedTests = GetArg("-playOnlySelectedTests");
-				if (string.IsNullOrEmpty(ignoreUnselectedTests))
-				{
-					PlayerPrefs.SetInt(PlayModeTestRunner.PLAY_ONLY_SELECTED_TESTS, 0);
-				}
-				else
-				{
-					var result = ignoreUnselectedTests.Equals("true", StringComparison.OrdinalIgnoreCase);
-					PlayerPrefs.SetInt(PlayModeTestRunner.PLAY_ONLY_SELECTED_TESTS, result ? 1 : 0);
-				}
-
-				PlayerPrefs.SetInt(PlayModeTestRunner.QUIT_APP_AFTER_TESTS, 1);
-				EditorApplication.isPlaying = true;
+				EditorApplication.Exit(1);
 			}
+			
 		}
 
-		private static string GetArg(string name)
+		private static string GetArgValue(string name)
 		{
 			var args = System.Environment.GetCommandLineArgs();
 			for (int i = 0; i < args.Length; i++)
@@ -73,6 +89,31 @@ using Debug = UnityEngine.Debug;
 			}
 			return null;
 		}
+		
+		private static bool IsArgExist(string name)
+		{
+			var args = System.Environment.GetCommandLineArgs();
+			return args.Any(arg => arg == name);
+		}
 
+		public int callbackOrder
+		{
+			get { return 0; }
+		}
+
+
+		public void OnPreprocessBuild(BuildTarget target, string path)
+		{
+			if(IsArgExist("-makeTestBuild"))
+			{
+			
+				string scenePath = null;
+				PrepareBuild(out scenePath);
+				PlayModeTestRunner.AdjustSelectedTestsForBuild();	
+			}	
+		}
+	
 	}
 
+
+#endif

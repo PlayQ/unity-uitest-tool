@@ -123,8 +123,10 @@ namespace PlayQ.UITestTools
             }
         }
 
+//        private Color color = new Color();
         void OnGUI()
         {
+//            Debug.Log(Event.current);
             if (!switchedByHotKey && controller.IsRecording&&Event.current != null &&Event.current.type == EventType.KeyDown &&Event.current.alt && (Event.current.command ||Event.current.command) && Event.current.keyCode==KeyCode.C)
             {
                 controller.ChagneAssertation();
@@ -201,6 +203,9 @@ namespace PlayQ.UITestTools
             }
             EditorGUILayout.EndVertical();
         }
+
+        [SerializeField]
+        Color m_Color = Color.white;
         
         void AddMenuItem(GenericMenu menu, string menuPath, UserActionInfo action, int index)
         {

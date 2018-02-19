@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -45,6 +44,19 @@ namespace PlayQ.UITestTools
             else
             {
                 EditorUtility.DisplayDialog("Error", "Screenshot folder doesn't exist yet.", "Ok");
+            }
+        }
+        
+        [MenuItem("Window/UI Test Tools/Open FPS metrics")]
+        static void OpenFPSMetrics()
+        {
+            if (Directory.Exists(Interact.SaveFPSClass.FPSMettricsFolder))
+            {
+                EditorUtility.RevealInFinder(Interact.SaveFPSClass.FPSMettricsFolder);                
+            }
+            else
+            {
+                EditorUtility.DisplayDialog("Error", "FPS metrics folder doesn't exist yet.", "Ok");
             }
         }
 

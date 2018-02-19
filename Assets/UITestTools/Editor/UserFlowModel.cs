@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace PlayQ.UITestTools
@@ -183,7 +184,7 @@ namespace PlayQ.UITestTools
                         {
                             paramsValues = (List<object>) methodRetunsParams.Invoke(null, new object[]{null});
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
                             Debug.LogWarning("can't extract parameters for: "+ methodInfoExt.AssertationMethodFullName);
                             continue;

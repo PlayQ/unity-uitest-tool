@@ -195,7 +195,7 @@ namespace PlayQ.UITestTools
             }
         }
         
-        [ShowInEditor(typeof(CheckAverageFPSClass), "check awerage FPS", false)]
+        [ShowInEditor(typeof(CheckAverageFPSClass), "FPS/Check average FPS", false)]
         public static void CheckAverageFPS(float targetFPS)
         {
             CheckAverageFPSClass.CheckAverageFPS(targetFPS);
@@ -217,7 +217,7 @@ namespace PlayQ.UITestTools
             } 
         }
         
-        [ShowInEditor(typeof(CheckMinFPSClass), "Check min FPS", false)]
+        [ShowInEditor(typeof(CheckMinFPSClass), "FPS/Check min FPS", false)]
         public static void CheckMinFPS(float targetFPS)
         {
             CheckMinFPSClass.CheckMinFPS(targetFPS);
@@ -306,7 +306,7 @@ namespace PlayQ.UITestTools
 #endregion
 
 #region ExistNotExtis
-        [ShowInEditor("Is Exist")]
+        [ShowInEditor("Is exist")]
         public static GameObject IsExist(string path)
         {
             var go = UITestUtils.FindAnyGameObject(path);
@@ -342,7 +342,7 @@ namespace PlayQ.UITestTools
             return go.gameObject;
         }
         
-        [ShowInEditor("Is not Exist")]
+        [ShowInEditor("Is not exist")]
         public static void IsNotExist(string path)
         {
             var go = UITestUtils.FindAnyGameObject(path);

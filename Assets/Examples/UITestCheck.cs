@@ -16,8 +16,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckObjectDisabled()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive); // unload scene in tearsdown
 
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             testObject.gameObject.SetActive(false);
@@ -38,8 +38,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckObjectDisabledFailCases()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             testObject.gameObject.SetActive(true);
@@ -101,8 +101,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckObjectEnabled()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             //get manual reference to the object
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
@@ -124,8 +124,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckObjectEnabledFailCases()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             testObject.gameObject.SetActive(false);
@@ -186,8 +186,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckObjectExists()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             Check.IsExist("container");
             Check.IsExist<TestObject>();
@@ -197,8 +197,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckObjectExistsFailCases()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             Object.DestroyImmediate(testObject.gameObject);
@@ -246,8 +246,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckObjectDontExists()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.DestroyImmediate(testObject);
@@ -262,8 +262,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckObjectDontExistsFailCases()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             try
             {
@@ -307,8 +307,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckForToggle()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var testToggle = UITestUtils.FindAnyGameObject<Toggle>();
 
@@ -322,8 +322,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckForToggleOffFailCases()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var testToggle = UITestUtils.FindAnyGameObject<Toggle>();
 
@@ -358,8 +358,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckForToggleOnFailCases()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             try
             {
@@ -394,8 +394,8 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator CheckTextEquals()
         {
-            //Wait for scene loading
-            yield return Interact.LoadScene("1");
+            yield return null;
+           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var testText = UITestUtils.FindAnyGameObject<Text>();
             testText.text = "text";
