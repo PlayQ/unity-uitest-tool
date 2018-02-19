@@ -11,8 +11,7 @@ Content
 	* [Helper Window](#helper-window)
 * [Extending Test Tool](#extending-test-tool)
 	* [Implementing Assertation method](#implementing-assertation-method)
-	* [Class Helper](#class-helper)
-	* [Helper custom attribute](#helper-custom-attribute)
+	* [ShowInEditor custom attribute](#showineditor-custom-attribute)
 * [API methods](#api-methods)
 	* [Wait class](#wait-class)
 	* [Check class](#check-class)
@@ -163,102 +162,255 @@ Extending Test Tool
 
 
 ### Implementing Assertation method
-Most of `Assertation methods` are working with `GameObjects` that instantiated of will be instantiated on scene. If `assertation method` works with `GameObject`, the first argument has to be `string`, which is path to `GameObject` in `hierarchy`.  If you want to use `assertation method` in `Flow Recorder` you have to pass a corresponding flag to custom method attribute, [described](#helper-custom-attribute) below.
 
-If you want `assertation method` compare some `GameObject` parameters with specific values, you can pass these values as additional arguments to `assertation method`.  If you want to use `assertation method` in `Flow Recorder` you have to describe default values for these arguments in [class helper](#class-helper) described below.
+Let's create a simple assertation method, which takes GameObject and checks whether it's present on scene.
 
-`Assertation method` returns either `void` or `IEnumerable`. In first case method is executed immediately. In the second case method is execution during specific amount of frames, for example `asssertation method` would wait for some condition during timeout (usually given as argument) and fails if condition doesn't fulfill in given time. If `assertation method` passes successfully, next recorded `assertation method` is started.
-
-`Assertation method` could be show in `Flow Recorder` if it implemented in specific way. In such case you can find your `assertation method` in `Recorder Window` drop down menu of recorded user action.
-
-### Class Helper
-If you want to use `Assertation method` in `Flow Recorder` you have to implement static class helper and custom attribute to your method. Class helper could contain next methods:
-
-```c#
-public static bool IsAvailable(GameObject go)
+``` c#
+public static void IsExist(string path) //path is a full path of GameObject in hierarchy on scene
 {
-	//checks if GameObject has Text component. If it has, than assertation could be applied to this GameObject
-	return go.GetComponent<Text>() != null;
-}
-```
-
-`GameObject go` - instance of selected `GameObject` would be passed to this method during recording. This method check, if `assertation` could be applied to given `GameObject`. If you implement new `assertation method`, and it could be applied only to specific `GameObjects` then you have to implement it. If new `assertation` could be applied to any `GameObject`, or `assertation` doesn’t need `GameObject` at all - you can skip method implementation.
-
-```c#
- public static List<object> GetDefautParams(GameObject go)
- {
- 	List<object> result = new List<object>();
-	var labelText = go.GetComponent<InputField>(); 
-	result.Add(labelText.text); //takes current values from given GameObject
- 	return result; 
- }
- ```
- 
-`GameObject go` - instance of selected `GameObject` would be passed to this method during recording. You can fetch necessary parameters from `GameObject` and add it to list of values. This method returns list of default values for arguments, that have to be passed to assertation method. Order of elements in list is the same as order of arguments in assertation method. Type of specific element of list is the same as type of appropriate argument of assertation method.  If assertation method’s first argument is path to gameobject - you must not add it to list, just skip it. If you assertation method doesn’t require additional params - return empty list.
-
-```c#
-public static Camera Camera
-{
-	get
+    //UITestUtils is a class with a bunch of helpfull methods. For example unity's 
+    //GameObject.Find searches only for enabled GameObjects.
+    //FindAnyGameObject can find disabled GameObjects as well. 
+    var go = UITestUtils.FindAnyGameObject(path);
+    if (go == null)
     {
-        // return custom game Camera to raycast to specific GameObject
-    	return Map.main != null ? Map.main.mapCamera : null; 
-	}
+        Assert.Fail("IsExist: Object with path " + path + " does not exist.");
+    }
 }
 ```
+Now we can use this method in out test method like this:
 
-When user click on item(button, switch etc) flow recorder takes click coords and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. This works only with unity ui objects. But sometimes user clicks on non ui gameobjects. For such case you have to define property that return specific camera to raycast. If your `assertation method` are developed for unity ui, just skip implementation of this method.
-
-#### Example of implemented Assertation Method
-```c#
-public static class Check
+``` c#
+[UnityTest]
+public IEnumerator SomeIntegrationTest()
 {
-	//custom attribute ShowInEditor links method TextEquals to class helper CheckTextEquals.
-	[ShowInEditor(typeof(CheckTextEquals), "Text equals")] 
-	public static void TextEquals(string path, string expectedText) //Assertation method
-	{
-		CheckextEquals.CheckEquals(path, expectedText);
-	}
+	// some code 
+	
+	Check.IsExist("UIRoot/Users_Panel/UserPic")
+}
+```
 
-	//class helper
-	private static class CheckInputTextEquals
-	{
-		// Method that finds gameObject by its path
-		// and checks that it has
-		public static void CheckEquals(string path, string expectedText)
-		{
-			var go = UITestUtils.FindAnyGameObject(path); // UITestUtils is util class with helpfull methods
-			Assert.AreEqual(null, go, "CheckEquals: Object " + path + " is not exist"); 
-			TextEquals(go, expectedText);
-		}
+But it's too much of manual work to find necessary GameObject in editor's scene, copy it's full path and paste into test code. [Flow Recorder](#flow-recorder) can do this for you. Let's modify our assertation method, so it will be awailable in Flow Recorder.
 
+``` c#
+[ShowInEditor("Is Exist")]
+public static void IsExist(string path)
+{
+    // assertation code
+}
+```
 
-		public static bool IsAvailable(GameObject go)
-		{
-			return go.GetComponent<Text>() != null; //GameObject has to have Text component on it
-		}
-		
-		// out assertation method requires text as an additional param
-		//that's why GetDefautParams extracts this value from GameObject
-		// and returns it
-		public static List<object> GetDefautParams(GameObject go)
-		{
-			List<object> result = new List<object>();
-			var labelText = go.GetComponent<Text>();
-			result.Add(labelText.text);
-			return result;              
-		}
-	}
+Custom attribute `ShowInEditor` means, that this method is shown in Flow Recorder. The first `string` parameter of attribute constructor is a description. Description is shown in Flow Recorder, when you pick assertation method you want to use. 
+
+Let's define another assertation method which checks some specific game mechanics: lets assume we have a `ScreenManager` monobehaviour on scene with a string property of current active screen, and we want to check if lobby screen is active.
+
+``` c#
+[ShowInEditor("Check current screen", false)]
+public static void IsScreenActive(string screenName)
+{
+    // FindAnyGameObject has overload to seach for GameObject with given type of component.
+    var screenManager = UITestUtils.FindAnyGameObject<ScreenManager>();
+    if (!screenManager)
+    {
+        Assert.Fail("IsScreenActive: no ScreenManager found");
+    }
+	Assert.AreEquals(screenManager.CurrentScreen, screenName);
+	
+}
+```
+
+Example in test:
+
+``` c#
+[UnityTest]
+public IEnumerator SomeIntegrationTest()
+{
+	// some code 
+	
+	Check.IsScreenActive("Lobby_Screen");
+}
+```
+
+The second parameter of ShowInEditor's constructor is a `string pathInPresent` and it's set to `false`. Parameter `pathInPresent` is set to `true` by default and means that if the first argument of assertation method is type of `string` - it's a path to GameObject. In our case it's just a string value and not a path, so you have to set it to `false`. That doesn't looks very nice, but it's important for code generation, and spares you from unnecessary description of assertation methods parameters. You can read more about it below.
+
+Very often you have to pass more that 1 argument to assertation method to check things you need. Let's implement method, that checks text on our UI component.
+
+``` c#
+public static void TextEquals(string path, string expectedText)
+{
+    var go = UITestUtils.FindAnyGameObject(path);
+    Assert.AreEqual(null, go, "InputEquals: Object " + path + " is not exist");
+    var t = go.GetComponent<Text>();
+    if (t == null)
+    {
+        Assert.Fail("TextEquals: Object " + go.name + " has no Text attached");
+    }
+    if (t.text != expectedText)
+    {
+        Assert.Fail("TextEquals: Label " + go.name + " actual text: " + t.text + ", expected "+expectedText+", text dont't match");
+    }
+}
+```
+Example in test:
+
+``` c#
+[UnityTest]
+public IEnumerator SomeIntegrationTest()
+{
+	// some code 
+	Check.TextEquals("MainUI/PLayerInfo/PlayerClass", "warrior");
+}
+```
+If you record your actions with Flow Recorder, it generates such code for you. When you tap on GameObject with text, Flow Recorder checks if GameObject contains MonoBehaviour with a type of `UnityEngine.UI.Text` and if check is successfull Flow Recorder takes GameObject's path in hierarchy and text value and substitutes these values into method call code, so it looks like this:
+
+`Check.TextEquals("MainUI/PLayerInfo/PlayerClass", "warrior");`
+
+But how Flow Recorder would know which component to serach and which value to substitute into method call code. You have to provide all information about it in a specific `helper class`. You can name this class like you want, `helper class` is just a term for class with metadata related to specific assertation method.
+
+Let's define a static class helper and name it `CheckTextEquals`. Also we have to link class `CheckTextEquals` to method `TextEquals` with a help of `ShowInEditor` attribute.
+
+``` c#
+[ShowInEditor(typeof(CheckTextEquals), "Text equals")]
+public static void TextEquals(string path, string expectedText)
+{
+    // assertation code
+}
+
+static class CheckTextEquals
+{
+    //some methods will be implemented
+}
+```
+
+`TextEquals` can't be applied to any GameObject, but only to that one with `Text` component. So we have to define in class `CheckTextEquals` public static method `bool IsAvailable(GameObject go)`. Method name, argument and return type is processed by reflection, so they must be exactly like described. 
+
+``` c#
+[ShowInEditor(typeof(CheckTextEquals), "Text equals")]
+public static void TextEquals(string path, string expectedText)
+{
+    // assertation code
+}
+
+static class CheckTextEquals
+{
+    public static bool IsAwailable(GameObjec go)
+    {
+        return go.GetComponent<Text>() != null;	
+    }
+}
+```
+
+Now when you tap on GameObject on a game screen, Flow Recorder will look through all assertation methods with an `ShowInEditor` attribute. If type is passed to the first parameter of attribute consctructor, Flow Recorder will check, if given type has method with name `IsAwailable` and if so, Flow Recorder will pass instance of selected GameObject to `IsAwailable` method. If it returns true then assertation method will be shown in list of assertation methods in Flow Recorder UI.
+If there is no `IsAwailable` method or `ShowInEditor` has no type passed to first parameter Flow Recorder assume that assertation method is common, and could be aplied to any GameObject and assertation method will be shown in list of methods.
+
+Sometimes target GameObject, in our case it's a GameObject with a `Text` component, could contain childs, which also could receive click. Child could be also with alpha 0 or disabled, so you will not notice them. It can lead to confuse, for example you tap on text, but target GameObject is an image, because it's child of Text component and receives your click instead of Text component. That's why when Flow Recorder passes target GameObject to `IsAwailabel` method and if it returns false, Flow Recored takes parent of target GameObject and passes it to `IsAwailabel` method and so on, until parent is null.
+
+When you click on GameObject with `Text` component Flow Recorder takes it text values and substitute it to the call code. To implement such behaviour you have to implement method 
+
+`public static List<object> GetDefautParams(GameObject go)`
+
+in `CheckTextEquals` class. This method takes target GameOBject, obtains necessary values from it and returns list of values for assertation method arguments. Method name, return type and parameter type are important, because they are processed by reflection.
+ 
+ 
+``` c#
+[ShowInEditor(typeof(CheckTextEquals), "Text equals")]
+public static void TextEquals(string path, string expectedText)
+{
+    // assertation code
+}
+
+static class CheckTextEquals
+{
+    public static bool IsAwailable(GameObjec go)
+    {
+        return go.GetComponent<Text>() != null;	
+    }
+
+    public static List<object> GetDefautParams(GameObject go)
+    {
+        List<object> result = new List<object>();
+        var labelText = go.GetComponent<Text>();
+        result.Add(labelText.text);
+        return result;
+    }
+}
+```
+
+Assertation `TextEquals` takes two arguments: path to GameObject and expected text, but `GetDefautParams` return list with only one value - expected text. That is because if first argument of assertation method is path to GameObject it's substituted automatically for you, so you must not add path to object list in `GetDefautParams` method. Also ShowInEditor's third parameter is `pathIsPresent` flag. It's true by default, because most of assertation method are working with GameObjects. Flag means that first string argument is path to GameObject and not a regular string value.
+
+All assertation methods described above are checking something immediately. But what if we want to wait for some condition during given timeout. In such case assertaton method has to return `IEnumerator`. Let's implement method that waits until GameObject is enabled.
+
+``` c#
+[ShowInEditor(typeof(WaitForEnabledClass), "Wait for enabled")]
+public static IEnumerator WaitForEnabled(string path, float timeOut)
+{
+    yield return WaitForEnabledClass.WaitFor(() =>
+    {
+        var obj = GameObject.Find(path); //finds only enabled gameobjects
+        return obj != null && obj.activeInHierarchy;
+
+    }, timeOut);
+}
+
+static class WaitForEnabledClass
+{
+    // helper method which awaits for condition during timeout
+    public static IEnumerator WaitFor(Func<bool> condition, float timeout)
+    {
+        float time = 0;
+        while (!condition())
+        {
+            time += Time.unscaledDeltaTime;
+            if (time > timeout)
+            {
+                throw new Exception("Operation timed out");
+            }
+            yield return null;
+        }
+    }
+
+    public static List<object> GetDefautParams(GameObject go)
+    {
+        List<object> result = new List<object>();
+        var defaultTimeout = 2f; //default. this values could be edited in Flow Recorder Window.
+        result.Add(defaultTimeout);
+        return result;
+    }
+}
+```
+
+Example in test method:
+
+``` c#
+[UnityTest]
+public IEnumerator SomeIntegrationTest()
+{
+	// some code 
+	yield return Wait.WaitForEnabled("MainUI/PLayerInfo/PlayerClass", 10f);
 }
 ```
 
 
+When user click on item(button, switch etc) Flow Recorder takes click coords and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. This works only with unity ui objects. In case when you click on non UI object you have to define property in `Class Helper` that return specific camera to raycast. 
 
-### Helper custom attribute
+```c#
+static class MapLocationClick
+{
+    public static Camera Camera
+    {
+        get
+        {
+            // return custom game Camera to raycast to specific GameObject
+            return Map.mapCamera; 
+        }
+    }
+}
+```
 
-To link your `Class Helper` to `assertation method` use custom attribute `[ShowInEditorAttribute]` on your method.
 
-`ShowInEditorAttribute` first constructor  `params`:
+### ShowInEditor custom attribute
+
+`ShowInEditorAttribute` constructor  params:
 * `Type classType` - type of class helper. Optional, skip it if you just want to add method to flow recorder, without any specific parameters, except probably path.
 * `string description` - human friendly description of what this assertation for, this label is shown in recorder in dropdown list of assertations.
 * `bool pathIsPresent` = true - optional, if first param of assertation method is path to `GameObject`, set it to true. If assertation method doesn’t use any `GameObject` - set false.
