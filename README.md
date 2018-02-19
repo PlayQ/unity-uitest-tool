@@ -98,20 +98,50 @@ public IEnumerator SomeTest()
 
 If test is run on mobile device, custom `Test Runner` will ignore with target resolution different from device resolution. If tests is run in editor custom `Test Runner` will chage Unity Game Window resolution to target resolution.
 
-To run custom Test Runner via console use followin command:
+To run test in editor mode via console use followin command:
 
 ```
-Unity.exe -projectPath project_path -buildTarget build_target -executeMethod TestToolBuildScript.Build -runOnlySelectedTests -runOnlySmokeTests -runTests -testBuildPath test_build_path
+Unity.exe -projectPath project_path -executeMethod TestToolBuildScript.RunPlayModeTests -runOnlySelectedTests -runOnlySmokeTests
 ```
 `project_path` - absolute path to project folder
 
-`build_target` - platform name, could be `Android` or `IOS`
+`-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window.
+
+`-runOnlySmokeTests` - optional, runs test with [SmokeTest] attribute only.
+
+This is common script, which we use on teamcity to make build:
+```
+%UNITY_PATH% \
+ -quit \
+ -batchmode \
+ -serial $USINGSERIAL \
+ -username $USINGUSER \
+ -password $USINGPASS \
+ -out %teamcity.build.checkoutDir%/builds/android/CharmKing.apk \
+ -projectPath %teamcity.build.checkoutDir% \
+ -logFile %teamcity.build.checkoutDir%/unity.log \
+ -buildNumber $intversion \
+ -keystoreName "%ANDROID_KEYSTORE_FILE%" \
+ -keystorePass "%ANDROID_KEYSTORE_PASS%" \
+ -keyaliasName "%ANDROID_KEYALIAS_NAME%" \
+ -keyaliasPass "%ANDROID_KEYALIAS_PASS%" \
+ -addDefines $ADD_DEFINES \
+ -buildMode $BUILD_MODE \
+ -reporter TeamCity \
+ -buildTarget android \
+ -target %TARGET_ANDROID% \
+ -androidSDKPath %ANDROID_SDK_HOME% \
+ -jdkPath %env.JAVA_HOME% \
+ -executeMethod PlayQ.Build.CommandLineBuild.Build \
+```
+
+To make test build add following parameters to previous statement:
+
+`-makeTestBuild` - it will run tests when your app starts.
 
 `-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window.
 
-`-runTests` - optional, runs test in editor.
-
-`-testBuildPath test_build_path` - optional, creates build which starts from test scene and runs tests.
+`-runOnlySmokeTests` - optional, runs test with [SmokeTest] attribute only. 
 
 
 
