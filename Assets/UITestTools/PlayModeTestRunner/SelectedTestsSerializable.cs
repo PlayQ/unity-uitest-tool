@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PlayQ.UITestTools;
 using UnityEngine;
+using System.IO;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -16,9 +17,7 @@ public class SelectedTestsSerializable : ScriptableObject
     public string SpecificTestOrClassName;
     public bool QuitAferComplete;
     public float DefaultTimescale;
-    
-    public const string path = "Assets/Tests/UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset";
-    
+
     [SerializeField] private List<TestInfo> testsInfo = new List<TestInfo>();
 
     private Dictionary<string, TestInfo> testInfoToMethodName;
@@ -105,19 +104,56 @@ public class SelectedTestsSerializable : ScriptableObject
 #if UNITY_EDITOR
     public static SelectedTestsSerializable CreateOrLoad()
     {
-        var asset = AssetDatabase.LoadAssetAtPath<SelectedTestsSerializable>(path);
+        var asset = Resources.Load<SelectedTestsSerializable>("SelectedTest");
+
         if (!asset)
         {
-            asset = CreateInstance<SelectedTestsSerializable>();
+            string path = FindPath("PlayModeTestRunner", Application.dataPath);
 
-            AssetDatabase.CreateAsset(asset, path);
-            AssetDatabase.SaveAssets();
+            if (!string.IsNullOrEmpty(path))
+            {
+                path = "Assets" + path.Substring(Application.dataPath.Length);
+                path = string.Concat(path, "/Resources/SelectedTests.asset");
+
+                asset = CreateInstance<SelectedTestsSerializable>();
+
+                AssetDatabase.CreateAsset(asset, path);
+                AssetDatabase.SaveAssets();
+            }
         }
+
         return asset;
+    }
+
+    //Breadth-first search
+    public static string FindPath(string targetDirectory, string directoryPath)
+    {
+        string[] directories = Directory.GetDirectories(directoryPath);
+
+        if (directories == null || directories.Length == 0)
+            return null;
+
+        foreach (var directory in directories)
+        {
+            if (directory.Split('/').Last() == targetDirectory)
+            {
+                return directory;
+            }
+        }
+
+        foreach (var directory in directories)
+        {
+            string deepSearchResult = FindPath(targetDirectory, directory);
+
+            if (!string.IsNullOrEmpty(deepSearchResult))
+                return deepSearchResult;
+        }
+
+        return null;
     }
 #endif
 
-    
+
     public static SelectedTestsSerializable Load()
     {
         return Resources.Load<SelectedTestsSerializable>("SelectedTests");

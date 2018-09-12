@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Reflection;
 using EditorUITools;
 using Newtonsoft.Json.Linq;
-using PlayQ.TG.Mediator.Utils;
 using Tests.Nodes;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -382,10 +380,35 @@ namespace PlayQ.UITestTools
             get
             {
                 var isDirty = selectedTests &&
-                              (bool) Reflector.CallStaticMethod(typeof(EditorUtility), "IsDirty",
+                              (bool) CallStaticMethod(typeof(EditorUtility), "IsDirty",
                                   selectedTests.GetInstanceID());
                 return isDirty;
             }
+        }
+
+        private const BindingFlags staticFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;
+
+        //Reflector.CallStaticMethod
+        private static object CallStaticMethod(Type targetType, string methodName, params object[] methodParams)
+        {
+            var methods = targetType.GetMethods(staticFlags);
+            foreach (var method in methods)
+            {
+                if (method != null)
+                {
+                    if (method.Name == methodName)
+                    {
+                        if (method.GetParameters().Length == methodParams.Length)
+                        {
+                            return method.Invoke(null, methodParams);
+                        }
+                    }
+                }
+            }
+
+            Debug.LogError("Injector:: Cannot find method \"" + methodName + "\" in type \"" +
+                                   targetType.Name + "\"");
+            return null;
         }
 
         private void DrawClasses()

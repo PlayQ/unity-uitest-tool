@@ -434,7 +434,18 @@ namespace PlayQ.UITestTools
                 return go != null;
             }
         }
-        
+
+        [ShowInEditor(typeof(IsNotExistsGenerator), "Is Not Exist")]
+        public static void IsNotExist(string path)
+        {
+            var go = UITestUtils.FindAnyGameObject(path);
+
+            if (go != null)
+            {
+                Assert.Fail("IsNotExist: Object with path " + path + " exists.");
+            }
+        }
+
         [ShowInEditor(typeof(IsNotExistsGenerator), "Does Not Exist")]
         public static void DoesNotExist(string path)
         {
@@ -479,6 +490,26 @@ namespace PlayQ.UITestTools
             public override bool IsAvailable(GameObject go)
             {
                 return go != null;
+            }
+        }
+
+        public static void IsNotExist<T>() where T : Component
+        {
+            IsNotExist<T>(string.Empty);
+        }
+
+        /// <summary>
+        /// Checks `GameObject` by give path and component `T` is not present on scene.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <typeparam name="T">`Type` of object</typeparam>
+        public static void IsNotExist<T>(string path) where T : Component
+        {
+            var go = UITestUtils.FindAnyGameObject<T>(path);
+
+            if (go != null)
+            {
+                Assert.Fail("IsNotExist<" + typeof(T) + ">: Object with path " + path + " exists.");
             }
         }
 

@@ -2,22 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Tests;
 using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
-    public class CustomResolution
-    {
-        public CustomResolution(int width, int height)
-        {
-            Width = width;
-            Height = height;
-        }
-
-        public readonly int Width;
-        public readonly int Height;
-    }
-
     public class UnitTestMethod
     {
         private const float DEFAULT_TIME_OUT = 30000f;

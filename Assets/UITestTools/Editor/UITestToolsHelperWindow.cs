@@ -26,13 +26,6 @@ namespace PlayQ.UITestTools
             window.Show();
         }
 
-        [MenuItem("Window/UI Test Tools/Game Event Importer")]
-        static void GameEventImporter()
-        {
-            // Get existing open window or if none, make a new one:
-            GetWindow(typeof(GameEventImporter), false, "Game Event Importer").Show();
-        }
-
         [MenuItem("GameObject/Copy Path", false, 0)]
         private static void CopyPath()
         {

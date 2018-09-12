@@ -438,7 +438,7 @@ namespace PlayQ.UITestTools
 #if UNITY_EDITOR
                 if (methodNode.TestSettings.EditorTargetResolution != null)
                 {
-                    Tests.CustomResolution resolution = methodNode.TestSettings.EditorTargetResolution;
+                    CustomResolution resolution = methodNode.TestSettings.EditorTargetResolution;
 
                     if (resolution.Width != Screen.width ||
                         resolution.Height != Screen.height)
