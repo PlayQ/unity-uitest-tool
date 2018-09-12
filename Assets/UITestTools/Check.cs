@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using NUnit.Framework;
+using System.Runtime;
+using PlayQ.UITestTools.WaitResults;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,49 +11,57 @@ namespace PlayQ.UITestTools
 {
     public static partial class Check
     {
-#region Text
-        [ShowInEditor(typeof(CheckTextEquals), "Text equals")]
+        #region Text
+
+        /// <summary>
+        /// Checks `GameObject` by given path has `Text` component and it's variable text is equals to expected text.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="expectedText">Expected text</param>\
+        [ShowInEditor(typeof(CheckTextEquals), "Text Equals")]
         public static void TextEquals(string path, string expectedText)
         {
-            CheckTextEquals.CheckEquals(path, expectedText);
+            var go = UITestUtils.FindAnyGameObject(path);
+            Assert.IsNotNull(go, "InputEquals: Object " + path + " is not exist");
+            TextEquals(go, expectedText);
         }
-        
-        [ShowInEditor(typeof(CheckTextEquals), "Text not equals")]
+
+        /// <summary>
+        /// Checks `GameObject` by given path has `Text` component and it's variable text is not equals to expected text.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="expectedText">Expected text</param>
+        [ShowInEditor(typeof(CheckTextEquals), "Text Not Equals")]
         public static void TextNotEquals(string path, string expectedText)
         {
-            CheckTextEquals.CheckNotEquals(path, expectedText);
+            var go = UITestUtils.FindAnyGameObject(path);
+            Assert.IsNotNull(go, "InputEquals: Object " + path + " is not exist");
+            TextNotEquals(go, expectedText);
         }
 
-        private static class CheckTextEquals
+        private class CheckTextEquals : ShowHelperBase
         {
-            public static void CheckEquals(string path, string expectedText)
+            public override bool IsAvailable(GameObject go)
             {
-                var go = UITestUtils.FindAnyGameObject(path);
-                Assert.AreEqual(null, go, "InputEquals: Object " + path + " is not exist");
-                TextEquals(go, expectedText);
-            }
-
-            public static void CheckNotEquals(string path, string expectedText)
-            {
-                var go = UITestUtils.FindAnyGameObject(path);
-                Assert.AreEqual(null, go, "InputEquals: Object " + path + " is not exist");
-                TextNotEquals(go, expectedText);
-            }
-
-            public static bool IsAvailable(GameObject go)
-            {
+                if (!go)
+                {
+                    return false;
+                }
                 return go.GetComponent<Text>() != null;
             }
 
-            public static List<object> GetDefautParams(GameObject go)
+            public override AbstractGenerator CreateGenerator(GameObject go)
             {
-                List<object> result = new List<object>();
-                var labelText = go.GetComponent<Text>();
-                result.Add(labelText.text);
-                return result;
+                return VoidMethod.Path(go)
+                    .String(go.GetComponent<Text>().text);
             }
         }
 
+        /// <summary>
+        /// Checks `GameObject` has `Text` component and it's variable text is equals to expected text.
+        /// </summary>
+        /// <param name="go">`GameObject` with `Text` component</param>
+        /// <param name="expectedText">Expected text</param>
         public static void TextEquals(GameObject go, string expectedText)
         {
             var t = go.GetComponent<Text>();
@@ -64,10 +71,16 @@ namespace PlayQ.UITestTools
             }
             if (t.text != expectedText)
             {
-                Assert.Fail("TextEquals: Label " + go.name + " actual text: " + t.text + ", expected "+expectedText+", text dont't match");
+                Assert.Fail("TextEquals: Label " + go.name + " actual text: " + t.text + ", expected " + expectedText +
+                            ", text dont't match");
             }
         }
-      
+
+        /// <summary>
+        /// Checks `GameObject` has `Text` component and it's variable text is not equals to expected text.
+        /// </summary>
+        /// <param name="go">`GameObject` with `Text` component</param>
+        /// <param name="expectedText">Expected text</param>
         public static void TextNotEquals(GameObject go, string expectedText)
         {
             var t = go.GetComponent<Text>();
@@ -77,13 +90,20 @@ namespace PlayQ.UITestTools
             }
             if (t.text == expectedText)
             {
-                Assert.Fail("TextNotEquals: Label " + go.name + " actual text: " + expectedText + " text matches but must not");
+                Assert.Fail("TextNotEquals: Label " + go.name + " actual text: " + expectedText +
+                            " text matches but must not");
             }
         }
-#endregion
 
-#region Input
+        #endregion
 
+        #region Input
+        
+        /// <summary>
+        /// Checks `GameObject` has `InputField` component and it's variable text is equals to expected text.
+        /// </summary>
+        /// <param name="go">`GameObject` with `InputField` component</param>
+        /// <param name="expectedText">Expected text</param>
         public static void InputEquals(GameObject go, string expectedText)
         {
             var t = UITestUtils.FindComponentInParents<InputField>(go);
@@ -93,10 +113,16 @@ namespace PlayQ.UITestTools
             }
             if (t.text != expectedText)
             {
-                Assert.Fail("InputEquals: InputField " + go.name + " actual text: " + t.text + ", expected "+expectedText+", text dont't match");
+                Assert.Fail("InputEquals: InputField " + go.name + " actual text: " + t.text + ", expected " +
+                            expectedText + ", text dont't match");
             }
         }
-       
+
+        /// <summary>
+        /// Checks `GameObject` has `InputField` component and it's variable text is not equals to expected text.
+        /// </summary>
+        /// <param name="go">`GameObject` with `InputField` component</param>
+        /// <param name="expectedText">Expected text</param>
         public static void InputNotEquals(GameObject go, string expectedText)
         {
             var t = go.GetComponent<Text>();
@@ -106,211 +132,254 @@ namespace PlayQ.UITestTools
             }
             if (t.text == expectedText)
             {
-                Assert.Fail("InputNotEquals: InputField " + go.name + " actual text: " + expectedText + " text matches but must not");
+                Assert.Fail("InputNotEquals: InputField " + go.name + " actual text: " + expectedText +
+                            " text matches but must not");
             }
         }
-       
-        [ShowInEditor(typeof(CheckInputTextEquals), "Input text equals")]
+
+        /// <summary>
+        /// Checks `GameObject` by given path has `InputField` component and it's variable text is equals to expected text.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="expectedText">Expected text</param>
+        [ShowInEditor(typeof(CheckInputTextEquals), "Input Text Equals")]
         public static void InputEquals(string path, string expectedText)
         {
-            CheckInputTextEquals.CheckEquals(path, expectedText);
+            var go = UITestUtils.FindAnyGameObject(path);
+            Assert.AreEqual(null, go, "InputEquals: Object " + path + " is not exist");
+            InputEquals(go, expectedText);
         }
-        
-        [ShowInEditor(typeof(CheckInputTextEquals), "Input text not equals")]
+
+        /// <summary>
+        /// Checks `GameObject` by given path has `InputField` component and it's variable text is not equals to expected text.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="expectedText">Expected text</param>
+        [ShowInEditor(typeof(CheckInputTextEquals), "Input Text Not Equals")]
         public static void InputNotEquals(string path, string expectedText)
         {
-            CheckInputTextEquals.CheckNotEquals(path, expectedText);
+            var go = UITestUtils.FindAnyGameObject(path);
+            Assert.IsNotNull(go, "InputEquals: Object " + path + " is not exist");
+            InputNotEquals(go, expectedText);
         }
-        
-        private static class CheckInputTextEquals
+
+        private class CheckInputTextEquals : ShowHelperBase
         {
-            public static void CheckEquals(string path, string expectedText)
+            public override AbstractGenerator CreateGenerator(GameObject go)
             {
-                var go = UITestUtils.FindAnyGameObject(path);
-                Assert.AreEqual(null, go, "InputEquals: Object " + path + " is not exist");
-                InputEquals(go, expectedText);
-            }
-            
-            public static void CheckNotEquals(string path, string expectedText)
-            {
-                var go = UITestUtils.FindAnyGameObject(path);
-                Assert.AreEqual(null, go, "InputEquals: Object " + path + " is not exist");
-                InputNotEquals(go, expectedText);
+                return VoidMethod
+                    .Path(go).String(go.GetComponent<InputField>().text);
             }
 
-            public static bool IsAvailable(GameObject go)
+            public override bool IsAvailable(GameObject go)
             {
+                if (!go)
+                {
+                    return false;
+                }
                 return go.GetComponent<InputField>() != null;
             }
+        }
 
-            public static List<object> GetDefautParams(GameObject go)
+        #endregion
+
+        #region EnableDisable
+
+        private class IsEnableGenerator : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
             {
-                List<object> result = new List<object>();
-                var labelText = go.GetComponent<InputField>();
-                result.Add(labelText.text);
-                return result;              
+                return VoidMethod.Path(go);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                return go != null;
             }
         }
-#endregion
-
-#region EnableDisable
         
-        
-        
+        [ShowInEditor(typeof(IsEnableGenerator), "Is Enable")]
         public static void IsEnable(string path)
         {
             var go = IsExist(path);
-            
-            if(!go.gameObject.activeInHierarchy)
+
+            if (!go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsEnable: with path "+path+" Game Object disabled");
+                Assert.Fail("IsEnable: with path " + path + " Game Object disabled");
             }
         }
 
+        /// <summary>
+        /// Checks `Gameobject` by path is present on scene, contains component `T` and active in hierarchy.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <typeparam name="T">`Type` of object</typeparam>
         public static void IsEnable<T>(string path) where T : Component
         {
             var go = IsExist<T>(path);
 
-            if(!go.gameObject.activeInHierarchy)
+            if (!go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsEnable<"+typeof(T)+">: with path "+path+" Game Object disabled");
+                Assert.Fail("IsEnable<" + typeof(T) + ">: with path " + path + " Game Object disabled");
             }
         }
 
+        /// <summary>
+        /// Searches for `Gameobject` with component `T` and checks it is present on scene and active in hierarchy.
+        /// </summary>
+        /// <typeparam name="T">`Type` of object</typeparam>
         public static void IsEnable<T>() where T : Component
         {
             var go = IsExist<T>();
-            
+
             if (!go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsEnable<"+typeof(T)+">: Game Object disabled");
+                Assert.Fail("IsEnable<" + typeof(T) + ">: Game Object disabled");
             }
         }
-      
+
+        /// <summary>
+        /// Checks `GameObject` is active in hierarchy.
+        /// </summary>
+        /// <param name="go">`GameObject`</param>
         public static void IsEnable(GameObject go)
         {
             if (!go.activeInHierarchy)
             {
-                Assert.Fail("IsEnable by object instance: with path " + UITestUtils.GetGameObjectFullPath(go) + " Game Object disabled");
+                Assert.Fail("IsEnable by object instance: with path " + UITestUtils.GetGameObjectFullPath(go) +
+                            " Game Object disabled");
             }
-        }
-        
-        [ShowInEditor(typeof(CheckAverageFPSClass), "FPS/Check average FPS", false)]
-        public static void CheckAverageFPS(float targetFPS)
-        {
-            CheckAverageFPSClass.CheckAverageFPS(targetFPS);
         }
 
-        private static class CheckAverageFPSClass
+        /// <summary>
+        /// Checks `GameObject` by path is present on scene and not active in hierarchy.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+
+        private class IsDisableGenerator : ShowHelperBase
         {
-            public static void CheckAverageFPS(float targetFPS)
+            public override AbstractGenerator CreateGenerator(GameObject go)
             {
-                var awerageFps = FPSCounter.AverageFPS;
-                Assert.GreaterOrEqual(awerageFps, targetFPS);
+                return VoidMethod.Path(go);
             }
-            
-            public static List<object> GetDefautParams(GameObject go)
+
+            public override bool IsAvailable(GameObject go)
             {
-                List<object> result = new List<object>();
-                result.Add(30f);
-                return result;
-            } 
-        }
-        
-        [ShowInEditor(typeof(CheckMinFPSClass), "FPS/Check min FPS", false)]
-        public static void CheckMinFPS(float targetFPS)
-        {
-            CheckMinFPSClass.CheckMinFPS(targetFPS);
+                return go != null;
+            }
         }
 
-        private static class CheckMinFPSClass
-        {
-            public static void CheckMinFPS(float targetFPS)
-            {
-                var minFps = FPSCounter.MixFPS;
-                Assert.GreaterOrEqual(minFps, targetFPS);
-            }
-            
-            public static List<object> GetDefautParams(GameObject go)
-            {
-                List<object> result = new List<object>();
-                result.Add(20f);
-                return result;
-            } 
-        }
-        
+        [ShowInEditor(typeof(IsDisableGenerator), "Is Disable")]
         public static void IsDisable(string path)
         {
             var go = IsExist(path);
-             
-            if(go.gameObject.activeInHierarchy)
+
+            if (go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsDisable: with path "+path+" Game Object enabled");
+                Assert.Fail("IsDisable: with path " + path + " Game Object enabled");
             }
         }
 
+        /// <summary>
+        /// Checks `GameObject` by path is present on scene, contains component `T` and not active in hierarchy.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <typeparam name="T">`Type` of object</typeparam>
         public static void IsDisable<T>(string path) where T : Component
         {
             IsExist<T>(path);
             var go = UITestUtils.FindAnyGameObject<T>(path);
-             
-            if(go.gameObject.activeInHierarchy)
+
+            if (go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsDisable<"+typeof(T)+">: with path "+path+" Game Object enabled");
+                Assert.Fail("IsDisable<" + typeof(T) + ">: with path " + path + " Game Object enabled");
             }
         }
 
+        /// <summary>
+        /// Searches for `Gameobject` with component `T` and checks it is present on scene and not active in hierarchy.
+        /// </summary>
+        /// <typeparam name="T">`Type` of object</typeparam>
         public static void IsDisable<T>() where T : Component
         {
             var go = IsExist<T>();
-            
-            if(go.gameObject.activeInHierarchy)
+
+            if (go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsDisable<"+typeof(T)+">: Game Object enabled");
+                Assert.Fail("IsDisable<" + typeof(T) + ">: Game Object enabled");
             }
         }
 
+        /// <summary>
+        /// Checks `GameObject` is not active in hierarchy.
+        /// </summary>
+        /// <param name="go">`GameObject`</param>
         public static void IsDisable(GameObject go)
         {
             if (go.activeInHierarchy)
             {
-                Assert.Fail("IsDisable by object instance: Game Object " + UITestUtils.GetGameObjectFullPath(go) + " enabled");
+                Assert.Fail("IsDisable by object instance: Game Object " + UITestUtils.GetGameObjectFullPath(go) +
+                            " enabled");
             }
         }
 
-        [ShowInEditor(typeof(CheckEnabledState), "Check enabled state")]
+        /// <summary>
+        /// Checks `Gameobject` by path is present on scene and it's active in hierarchy flag is equals state variable.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="state">Enable state</param>
+        [ShowInEditor(typeof(CheckEnabledState), "Check Enabled State")]
         public static void CheckEnabled(string path, bool state = true)
         {
-            CheckEnabledState.Check(path, state);
+            var go = IsExist(path);
+            Assert.AreEqual(state, go.gameObject.activeInHierarchy, "CheckEnabled: object with path " + path + " is " +
+                                                                    (go.gameObject.activeInHierarchy
+                                                                        ? "enabled"
+                                                                        : "disabled") +
+                                                                    " but expected: " +
+                                                                    (state ? "enabled" : "disabled"));
         }
-        
-        private static class CheckEnabledState
+
+        private class CheckEnabledState : ShowHelperBase
         {
-            public static void Check(string path, bool state)
+            public override AbstractGenerator CreateGenerator(GameObject go)
             {
-                var go = IsExist(path);
-                Assert.AreEqual(state, go.gameObject.activeInHierarchy, "IsEnable: object with path "+path+" is "+
-                                                                           (go.gameObject.activeInHierarchy?"enabled":"disabled") +
-                                                                           " but expected: "+(state?"enabled":"disabled"));
+                return VoidMethod.Path(go).Bool(go.activeInHierarchy);
             }
 
-            public static List<object> GetDefautParams(GameObject go)
+            public override bool IsAvailable(GameObject go)
             {
-                List<object> result = new List<object>();
-                result.Add(go.activeInHierarchy);
-                return result;
+                return go != null;
+            }
+        }
+
+        #endregion
+
+        #region ExistNotExtis
+
+        private class IsExistsGenerator : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return VoidMethod.Path(go);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                return go != null;
             }
         }
         
-
-#endregion
-
-#region ExistNotExtis
-        [ShowInEditor("Is exist")]
+        /// <summary>
+        /// Checks `GameObject` by give path is present on scene.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <returns>`GameObject`</returns>
+        [ShowInEditor(typeof(IsExistsGenerator), "Is Exist")]
         public static GameObject IsExist(string path)
         {
             var go = UITestUtils.FindAnyGameObject(path);
-            
+
             if (go == null)
             {
                 Assert.Fail("IsExist: Object with path " + path + " does not exist.");
@@ -318,69 +387,143 @@ namespace PlayQ.UITestTools
             return go;
         }
 
+        /// <summary>
+        /// Checks `GameObject` by give path is present on scene and contains component `T`.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <typeparam name="T">`Type` of object</typeparam>
+        /// <returns></returns>
         public static GameObject IsExist<T>(string path) where T : Component
         {
             var go = UITestUtils.FindAnyGameObject<T>(path);
-            
+
             if (go == null)
             {
-                Assert.Fail("IsExist<"+typeof(T)+">: Object with path " + path + " does not exist.");
+                Assert.Fail("IsExist<" + typeof(T) + ">: Object with path " + path + " does not exist.");
             }
 
             return go.gameObject;
         }
 
+        /// <summary>
+        /// Searches for `GameObject` with component `T` on scene.
+        /// </summary>
+        /// <typeparam name="T">`Type` of object</typeparam>
+        /// <returns></returns>
         public static GameObject IsExist<T>() where T : Component
         {
             var go = UITestUtils.FindAnyGameObject<T>();
-            
+
             if (go == null)
             {
-                Assert.Fail("IsExist<"+typeof(T)+">: Object does not exist.");
+                Assert.Fail("IsExist<" + typeof(T) + ">: Object does not exist.");
             }
 
             return go.gameObject;
         }
+
+        private class IsNotExistsGenerator : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return VoidMethod.Path(go);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                return go != null;
+            }
+        }
         
-        [ShowInEditor("Is not exist")]
-        public static void IsNotExist(string path)
+        [ShowInEditor(typeof(IsNotExistsGenerator), "Does Not Exist")]
+        public static void DoesNotExist(string path)
         {
             var go = UITestUtils.FindAnyGameObject(path);
-            
+
             if (go != null)
             {
-                Assert.Fail("IsNotExist: Object with path " + path + " exists.");
+                Assert.Fail("DoesNotExist: Object with path " + path + " exists.");
             }
         }
 
-        public static void IsNotExist<T>(string path) where T : Component
+        /// <summary>
+        /// Checks `GameObject` by give path is not present on scene or it not active.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="timeout">Timeout</param>
+        /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
+        /// <returns></returns>
+        /// 
+        [ShowInEditor(typeof(DoesNotExistOrDisabledClass), "Does Not Exist Or Disabled")]
+        public static IEnumerator DoesNotExistOrDisabled(string path, float timeout = 2, bool ignoreTimeScale = false)
+        {
+            var go = UITestUtils.FindAnyGameObject(path);
+
+            yield return Wait.WaitFor(() =>
+            {
+                if (go == null || !go.activeInHierarchy)
+                {
+                    return new WaitSuccess();
+                }
+                return new WaitFailed("DoesNotExistOrDisabled: object with path: " + path + " exists or enabled after " + timeout + " second(s)");
+            }, timeout, ignoreTimeScale: ignoreTimeScale);
+        }
+
+        private class DoesNotExistOrDisabledClass : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return IEnumeratorMethod.Path(go).Float(1f).Bool(false);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                return go != null;
+            }
+        }
+
+        /// <summary>
+        /// Checks `GameObject` by give path and component `T` is not present on scene.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <typeparam name="T">`Type` of object</typeparam>
+        public static void DoesNotExist<T>(string path) where T : Component
         {
             var go = UITestUtils.FindAnyGameObject<T>(path);
-            
+
             if (go != null)
             {
-                Assert.Fail("IsNotExist<"+typeof(T)+">: Object with path " + path + " exists.");
+                Assert.Fail("IsNotExist<" + typeof(T) + ">: Object with path " + path + " exists.");
             }
         }
 
-        public static void IsNotExist<T>() where T : Component
+        /// <summary>
+        /// Searches for any `GameObject` on scene with component `T`. Fails if found one.
+        /// </summary>
+        /// <typeparam name="T">`Type` of object</typeparam>
+        public static void DoesNotExist<T>() where T : Component
         {
             var go = UITestUtils.FindAnyGameObject<T>();
-            
+
             if (go != null)
             {
-                Assert.Fail("IsNotExist<"+typeof(T)+">: Object exists.");
+                Assert.Fail("IsNotExist<" + typeof(T) + ">: Object exists.");
             }
         }
-#endregion
-        
-#region Toggle
 
+        #endregion
+
+        #region Toggle
+
+        /// <summary>
+        /// Checks thart `GameObject` has `Toggle` component and it's `isOn` value is equals to expected.
+        /// </summary>
+        /// <param name="go">`GameObject` with `Toggle` component</param>
+        /// <param name="expectedIsOn"></param>
         public static void CheckToggle(GameObject go, bool expectedIsOn)
         {
-            var toggleGO = UITestUtils.FindGameObjectWithComponentInParents<Toggle>(go);
-            var toggle = toggleGO.GetComponent<Toggle>();
-            
+            var toggle = UITestUtils.FindGameObjectWithComponentInParents<Toggle>(go);
+
             if (toggle == null)
             {
                 Assert.Fail("CheckToggle: Game object "
@@ -389,92 +532,112 @@ namespace PlayQ.UITestTools
             }
             if (toggle.isOn != expectedIsOn)
             {
-                Assert.Fail("CheckToggle: Toggle "+
+                Assert.Fail("CheckToggle: Toggle " +
                             UITestUtils.GetGameObjectFullPath(go) +
-                            " is "+(toggle.isOn ? "On" : "Off")+" - but expected  "+
-                            " is "+(expectedIsOn ? "On" : "Off"));    
+                            " is " + (toggle.isOn ? "On" : "Off") + " - but expected  " +
+                            " is " + (expectedIsOn ? "On" : "Off"));
             }
         }
-     
-        private static class CheckToggleState
+
+        private class CheckToggleState : ShowHelperBase
         {
-            public static void Check(string path, bool state)
+            public override AbstractGenerator CreateGenerator(GameObject go)
             {
-                var go = IsExist(path);
-                Toggle toggle = go.GetComponent<Toggle>();
-                Assert.AreEqual(null, toggle, "CheckToggle: Game object " + path + " has no Toggle component.");
-                Assert.AreNotEqual(state, toggle.isOn, "CheckToggle: Toggle "+ path +
-                            " is "+(toggle.isOn ? "On" : "Off")+" - but expected  "+
-                            " is "+(state ? "On" : "Off"));
+                return VoidMethod.Path(go).Bool(UITestUtils.FindComponentInParents<Toggle>(go).isOn);
             }
 
-            public static bool IsAvailable(GameObject go)
+            public override bool IsAvailable(GameObject go)
             {
+                if (!go)
+                {
+                    return false;
+                }
                 var toggleGo = UITestUtils.FindGameObjectWithComponentInParents<Toggle>(go);
-                return toggleGo && toggleGo.activeInHierarchy;
-            }
-
-            public static List<object> GetDefautParams(GameObject go)
-            {
-                List<object> result = new List<object>();
-                var toggleGo = UITestUtils.FindComponentInParents<Toggle>(go);
-                result.Add(toggleGo.isOn);
-                return result;
+                return toggleGo && toggleGo.gameObject.activeInHierarchy;
             }
         }
 
-        [ShowInEditor(typeof(CheckToggleState), "check toggle state")]
+        /// <summary>
+        /// Checks thart `GameObject` by given path has `Toggle` component and it's `isOn` value is equals to expected.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="state">Toggle state</param>
+        [ShowInEditor(typeof(CheckToggleState), "Check Toggle State")]
         public static void CheckToggle(string path, bool state)
         {
-            CheckToggleState.Check(path, state);
-        }
-        
-#endregion
- 
-        
-#region animation
-        
-        [ShowInEditor(typeof(AnimatorStateStartedClass), "Animator state started", false)]
-        public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout)
-        {
-            yield return AnimatorStateStartedClass.AnimatorStateStarted(path, stateName, timeout);
+            var go = IsExist(path);
+            Toggle toggle = go.GetComponent<Toggle>();
+            Assert.IsNotNull(toggle, "CheckToggle: Game object " + path + " has no Toggle component.");
+            Assert.AreNotEqual(state, toggle.isOn, "CheckToggle: Toggle " + path +
+                                                   " is " + (toggle.isOn ? "On" : "Off") + " - but expected  " +
+                                                   " is " + (state ? "On" : "Off"));
         }
 
-        private static class AnimatorStateStartedClass
+        #endregion
+
+        #region Animation
+
+        /// <summary>
+        /// Seraches for `GameObject` by given path with `Animator` component. Waits during given `timeOut` until animation state with given name becames active.
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="stateName">`Animator` state name</param>
+        /// <param name="timeout">Timeout</param>
+        /// <returns></returns>
+
+        [ShowInEditor(typeof(AnimatorStateStartedClass), "Animator State Started", false)]
+        public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout)
         {
+            return AnimatorStateStartedClass.AnimatorStateStarted(path, stateName, timeout);
+        }
+
+        private class AnimatorStateStartedClass : ShowHelperBase
+        {
+            // todo: move logic from class
             private static Func<Animator, int, string> GetCurrentStateName;
-            private static Func<TThis, TArg0, TReturn> BuildFastOpenMemberDelegate<TThis, TArg0, TReturn>(string methodName)
+
+            private static Func<TThis, TArg0, TReturn> BuildFastOpenMemberDelegate<TThis, TArg0, TReturn>(
+                string methodName)
             {
                 var method = typeof(TThis).GetMethod(
                     methodName,
                     BindingFlags.Instance | BindingFlags.NonPublic,
                     null,
                     CallingConventions.Any,
-                    new[] { typeof(TArg0) },
+                    new[] {typeof(TArg0)},
                     null);
 
                 if (method == null)
                 {
-                    throw new ArgumentException("Can't find method " + typeof(TThis).FullName + "." + methodName + "(" + typeof(TArg0).FullName + ")");
-                } 
+                    throw new ArgumentException("Can't find method " + typeof(TThis).FullName + "." + methodName + "(" +
+                                                typeof(TArg0).FullName + ")");
+                }
                 else if (method.ReturnType != typeof(TReturn))
                 {
-                    throw new ArgumentException("Expected " + typeof(TThis).FullName + "." + methodName + "(" + typeof(TArg0).FullName + ") to have return type of string but was " + method.ReturnType.FullName);
+                    throw new ArgumentException("Expected " + typeof(TThis).FullName + "." + methodName + "(" +
+                                                typeof(TArg0).FullName + ") to have return type of string but was " +
+                                                method.ReturnType.FullName);
                 }
-                return (Func<TThis, TArg0, TReturn>)Delegate.CreateDelegate(typeof(Func<TThis, TArg0, TReturn>), method);
+                return (Func<TThis, TArg0, TReturn>) Delegate.CreateDelegate(typeof(Func<TThis, TArg0, TReturn>),
+                    method);
             }
-            
-            public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout)
+
+            public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout, bool ignoreTimeScale = false)
             {
                 var stateNames = stateName.Split(';');
-                yield return Wait.ObjectEnabled(path, timeout);
-                var animator = GameObject.Find(path).GetComponent<Animator>();
+                var obj = UITestUtils.FindEnabledGameObjectByPath(path);
+                if (obj == null || !obj.activeInHierarchy)
+                {
+                    yield return Wait.ObjectEnabled(path, timeout);
+                }
+
+                var animator = UITestUtils.FindEnabledGameObjectByPath(path).GetComponent<Animator>();
 
                 if (GetCurrentStateName == null)
                 {
                     GetCurrentStateName = BuildFastOpenMemberDelegate<Animator, int, string>("GetCurrentStateName");
                 }
-                
+
                 yield return Wait.WaitFor(() =>
                 {
                     if (animator.enabled)
@@ -484,21 +647,166 @@ namespace PlayQ.UITestTools
                             var name = GetCurrentStateName(animator, i);
                             if (stateNames.Any(x => name.EndsWith(x)))
                             {
-                                return true;
+                                return new WaitSuccess();
                             }
                         }
                     }
-                    return false;
-                }, timeout, "AnimatorStateStarted failed for path: " + path + "  and state name: "+stateName);
-            } 
-           
+                    return new WaitFailed("AnimatorStateStarted failed for path: " + path + "  and state name: " +
+                                          stateName);
+                }, timeout, ignoreTimeScale: ignoreTimeScale);
+            }
 
-            public static List<object> GetDefautParams(GameObject go)
+            public override AbstractGenerator CreateGenerator(GameObject go)
             {
-                List<object> result = new List<object>{"object path", "animator state name", 2f};
-                return result;
+                return IEnumeratorMethod.Path(go).String("animator state name").Float(2f);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                if (!go)
+                {
+                    return false;
+                }
+                var animator = go.GetComponent<Animator>();
+                return animator != null;
             }
         }
-#endregion
+
+        #endregion
+
+        #region Fps
+
+        /// <summary>
+        /// Checks average fps since moment user last time called `Interact.ResetFPS()` method or since game started. If average fps less than `targetFPS` test will faled.
+        /// </summary>
+        /// <param name="targetFPS">Minimum allowable value of average fps</param>
+        [ShowInEditor(typeof(CheckAverageFPSClass), "FPS/Check Average FPS", false)]
+        public static void CheckAverageFPS(float targetFPS)
+        {
+            var awerageFps = FPSCounter.AverageFPS;
+            Assert.GreaterOrEqual(awerageFps, targetFPS);
+        }
+
+        private class CheckAverageFPSClass : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return VoidMethod.Float(30f);
+            }
+        }
+
+        /// <summary>
+        /// Checks minimum fps since moment user last time called `Interact.ResetFPS()` method or since game started. If minimum fps less than `targetFPS` test will faled.
+        /// </summary>
+        /// <param name="targetFPS">Minimum allowable value of minimum fps</param>
+        [ShowInEditor(typeof(CheckMinFPSClass), "FPS/Check Min FPS", false)]
+        public static void CheckMinFPS(float targetFPS)
+        {
+            CheckMinFPSClass.CheckMinFPS(targetFPS);
+        }
+
+        private class CheckMinFPSClass : ShowHelperBase
+        {
+            public static void CheckMinFPS(float targetFPS)
+            {
+                var minFps = FPSCounter.MixFPS;
+                Assert.GreaterOrEqual(minFps, targetFPS);
+            }
+
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return VoidMethod.Float(20f);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                return true;
+            }
+        }
+
+        #endregion
+        
+        #region Image
+
+        public static void SourceImage(GameObject go, string sourceName)
+        {
+            var image = UITestUtils.FindGameObjectWithComponentInParents<Image>(go);
+            var sr = UITestUtils.FindGameObjectWithComponentInParents<SpriteRenderer>(go);
+
+            if (image != null)
+            {
+                Assert.IsNotNull(image.sprite, "SourceImage: Image " +
+                                                 UITestUtils.GetGameObjectFullPath(go) +
+                                                 " has no sprite.");
+                Assert.AreEqual(image.sprite.name, sourceName, "SourceImage: Image " +
+                                                                    UITestUtils.GetGameObjectFullPath(go) +
+                                                                    " has sprite: " + image.sprite.name +
+                                                                    " - but expected: " +
+                                                                    sourceName);
+                return;
+            }
+            if (sr != null)
+            {
+                Assert.IsNotNull(sr.sprite, "SourceImage: SpriteRenderer " +
+                                         UITestUtils.GetGameObjectFullPath(go) +
+                                         " has no sprite.");
+                Assert.AreEqual(sr.sprite.name, sourceName, "SourceImage: SpriteRenderer " +
+                                                            UITestUtils.GetGameObjectFullPath(go) +
+                                                            " has sprite: " + sr.sprite.name +
+                                                            " - but expected: " +
+                                                            sourceName);
+                return;
+            }
+            Assert.Fail("SourceImage: Game object "
+                        + UITestUtils.GetGameObjectFullPath(go) +
+                        " has no Image and SpriteRenderer component.");
+        }
+
+        private class CheckSourceImage : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                var image = UITestUtils.FindGameObjectWithComponentInParents<Image>(go);
+                var sr = UITestUtils.FindGameObjectWithComponentInParents<SpriteRenderer>(go);
+
+                if (image != null)
+                {
+                    if (image.sprite!= null)
+                    {
+                        return VoidMethod.Path(go).String(image.sprite.name);
+                    }
+                    return VoidMethod.Path(go).String(string.Empty);
+                }
+                if (sr != null)
+                {
+                    if (sr.sprite != null)
+                    {
+                        return VoidMethod.Path(go).String(sr.sprite.name);
+                    }
+                    return VoidMethod.Path(go).String(string.Empty);
+                }
+                throw new ArgumentException();
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                if (!go)
+                {
+                    return false;
+                }
+                var image = UITestUtils.FindGameObjectWithComponentInParents<Image>(go);
+                var sr = UITestUtils.FindGameObjectWithComponentInParents<SpriteRenderer>(go);
+                return image || sr;
+            }
+        }
+
+        [ShowInEditor(typeof(CheckSourceImage), "Check/Source Image")]
+        public static void SourceImage(string path, string sourceName)
+        {
+            var go = IsExist(path);
+            SourceImage(go, sourceName);
+        }
+
+        #endregion
     }
 }

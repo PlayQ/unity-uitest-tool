@@ -1,28 +1,26 @@
 ﻿using System;
+using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
     public class ShowInEditorAttribute : Attribute
     {
-        public readonly string Descryption;
+        public readonly string Description;
         public readonly Type ClassType;
-        public bool PathIsPresent;
         public bool IsDefault;
         
-        public ShowInEditorAttribute(Type classType, string description, bool pathIsPresent = true, bool isDefault = false)
+        public ShowInEditorAttribute(Type classType, string description, bool isDefault = false)
         {
-            Descryption = description;
+            if (classType.IsAssignableFrom(typeof(ShowHelperBase)))
+            {
+                Debug.LogError("Class type for " + description + " is not ShowHelperBase");
+                return;
+            }
+            Description = description;
             ClassType = classType;
-            PathIsPresent = pathIsPresent;
             IsDefault = isDefault;
         }
-        public ShowInEditorAttribute(string description, bool pathInPresent = true, bool isDefault = false)
-        {
-            Descryption = description;
-            PathIsPresent = pathInPresent;
-            IsDefault = isDefault;
-        }
-    } 
+    }
     
     public class RaycastChangerAttribute : Attribute
     {

@@ -55,6 +55,7 @@ namespace PlayQ.UITestTools
 
 		public static void SetResolution(int width, int height)
 		{
+		#if UNITY_EDITOR
 			var window = GetWindow();
 
 			var instance = SingletonOfGameViewSizesInstance.GetValue(null, null);
@@ -64,6 +65,7 @@ namespace PlayQ.UITestTools
 			AddCustomSizeMethod.Invoke(currentGroup, new object[] {targetSize});
 			var count = (int) GetTotalGroupCountMethod.Invoke(currentGroup, new object[0]);
 			SetSelectionMethod.Invoke(window, new object[] {count - 1, null});
+		#endif
 		}
 
 		private static EditorWindow GetWindow()

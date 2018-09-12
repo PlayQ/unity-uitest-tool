@@ -1,40 +1,62 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
- using System.Linq;
- using System.Reflection;
- using NUnit.Framework;
- using UnityEngine;
- using UnityEngine.TestTools;
- using Debug = UnityEngine.Debug;
-
+using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
+using Screen = UnityEngine.Screen;
+using Tests.Nodes;
+using Tests;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
 namespace PlayQ.UITestTools
-{   
-    public class PlayModeTestRunner : MonoBehaviour
+{
+    public class PlayModeTestRunner : TestCoroutiner
     {
-        private const string PLAY_ONLY_SELECTED_TESTS = "playOnlySelectedTests";
-        private const string PLAY_ONLY_SMOKE_TESTS = "playOnlySmokeTests";
-        private const string QUIT_APP_AFTER_TESTS = "QuitAferComplete";
+        public enum SpecificTestType { Class, Method }
+
+        public static bool IsTestUIEnabled = true;
         
-        public static Action<MethodInfo> OnTestPassed;
-        public static Action<MethodInfo> OnTestIgnored;
-        public static Action<MethodInfo> OnTestFailed;
-        public static Action OnStartProcessingTests;
+        public static event Action<string, List<string>> OnTestPassed;
+        public static event Action<string, List<string>> OnTestIgnored;
+        public static event Action<string, List<string>> OnTestFailed;
         
         public static bool IsRunning
         {
-            get { return isRunning; }
+            get { return isRunning && Application.isPlaying; }
         }
         
         public const string TEST_NAME_SCENE = "RuntimeTestScene.unity";
         private const string LOG_FILE_NAME = "runtimeTests.txt";
 
-        private static List<UnitTestClass> classesForTest;
+        private static Node testsRootNode;
+        public static Node TestsRootNode
+        {
+            get
+            {
+                if (testsRootNode == null)
+                    RefreshTestsRootNode();
+
+                return testsRootNode;
+            }
+        }
+
+        public static int TestsAmount = -1;
+
+        private static List<MethodNode> methodsToTestQueue = new List<MethodNode>();
+
+        public static void RefreshTestsRootNode()
+        {
+            testsRootNode = NodeFactory.Build();
+
+            TestsAmount = ((IAllMethodsEnumerable)testsRootNode).AllMethods.Count();
+        }
+
+        private static TestInfoData testInfoData;
 
         public enum TestState
         {
@@ -44,6 +66,7 @@ namespace PlayQ.UITestTools
             Success,
             Ignored
         }
+
 
         public static MethodInfo CurrentMethodInfo
         {
@@ -56,242 +79,302 @@ namespace PlayQ.UITestTools
 
         private static MethodInfo currentMethodInfo;
         private static TestState currentTestState;
-        private Coroutine currentTestCoroutine;
         private PlayModeLogger playModeLogger;
         private LogSaver logSaver;
         private PlayModeTestRunnerGUI screenGUIDrawer;
         private static bool isRunning;
-        private SelectedTestsSerializable selectedTests;
         
-        public void Awake()
+        
+        private static SelectedTestsSerializable serializedTests;
+        public static SelectedTestsSerializable SerializedTests
         {
+            get
+            {
+#if UNITY_EDITOR
+                return SelectedTestsSerializable.CreateOrLoad();
+#else
+                if (!serializedTests)
+                {
+                    serializedTests = SelectedTestsSerializable.Load(); 
+                }
+                if (serializedTests == null)
+                {
+                    throw new NullReferenceException("SelectedTestsSerializable not found");
+                }
+                return serializedTests;
+#endif
+            }
+        }
+        
+        private void Awake()
+        {
+            Debug.Log("--------Playmode test runner awakes");
             DontDestroyOnLoad(gameObject);
             playModeLogger = new PlayModeLogger();
             screenGUIDrawer = new PlayModeTestRunnerGUI();
             logSaver = new LogSaver(Path.Combine(Application.persistentDataPath, LOG_FILE_NAME));
-            
-            selectedTests = SelectedTestsSerializable.Load();
-            classesForTest = GetTestClasses();
-            
-            DiscardUnselectedTests();
-            StartProcessingTests();
-        }
+            serializedTests = SelectedTestsSerializable.Load();
+            testInfoData = new TestInfoData();
 
-#if UNITY_EDITOR
-        private static void ClearEditorPrefs()
-        {
-            EditorPrefs.DeleteKey(QUIT_APP_AFTER_TESTS);
-            EditorPrefs.DeleteKey(PLAY_ONLY_SMOKE_TESTS);
-            EditorPrefs.DeleteKey(PLAY_ONLY_SELECTED_TESTS);
+            if (testsRootNode == null)
+                RefreshTestsRootNode();
+
+            AddSelectedMethodsToTestQueue();
+            StartProcessingTests();
         }
 
         public static bool QuitAppAfterCompleteTests
         {
             set
             {
-                EditorPrefs.SetInt(QUIT_APP_AFTER_TESTS, value ? 1 : 0);
+                SerializedTests.QuitAferComplete = value;
+            }
+            get { return SerializedTests.QuitAferComplete; }
+        }
+
+        public static float DefaultTimescale
+        {
+            set
+            {
+                SerializedTests.DefaultTimescale = value;
             }
             get
             {
-                return EditorPrefs.HasKey(QUIT_APP_AFTER_TESTS) && EditorPrefs.GetInt(QUIT_APP_AFTER_TESTS) == 1;
+                return SerializedTests.DefaultTimescale;
             }
         }
 
-        public static bool RunOnlySmokeTests
+        public static int RunTestsGivenAmountOfTimes
         {
-            set
-            {
-                EditorPrefs.SetInt(PLAY_ONLY_SMOKE_TESTS, value ? 1 : 0);
-            }
-            get
-            {
-                return EditorPrefs.HasKey(PLAY_ONLY_SMOKE_TESTS) && EditorPrefs.GetInt(PLAY_ONLY_SMOKE_TESTS) == 1;
-            }
+            get { return RunTestsMode.RunTestsGivenAmountOfTimes; }
+            set { RunTestsMode.RunTestsGivenAmountOfTimes = value; }
         }
-        
-        public static bool RunOnlySelectedTests
-        {
-            set
-            {
-                EditorPrefs.SetInt(PLAY_ONLY_SELECTED_TESTS, value ? 1 : 0);
-            }
-            get
-            {
-                return EditorPrefs.HasKey(PLAY_ONLY_SELECTED_TESTS) && EditorPrefs.GetInt(PLAY_ONLY_SELECTED_TESTS) == 1;
-            }
-        }
-      
+
+#if UNITY_EDITOR
+
 
         public static void AdjustSelectedTestsForBuild()
         {
-            if (RunOnlySelectedTests && RunOnlySmokeTests)
-            {
-                Debug.LogWarning("you have selected both runOnlySelected abd runOnlySmoke option, " +
-                                 "you must choose one of them. Only selected test will be included in test build");
-            }
-            
             var selectedTests = SelectedTestsSerializable.CreateOrLoad();
-            classesForTest = GetTestClasses();
-            Dictionary<string, SelectedTestsSerializable.TestInfo> testAddedToBuild = 
-                new Dictionary<string, SelectedTestsSerializable.TestInfo>(); 
-            
-            foreach (var classForTest in classesForTest)
-            {
-                foreach (var testMethod in classForTest.TestMethods)
-                {
-                    var attributes = testMethod.Method.GetCustomAttributes(false);
-                    var isMethodSmoke = attributes.Any(attr => attr.GetType() == typeof(SmokeTestAttribute));
-                    var isSelectedMethod =
-                        selectedTests.TestInfoToMethodName.ContainsKey(testMethod.FullName)
-                            ? selectedTests.TestInfoToMethodName[testMethod.FullName].IsSelected
-                            : false;
 
-                    if (RunOnlySelectedTests && isSelectedMethod ||
-                        RunOnlySmokeTests && isMethodSmoke ||
-                        !RunOnlySelectedTests && !RunOnlySmokeTests)
+            var runMode = RunTestsMode.Mode;
+
+            var methodsToTest = new Dictionary<string, MethodNode>();
+
+            foreach (ClassNode classNode in ((IAllClassesEnumerable)TestsRootNode).AllClasses)
+            {
+                foreach (MethodNode methodNode in ((IAllMethodsEnumerable)classNode).AllMethods)
+                {
+                    methodsToTest.Add(methodNode.FullName, methodNode);
+
+                    if (runMode == RunTestsMode.RunTestsModeEnum.All 
+                        || (runMode == RunTestsMode.RunTestsModeEnum.Smoke && methodNode.TestSettings.IsSmoke))
                     {
-                        
-                        testAddedToBuild[testMethod.FullName] = new SelectedTestsSerializable.TestInfo
+                        var testInfo = selectedTests.GetTest(methodNode.FullName);
+
+                        if (testInfo != null)
                         {
-                            ClassName = classForTest.Type.FullName,
-                            IsSelected = true,
-                            MethodName = testMethod.FullName
-                        };
+                            testInfo.IsSelected = true;
+                        }
+                        else
+                        {
+                            selectedTests.AddTest(methodNode.FullName,
+                                                  new SelectedTestsSerializable.TestInfo(methodNode.FullName, classNode.FullName)
+                                                  {
+                                                      ClassName = classNode.FullName,
+                                                      IsSelected = true
+                                                  });
+                        }   
                     }
                 }
             }
 
-            selectedTests.TestInfoToMethodName = testAddedToBuild;
+            var testsToRemove = new List<string>();
+
+            foreach (var methodName in selectedTests.TestInfoKeys)
+            {
+                if (!methodsToTest.ContainsKey(methodName))
+                {
+                    testsToRemove.Add(methodName);
+                }
+            }
+            
+            foreach (var key in testsToRemove)
+            {
+                selectedTests.RemoveTest(key);
+            }
+            
             AssetDatabase.SaveAssets();
-            ClearEditorPrefs();
         }
-        
+
 #endif
-        
-        private void DiscardUnselectedTests()
+
+        private void AddSelectedMethodsToTestQueue()
         {
-            if (!selectedTests)
-            {
-                return;
-            }
+            methodsToTestQueue.Clear();
 
-            bool runOnlySmokeTests = false;
-            bool runOnlySelectedTests = false;
-      
-#if UNITY_EDITOR
-            runOnlySmokeTests = RunOnlySmokeTests;
-            runOnlySelectedTests = RunOnlySelectedTests;
-#endif
-          
-            if (!runOnlySmokeTests && !runOnlySelectedTests)
-            {
-                return;
-            }
+            var mode = RunTestsMode.Mode;
 
-            if (runOnlySmokeTests && runOnlySelectedTests)
+            int testRunsAmount = RunTestsMode.RunTestsGivenAmountOfTimes;
+
+            Debug.Log("QA: selectedTests: " + SerializedTests.TestInfoKeys.Count);
+
+            Node newTestsRootNode = new HierarchicalNode(string.Empty, null);
+
+            for (int i = 0; i < testRunsAmount; i++)
             {
-                Debug.LogWarning("you have selected both runOnlySelected abd runOnlySmoke option, " +
-                                 "you must choose one of them. Only selected test will be runned");
-            }
-            
-            
-            var filteredClassesForTests = new List<UnitTestClass>();
-            foreach(var classForTest in classesForTest)
-            {
-                var newClassForTest = new UnitTestClass(classForTest.Type);
-                newClassForTest.SetUpMethods = classForTest.SetUpMethods;
-                newClassForTest.TearDownMethods = classForTest.TearDownMethods;
-                newClassForTest.TestMethods = new List<UnitTestMethod>();
-                
-                foreach (var methodForTest in classForTest.TestMethods)
+                foreach (MethodNode methodNode in ((IAllMethodsEnumerable)testsRootNode).AllMethods)
                 {
-                    var attributes = methodForTest.Method.GetCustomAttributes(false);
-                    var isMethodSmoke = attributes.Any(attr => attr.GetType() == typeof(SmokeTestAttribute));
-                    var isMethodSelected = selectedTests.TestInfoToMethodName.ContainsKey(methodForTest.FullName) &&
-                                           selectedTests.TestInfoToMethodName[methodForTest.FullName].IsSelected;
+                    ClassNode classNode = (ClassNode)methodNode.Parent;
 
-                    if (isMethodSelected && runOnlySelectedTests ||
-                        isMethodSmoke && runOnlySmokeTests)
+                    var isMethodSmoke = methodNode.TestSettings.IsSmoke;
+
+                    var isMethodSelected = SerializedTests.ContainsTest(methodNode.FullName)
+                                           && SerializedTests.GetTest(methodNode.FullName).IsSelected;
+
+                    switch (mode)
                     {
-                        newClassForTest.TestMethods.Add(methodForTest);
+                        case RunTestsMode.RunTestsModeEnum.All:
+
+                            methodsToTestQueue.Add(methodNode);
+
+                            break;
+
+                        case RunTestsMode.RunTestsModeEnum.Smoke:
+
+                            if (isMethodSmoke)
+                            {
+                                methodsToTestQueue.Add(methodNode);
+                            }
+
+                            break;
+
+                        case RunTestsMode.RunTestsModeEnum.Selected:
+
+                            if (isMethodSelected)
+                            {
+                                methodsToTestQueue.Add(methodNode);
+                            }
+
+                            break;
+
+                        case RunTestsMode.RunTestsModeEnum.DoubleClick:
+
+                            string specificTestOrClassName = RunTestsMode.SpecificTestOrClassName;
+
+                            switch (RunTestsMode.RunSpecificTestType)
+                            {
+                                case SpecificTestType.Class:
+
+                                    if (classNode.Type.FullName.Contains(specificTestOrClassName))
+                                    {
+                                        methodsToTestQueue.Add(methodNode);
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+
+                                    break;
+
+                                case SpecificTestType.Method:
+
+                                    if (methodNode.FullName == specificTestOrClassName)
+                                    {
+                                        methodsToTestQueue.Add(methodNode);
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+
+                                    break;
+
+                                default:
+                                    throw new ArgumentOutOfRangeException();
+                            }
+                            break;
+
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
-                if (newClassForTest.TestMethods.Count > 0)
-                {
-                    filteredClassesForTests.Add(newClassForTest);
-                }
             }
-            classesForTest = filteredClassesForTests;
         }
 
-        
-        private IEnumerator InvokeMethod(object instance, UnitTestMethod method)
+        void RunMethod(object instance, MethodInfo info, Action callback)
         {
-            var returnedType = method.Method.ReturnType;
+            var returnType = info.ReturnType;
 
-            if (method.Sync)
+            object result;
+
+            try
             {
-                if (returnedType != typeof(void))
-                {
-                    Debug.LogErrorFormat("Method \"{0}\" with attribute [Test] must return void.", method.FullName);
-                    yield break;
-                }
-                method.Method.Invoke(method.Method.IsStatic ? null : instance, null);
-                currentTestState = TestState.Success;
-                yield break;
+                result = info.Invoke(info.IsStatic ? null : instance, null);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogErrorFormat("Fail during RunMethod: \"{0}\"", ex);
+
+                callback();
+
+                return;
             }
 
-            if (returnedType != typeof(IEnumerable) && returnedType != typeof(IEnumerator))
+            if (returnType != typeof(IEnumerable) && returnType != typeof(IEnumerator))
             {
-                Debug.LogErrorFormat(
-                    "Method \"{0}\" with attribute [UnityTest] must return IEnumerable or IEnumerator.",
-                    method.FullName);
-                yield break;
-            }
+                callback();
 
-            var returnedObject = method.Method.Invoke(method.Method.IsStatic ? null : instance, null);
-            var enumerable = returnedObject as IEnumerable;
+                return;
+            }
+            
+            var enumerable = result as IEnumerable;
+
             if (enumerable != null)
             {
-                foreach (YieldInstruction yieldInstruction in enumerable)
-                {
-                    yield return yieldInstruction;
-                }
-                currentTestState = TestState.Success;
-                yield break;
+                StartTestCoroutine(enumerable, instance.GetType().Name, info.Name, callback);
+
+                return;
             }
 
-            var enumerator = returnedObject as IEnumerator;
+            var enumerator = result as IEnumerator;
             if (enumerator != null)
             {
-                while (enumerator.MoveNext())
-                {
-                    yield return enumerator.Current;
-                }
-                currentTestState = TestState.Success;
-                yield break;
+                StartTestCoroutine(enumerator, instance.GetType().Name, info.Name, callback);
             }
         }
 
-        private IEnumerator InvokeTestMethod(object instance, UnitTestMethod method)
+        private IEnumerator InvokeTestMethod(object instance, MethodNode methodNode)
         {
             currentTestState = TestState.InProgress;
-            currentTestCoroutine = StartCoroutine(InvokeMethod(instance, method));
+
+            bool testFinished = false;
+
+            RunMethod(instance, methodNode.TestSettings.Method, () =>
+            {
+                testFinished = true;
+            });
 
             var currentTimer = 0f;
-            var timeOut = method.TimeOut / 1000;
+
+            var timeOut = methodNode.TestSettings.TimeOut / 1000;
+
             do
             {
                 yield return null;
+
                 currentTimer += Time.unscaledDeltaTime;
 
                 if (currentTimer >= timeOut)
                 {
-                    Debug.LogErrorFormat("Method \"{0}\" failed by timeout.", method.FullName);
+                    Debug.LogErrorFormat("Method \"{0}\" failed by timeout.", methodNode.FullName);
+
                     yield break;
                 }
                 // wait for done
-            } while (currentTestState == TestState.InProgress);
+            } while (!testFinished);
+
+            yield return null; //we need to skip one frame to make sure error pause is executed
         }
 
         private void StartProcessingTests()
@@ -299,156 +382,250 @@ namespace PlayQ.UITestTools
             isRunning = true;
             
             logSaver.StartWrite();
+
             Application.logMessageReceived += ApplicationOnLogMessageReceived;
+
             StartCoroutine(ProcessTestQueue());
         }
 
         private void ApplicationOnLogMessageReceived(string condition, string stackTrace, LogType logType)
         {
             logSaver.Write(condition, stackTrace);
-            if (logType == LogType.Exception || logType == LogType.Error)
+            if ((logType == LogType.Exception || logType == LogType.Error))
             {
-                if (currentTestCoroutine != null)
+                if (logType == LogType.Error && 
+                    (stackTrace == "UnityEditor.AsyncHTTPClient:Done(State, Int32)\n" 
+                     || PermittedErrors.IsPermitted(condition)))
                 {
-                    StopCoroutine(currentTestCoroutine);
+                    return;
                 }
+                StopTestCoroutine();
                 currentTestState = TestState.Failed;
+                testInfoData.AddFailed(CurrentMethodInfo.DeclaringType.FullName +
+                                       "." + CurrentMethodInfo.Name,
+                    condition + "   " + stackTrace);
             }
         }
 
         private IEnumerator ProcessTestQueue()
         {
-            if (OnStartProcessingTests != null)
-            {
-                OnStartProcessingTests();
-            }
+            Debug.Log("QA: Process classesForTest #: " + testsRootNode.Children.Count());
 
-            foreach (var testClass in classesForTest)
+            ClassNode previousClassNode = null;
+
+            //foreach (MethodNode methodNode in methodsToTestQueue)
+            for (int i = 0; i < methodsToTestQueue.Count; i++)
             {
-                foreach (var method in testClass.TestMethods)
+                MethodNode methodNode = methodsToTestQueue[i];
+
+                ClassNode classNode = (ClassNode)methodNode.Parent;
+
+                Debug.Log("QA: Process " + classNode.Type + " testClass.TestMethods #: " + classNode.Children.Count());
+
+                playModeLogger.Logs.Clear();
+
+                testInfoData.Total++;
+
+                currentTestState = TestState.NotInited;
+
+                if (methodNode.TestSettings.IsIgnored)
                 {
-                    currentTestState = TestState.NotInited;
-                    if (method.IsIgnored)
-                    {
-                        currentTestState = TestState.Ignored;
-                        playModeLogger.IgnoreLog(method.FullName);
-                        if (OnTestIgnored != null)
-                        {
-                            OnTestIgnored(method.Method);
-                        }
-                        continue;
-                    }
+                    ProcessIgnore(methodNode);
 
-                    if (method.TargetResolution != null)
-                    {
-                        if (method.TargetResolution.Width != Screen.width ||
-                            method.TargetResolution.Height != Screen.height)
-                        {
+                    continue;
+                }
+
 #if UNITY_EDITOR
-                            GameViewResizer.SetResolution(method.TargetResolution.Width,
-                                method.TargetResolution.Height);
-#else
-                            playModeLogger.IgnoreLog(method.FullName);
-                            if (OnTestIgnored != null)
-                            {
-                                OnTestIgnored(method.Method);
-                            }
-                            continue;
-#endif
-                        }
-                    }
+                if (methodNode.TestSettings.EditorTargetResolution != null)
+                {
+                    Tests.CustomResolution resolution = methodNode.TestSettings.EditorTargetResolution;
 
-                    object testInstance = null;
-                    currentMethodInfo = method.Method;
-                    screenGUIDrawer.SetCurrentTest(method.FullName);
-                    playModeLogger.StartLog(method.FullName);
-
-                    try
+                    if (resolution.Width != Screen.width ||
+                        resolution.Height != Screen.height)
                     {
-                        testInstance = Activator.CreateInstance(testClass.Type);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogErrorFormat("Can't instantiate class \"{0}\". Exception: \"{1}\"",
-                            testClass.Type.FullName, ex.Message);
-                        ProcessTestFail(method);
-                        continue;
-                    }
-
-                    try
-                    {
-                        RunMethods(testClass.SetUpMethods, testInstance);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogErrorFormat("Fail during executing set up methods: \"{0}\"", ex.Message);
-                        ProcessTestFail(method);
-                        continue;
-                    }
-
-                    yield return InvokeTestMethod(testInstance, method);
-
-                    try
-                    {
-                        RunMethods(testClass.TearDownMethods, testInstance);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogErrorFormat("Fail during executing tear down methods: \"{0}\"", ex);
-                        ProcessTestFail(method);
-                        continue;
-                    }
-
-                    if (currentTestState == TestState.Success)
-                    {
-                        playModeLogger.SuccessLog(method.FullName);
-                        if (OnTestPassed != null)
-                        {
-                            OnTestPassed(method.Method);
-                        }
-                    }
-                    else
-                    {
-                        ProcessTestFail(method);
+                        GameViewResizer.SetResolution(resolution.Width, resolution.Height);
                     }
                 }
+
+#endif
+
+                if (!methodNode.TestSettings.ContainsTargetResolution(Screen.width, Screen.height))
+                {
+#if UNITY_EDITOR
+                    if (methodNode.TestSettings.EditorTargetResolution == null)
+                    {
+                        Debug.LogWarning(String.Format("PlayModeTestRunner: TARGET RESOLUTION {0}:{1}", methodNode.TestSettings.DefaultTargetResolution.Width, methodNode.TestSettings.DefaultTargetResolution.Height));
+
+                        GameViewResizer.SetResolution(methodNode.TestSettings.DefaultTargetResolution.Width,
+                                                      methodNode.TestSettings.DefaultTargetResolution.Height);
+                    }
+#else
+                        ProcessIgnore(method);
+                        continue;
+#endif
+                }
+
+                object testInstance = null;
+
+                currentMethodInfo = methodNode.TestSettings.Method;
+
+                screenGUIDrawer.SetCurrentTest(methodNode.FullName);
+
+                playModeLogger.StartLog(methodNode.FullName);
+
+                try
+                {
+                    testInstance = Activator.CreateInstance(classNode.Type);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogErrorFormat("Can't instantiate class \"{0}\". Exception: \"{1}\"",
+                                         classNode.Type.FullName, ex.Message);
+
+                    ProcessTestFail(methodNode);
+
+                    continue;
+                }
+
+#if UNITY_EDITOR
+                Time.timeScale = PlayModeTestRunner.DefaultTimescale;
+#endif
+                Debug.Log("QA: Running testClass: " + classNode.Type);
+                currentTestState = TestState.InProgress;
+
+                if (classNode != previousClassNode)
+                {
+                    previousClassNode = classNode;
+
+                    yield return RunMethods(classNode.OneTimeSetUpMethods, testInstance, true);
+
+                    if (currentTestState == TestState.Failed)
+                    {
+                        Debug.LogError("Fail during executing set up methods.");
+
+                        ProcessTestFail(methodNode);
+
+                        continue;
+                    }
+                }
+
+                yield return RunMethods(classNode.SetUpMethods, testInstance, true);
+
+                if (currentTestState == TestState.Failed)
+                {
+                    Debug.LogError("Fail during executing set up methods.");
+
+                    ProcessTestFail(methodNode);
+
+                    continue;
+                }
+
+                yield return InvokeTestMethod(testInstance, methodNode);
+                var previousState = currentTestState;
+
+                yield return RunMethods(classNode.TearDownMethods, testInstance, false);
+
+                if (i + 1 == methodsToTestQueue.Count || methodsToTestQueue[i + 1].Parent != classNode)
+                {
+                    yield return RunMethods(classNode.OneTimeTearDownMethods, testInstance, true);
+                }
+
+                if (currentTestState != previousState && currentTestState == TestState.Failed)
+                {
+                    Debug.LogError("Fail during executing tear down methods.");
+
+                    ProcessTestFail(methodNode);
+
+                    continue;
+                }
+
+                if (currentTestState == TestState.InProgress)
+                {
+                    currentTestState = TestState.Success;
+                    testInfoData.AddSuccess(methodNode.FullName);
+
+                    playModeLogger.SuccessLog(methodNode.FullName);
+
+                    if (OnTestPassed != null)
+                    {
+                        OnTestPassed(methodNode.FullName, playModeLogger.LogsCopy);
+                    }
+                }
+                else
+                {
+                    ProcessTestFail(methodNode);
+                }
             }
+
             FinalizeTest();
         }
 
-        private void ProcessTestFail(UnitTestMethod method)
+        private void ProcessIgnore(MethodNode method)
+        {
+            testInfoData.AddIgnored(method.FullName);
+
+            currentTestState = TestState.Ignored;
+
+            playModeLogger.IgnoreLog(method.FullName, method.TestSettings.IgnoreReason ?? "ignored by ignore attribute");
+
+            if (OnTestIgnored != null)
+            {
+                OnTestIgnored(method.FullName, playModeLogger.LogsCopy);
+            }
+            
+        }
+
+        private void ProcessTestFail(MethodNode method)
         {
             playModeLogger.FailLog(method.FullName);
+
             screenGUIDrawer.AddFailedTest(method.FullName);
+
             if (OnTestFailed != null)
             {
-                OnTestFailed(method.Method);
+                OnTestFailed(method.FullName, playModeLogger.LogsCopy);
             }
         }
 
         private void FinalizeTest()
         {
+            logSaver.SaveTestInfo(testInfoData);
+
             logSaver.Close();
+
             isRunning = false;
 #if UNITY_EDITOR
             EditorApplication.isPlaying = false;
             
             if(QuitAppAfterCompleteTests)
             {
-                ClearEditorPrefs();
                 EditorApplication.Exit(0);
             }
 #else
+            Debug.Log("QA: tests finished.");
             Application.Quit();
-#endif
-            
+#endif 
         }
 
-        private void RunMethods(List<MethodInfo> methods, object testInstance)
+        private IEnumerator RunMethods(IEnumerable<MethodInfo> methods, object testInstance, bool checkFailedTests)
         {
             foreach (var method in methods)
             {
-                method.Invoke(method.IsStatic ? null : testInstance, null);
+                bool done = false;
+
+                RunMethod(testInstance, method, () =>
+                {
+                    done = true;
+                });
+                while (!done)
+                {
+                    yield return null;
+                }
+
+                if (checkFailedTests && currentTestState == TestState.Failed)
+                {
+                    break;
+                }
             }
         }
 
@@ -468,70 +645,86 @@ namespace PlayQ.UITestTools
 
         private void OnGUI()
         {
-            screenGUIDrawer.Draw();
+            if (IsTestUIEnabled && screenGUIDrawer!=null)
+            {
+                screenGUIDrawer.Draw();   
+            }
         }
 
-        public static List<UnitTestClass> GetTestClasses()
+#if UNITY_EDITOR
+
+        public static void RunTestByDoubleClick(SpecificTestType type, string testFullName)
         {
-            var findedClasses = new List<UnitTestClass>();
-            var targetAssembly = Assembly.GetAssembly(typeof(PlayModeTestRunner));
-            var types = targetAssembly.GetTypes();
-
-            foreach (var type in types)
-            {
-                var methods = GetTestMethods(type);
-                if (methods.Count == 0)
-                {
-                    continue;
-                }
-                var unitTestClass = new UnitTestClass(type)
-                {
-                    TestMethods = methods,
-                    SetUpMethods = GetMethodsWithCustomAttribute<SetUpAttribute>(type),
-                    TearDownMethods = GetMethodsWithCustomAttribute<TearDownAttribute>(type)
-                };
-                findedClasses.Add(unitTestClass);
-            }
-
-            return findedClasses;
+            RunTestsMode.RunTestByDoubleClick(type, testFullName);
+            Run();
         }
 
-        private static List<UnitTestMethod> GetTestMethods(Type t)
+        
+        public static void Run()
         {
-            var list = new List<UnitTestMethod>();
-            var asyncTests = GetMethodsWithCustomAttribute<UnityTestAttribute>(t);
-            foreach (var asyncTest in asyncTests)
+            var scenePath = PlayModeTestRunner.GetTestScenePath();
+            if (scenePath == null)
             {
-                list.Add(new UnitTestMethod(asyncTest, false));
+                Debug.LogError("Cant find test scene");
+                return;
             }
-
-            var syncTests = GetMethodsWithCustomAttribute<TestAttribute>(t);
-            foreach (var syncTest in syncTests)
-            {
-                list.Add(new UnitTestMethod(syncTest, true));
-            }
-            return list;
+            UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scenePath);
+            EditorApplication.isPlaying = true;
         }
+#endif
+    }
 
-        private static List<MethodInfo> GetMethodsWithCustomAttribute<T>(Type targetType)
+    public class TestInfoData
+    {
+        public string Build;
+        public int Total;
+        public int Ignored;
+        public int Failed;
+        public int Success;
+        
+        public List<string> IgnoreTestsResults = new List<string>();
+        public List<TestResultMessage> FailedTestsResults = new List<TestResultMessage>();
+        public List<string> SuccessTestsResults = new List<string>();
+
+        public TestInfoData()
         {
-            var findedMethods = new List<MethodInfo>();
-            var methods = targetType.GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
-                                                BindingFlags.NonPublic);
-            foreach (var method in methods)
+            Build = Application.version;
+            var buildVersion = ConsoleArgumentHelper.GetArg("-buildNumber");
+            if (!string.IsNullOrEmpty(buildVersion))
             {
-                var attrs = method.GetCustomAttributes(false);
-                foreach (var attr in attrs)
-                {
-                    var isTestMethod = attr.GetType() == typeof(T);
-                    if (isTestMethod)
-                    {
-                        findedMethods.Add(method);
-                        break;
-                    }
-                }
+                Build = Build + ":" + buildVersion;
             }
-            return findedMethods;
         }
+
+        public void AddIgnored(string testName)
+        {
+            Ignored++;
+            IgnoreTestsResults.Add(testName); 
+        }
+        
+        public void AddSuccess(string testName)
+        {
+            Success++;
+            SuccessTestsResults.Add(testName); 
+        }
+        
+        public void AddFailed(string testName, string errorMessage)
+        {
+            var currentOne = FailedTestsResults.LastOrDefault();
+            if (currentOne == null || currentOne.Name != testName)
+            {
+                Failed++;
+                currentOne = new TestResultMessage();
+                currentOne.Name = testName;
+                FailedTestsResults.Add(currentOne);
+            }
+            currentOne.ErrorMessages.Add(errorMessage); 
+        }
+    }
+
+    public class TestResultMessage
+    {
+        public string Name;
+        public List<string> ErrorMessages = new List<string>();
     }
 }

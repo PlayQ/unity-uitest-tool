@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -9,12 +10,14 @@ namespace PlayQ.UITestTools
     public class UITestToolsHelperWindow : EditorWindow
     {
         [SerializeField] private UserFlowModel userFlowModel;
-        private UserActionInfo userAction;
         private List<string> generatedCodes;
+        private List<string> generatedLabels;
+        private GameObject selectedGameObject;
         private float maxWidthForAssertationName;
-        private float maxWidthForAudioName;
         IEnumerable<KeyValuePair<GameObject, string>> audioClipNameToGameObject;
 
+        private UITestToolWindowFooter footer;
+        
         [MenuItem("Window/UI Test Tools/Helper")]
         static void Init()
         {
@@ -22,16 +25,19 @@ namespace PlayQ.UITestTools
             UITestToolsHelperWindow window = (UITestToolsHelperWindow) GetWindow(typeof(UITestToolsHelperWindow), false, "Test Helper");
             window.Show();
         }
-        [MenuItem("GameObject/Copy path", false, 0)]
+
+        [MenuItem("Window/UI Test Tools/Game Event Importer")]
+        static void GameEventImporter()
+        {
+            // Get existing open window or if none, make a new one:
+            GetWindow(typeof(GameEventImporter), false, "Game Event Importer").Show();
+        }
+
+        [MenuItem("GameObject/Copy Path", false, 0)]
         private static void CopyPath()
         {
             EditorGUIUtility.systemCopyBuffer = UITestUtils.GetGameObjectFullPath((GameObject)Selection.activeObject);
         }
-//        [MenuItem("GameObject/kek/Copy path", true)]
-//        private static bool CopyPathValidation()
-//        {
-//            return Selection.activeObject && Selection.activeObject.GetType() == typeof(GameObject);
-//        }
 
         [MenuItem("Window/UI Test Tools/Open Screenshots")]
         static void OpenScreenshots()
@@ -62,16 +68,17 @@ namespace PlayQ.UITestTools
 
         private void OnEnable()
         {
+            footer = new UITestToolWindowFooter();
             Selection.selectionChanged += Repaint;
             userFlowModel = new UserFlowModel();
             generatedCodes = new List<string>();
+            generatedLabels = new List<string>();
             userFlowModel.FetchAssertationMethods();
         }
 
         private Vector2 scrollPosition;
         void OnGUI()
         {
-            
             EditorGUILayout.Space();
             if (Selection.gameObjects.Length == 0)
             {
@@ -88,40 +95,34 @@ namespace PlayQ.UITestTools
             {
                 EditorGUILayout.LabelField("Selected object: ", go.name, EditorStyles.boldLabel);
                 EditorGUILayout.Space();
-                var newAction = userFlowModel.HandleGameObject(go);
-                if (userAction == null || userAction.MethodsInfoExtended == null ||
-                    userAction.MethodsInfoExtended.Count == 0)
+
+                if (go != selectedGameObject)
                 {
-                    generatedCodes.Clear();
-                    userAction = newAction;
+                    var newAction = userFlowModel.HandleGameObject(go);
+                    selectedGameObject = go;
+                    GenerateText(newAction);
                 }
-                if (userAction.SelectedAssertation.GameObjectFullPath !=
-                    newAction.SelectedAssertation.GameObjectFullPath)
-                {
-                    generatedCodes.Clear();
-                    userAction = newAction;
-                }
-                DrawUserClickInfo(userAction);
+               
+                DrawUserClickInfo();
             }            
+            if (GUILayout.Button("Update Assertations", GUILayout.ExpandWidth(true)))
+            {
+                selectedGameObject = null;
+            }
             DrawPlayingSounds();
             EditorGUILayout.EndScrollView();
-            
+            GUILayout.Space(UITestToolWindowFooter.HEIGHT + 5);
+            footer.Draw(position);
         }
 
         private void DrawPlayingSounds()
         {
             if (GUILayout.Button("Find playing sounds", GUILayout.ExpandWidth(true)))
             {
-                maxWidthForAudioName = 0;
                 audioClipNameToGameObject = FindObjectsOfType<AudioSource>()
-                    .Where(source => source.isPlaying)
+                    .Where(source => source.isPlaying && source.clip)
                     .Select(source =>
                     {
-                        var currentWidth = GetContentLenght(source.clip.name);
-                        if (maxWidthForAudioName < currentWidth)
-                        {
-                            maxWidthForAudioName = currentWidth;
-                        } 
                         var kvp = new KeyValuePair<GameObject, string>(
                             source.gameObject,
                             source.clip.name);
@@ -131,26 +132,47 @@ namespace PlayQ.UITestTools
 
             if (audioClipNameToGameObject != null)
             {
+                GUILayout.Space(5);
+                var indent = GetContentLenght(" GameObject path:");
                 foreach (var kvp in audioClipNameToGameObject)
                 {
-                    var rect = EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField(kvp.Value);
-                    rect.x = maxWidthForAudioName + 5;
-                    rect.width = rect.width - 130 - maxWidthForAudioName;
-                    if (kvp.Key != null)
-                    {
-                        EditorGUI.TextField(rect, UITestUtils.GetGameObjectFullPath(kvp.Key));    
-                    }
-                    GUILayout.FlexibleSpace();
+                    
+                    var firstRect = EditorGUILayout.BeginHorizontal();
+                    
+                    GUI.Box(new Rect(firstRect.x, firstRect.y - 3,
+                        firstRect.width, firstRect.height * 2 + 9), "");
+                    
+                    EditorGUILayout.LabelField(" Audio name:");
+                    firstRect.x = indent + 5;
+                    firstRect.width = firstRect.width - 80 - indent;
+                    
+                    EditorGUI.TextField(firstRect, kvp.Value);
+                    
                     if (GUILayout.Button("Copy", GUILayout.Width(60)))
                     {
                         EditorGUIUtility.systemCopyBuffer = kvp.Value;
                     }
+                    GUILayout.Space(5);
+                    EditorGUILayout.EndHorizontal();
+                    
+                    var secondRect = EditorGUILayout.BeginHorizontal();
+                    secondRect.x = indent + 5;
+                    secondRect.width = secondRect.width - 80 - indent;
+                    if (kvp.Key != null)
+                    {
+                        EditorGUILayout.LabelField(" GameObject path:");
+                        EditorGUI.TextField(secondRect, UITestUtils.GetGameObjectFullPath(kvp.Key));    
+                    }
+                    
+                    GUILayout.FlexibleSpace();  
                     if (GUILayout.Button("Select", GUILayout.Width(60)))
                     {
                         Selection.activeGameObject = kvp.Key;
                     }
+                    GUILayout.Space(5);
                     EditorGUILayout.EndHorizontal();
+                    
+                    GUILayout.Space(5);
                 }
             }
         }
@@ -164,57 +186,71 @@ namespace PlayQ.UITestTools
             Vector2 size = style.CalcSize(content);
             return size.x;
         }
-        
-         private void DrawUserClickInfo(UserActionInfo userAction)
-         {
-             if (userAction.MethodsInfoExtended.Count == 0)
-             {
-                 return;
-             }
-            
-             EditorGUILayout.BeginHorizontal();
-             EditorGUILayout.TextField("Path", userAction.MethodsInfoExtended[0].GameObjectFullPath);
-             if (GUILayout.Button("Copy", GUILayout.Width(60)))
-             {
-                 EditorGUIUtility.systemCopyBuffer = userAction.MethodsInfoExtended[0].GameObjectFullPath;
-             }
-             
-             EditorGUILayout.EndHorizontal();
 
-             if (generatedCodes.Count == 0)
-             {
-                 if (userAction.MethodsInfoExtended.Any())
-                 {
-                     var label = userAction.MethodsInfoExtended[0].AssertationMethodDescription + ": ";
-                     maxWidthForAssertationName = GetContentLenght(label);
-                 }
-                 foreach(var assertation in userAction.MethodsInfoExtended)
-                 {
-                     generatedCodes.Add(assertation.GenerateMethodCode());
-                     var label = assertation.AssertationMethodDescription + ": ";
-                     var currentWidth = GetContentLenght(label);
-                     if (maxWidthForAssertationName < currentWidth)
-                     {
-                         maxWidthForAssertationName = currentWidth;
-                     } 
-                 }    
-             }
+
+        private void GenerateText(UserActionInfo userAction)
+        {
+            generatedLabels.Clear();
+            generatedCodes.Clear();
+            
+            generatedLabels.Add("GameObject Path: ");
+            generatedCodes.Add(UITestUtils.GetGameObjectFullPath(selectedGameObject));
+
+            maxWidthForAssertationName = 0;
+
+            WaitVariablesContainer.SilentMode = true;
+            for (int i = 0; i < userAction.AvailableAssertations.Count; i++)
+            {
+                userAction.SelectedIndex = i;
+                try
+                {
+                    var result = userAction.GenerateCode();
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        generatedCodes.Add(result);
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    continue;
+                }
+                
+                var label = userAction.SelectedAssertation.AssertationMethodDescription + ": ";
+                label = label.Replace("/", " ");
+                generatedLabels.Add(label);
+                var currentWidth = GetContentLenght(label);
+                if (maxWidthForAssertationName < currentWidth)
+                {
+                    maxWidthForAssertationName = currentWidth;
+                }   
+            } 
+            WaitVariablesContainer.SilentMode = false;
+        }
+        
+         private void DrawUserClickInfo()
+         {   
+             var oldValue = EditorGUIUtility.labelWidth;
+             EditorGUIUtility.labelWidth = maxWidthForAssertationName;
              
-             for(var i = 0; i < userAction.MethodsInfoExtended.Count; i++)
+             for(var i = 0; i < generatedLabels.Count; i++)
              {
                  var rect = EditorGUILayout.BeginHorizontal();
-                 var assertation = userAction.MethodsInfoExtended[i];
-                 EditorGUILayout.LabelField(assertation.AssertationMethodDescription + ": ");
+                 EditorGUILayout.LabelField(generatedLabels[i]);
                  rect.x = maxWidthForAssertationName;
                  rect.width = rect.width - 65 - maxWidthForAssertationName;  
                  EditorGUI.TextField(rect, generatedCodes[i]);
                  GUILayout.FlexibleSpace();
                  if (GUILayout.Button("Copy", GUILayout.Width(60)))
                  {
-                     EditorGUIUtility.systemCopyBuffer = assertation.GenerateMethodCode();
+                     EditorGUIUtility.systemCopyBuffer = generatedCodes[i];
                  }
                  EditorGUILayout.EndHorizontal();
-             } 
-        }
+             }
+             EditorGUIUtility.labelWidth = oldValue;
+         }
     }
 }

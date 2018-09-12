@@ -1,5 +1,7 @@
-﻿using System.Reflection;
-using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace PlayQ.UITestTools
@@ -15,7 +17,7 @@ namespace PlayQ.UITestTools
         public readonly int Width;
         public readonly int Height;
     }
-    
+
     public class UnitTestMethod
     {
         private const float DEFAULT_TIME_OUT = 30000f;
@@ -25,7 +27,18 @@ namespace PlayQ.UITestTools
         public readonly MethodInfo Method;
         public readonly float TimeOut = DEFAULT_TIME_OUT;
         public readonly bool IsIgnored;
-        public readonly CustomResolution TargetResolution;
+        public readonly string IgnoreReason;
+        public readonly List<CustomResolution> TargetResolutions = new List<CustomResolution>();
+        public readonly CustomResolution EditorTargetResolution;
+
+        public bool IsSmoke
+        {
+            get
+            {
+                var attributes = Method.GetCustomAttributes(false);
+                return attributes.Any(attr => attr.GetType() == typeof(SmokeTestAttribute));
+            }
+        }
 
         public UnitTestMethod(MethodInfo methodInfo, bool sync)
         {
@@ -33,7 +46,16 @@ namespace PlayQ.UITestTools
             Sync = sync;
             FullName = methodInfo.DeclaringType.FullName + "." + methodInfo.Name;
 
+
             var attrs = methodInfo.GetCustomAttributes(false);
+
+            //Attributes are getting added in a reverse order that they're written by c#
+            //i.e. if you have [A] above [B] above target method in your source code, 
+            //this list will be in order B: 0, A: 1
+            //If you have order-sensitive attributes then you need this list reversed against its initial state
+            //Ordering is needed to set correct resolution from target resolution attribute in editor
+            attrs.Reverse();
+
             foreach (var attr in attrs)
             {
                 var timeOut = attr as TimeoutAttribute;
@@ -46,15 +68,46 @@ namespace PlayQ.UITestTools
                 if (ignore != null)
                 {
                     IsIgnored = true;
+                    IgnoreReason = ignore.Reason; 
                     continue;
                 }
                 var targetResolution = attr as TargetResolutionAttribute;
                 if (targetResolution != null)
                 {
-                    TargetResolution = new CustomResolution(targetResolution.Width, targetResolution.Height);
+                    TargetResolutions.Add(new CustomResolution(targetResolution.Width, targetResolution.Height));
+
+                    continue;
+                }
+                var editorTargetResolution = attr as EditorResolutionAttribute;
+                if (editorTargetResolution != null)
+                {
+                    EditorTargetResolution = new CustomResolution(editorTargetResolution.Width, editorTargetResolution.Height);
                     continue;
                 }
             }
+        }
+
+        public bool Filter(string s)
+        {
+            if (s == null)
+            {
+                s = string.Empty;
+            }
+            if (!String.IsNullOrEmpty(FullName))
+            {
+                return FullName.IndexOf(s, StringComparison.OrdinalIgnoreCase) >= 0;
+            }
+
+            return false;
+        }
+
+        public bool ContainsTargetResolution(int width, int height)
+        {
+            if (TargetResolutions.Count == 0)
+            {
+                return true;
+            }
+            return TargetResolutions.FirstOrDefault(item => item.Width == width && item.Height == height) != null;
         }
     }
 }

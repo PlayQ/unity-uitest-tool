@@ -11,91 +11,661 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 825c94a0152363f46a14ee91221566d3, type: 3}
   m_Name: SelectedTests
   m_EditorClassIdentifier: 
-  TestsInfo:
+  TestRunMode: 2
+  RunSpecificTestType: 1
+  RepeatTestsNTimes: 0
+  SpecificTestOrClassName: CKTestSuites.AllFeatures.CherryTree.CherryTreeC23993
+  QuitAferComplete: 0
+  DefaultTimescale: 20
+  testsInfo:
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25472
-    ClassName: CKTestSuites.TestSuiteLevelProgression
+    MethodName: CKTestSuites.AllFeatures.CherryTree.CherryTreeC23993
+    ClassName: CKTestSuites.AllFeatures.CherryTree
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25473
-    ClassName: CKTestSuites.TestSuiteLevelProgression
+    MethodName: CKTestSuites.AllFeatures.CherryTree.CherryTreeC23994
+    ClassName: CKTestSuites.AllFeatures.CherryTree
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25474
-    ClassName: CKTestSuites.TestSuiteLevelProgression
+    MethodName: CKTestSuites.AllFeatures.CherryTree.CherryTreeC23995
+    ClassName: CKTestSuites.AllFeatures.CherryTree
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25475
-    ClassName: CKTestSuites.TestSuiteLevelProgression
+    MethodName: CKTestSuites.AllFeatures.CherryTree.CherryTreeC23996
+    ClassName: CKTestSuites.AllFeatures.CherryTree
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25476
-    ClassName: CKTestSuites.TestSuiteLevelProgression
+    MethodName: CKTestSuites.AllFeatures.CherryTree.CherryTreeC26323
+    ClassName: CKTestSuites.AllFeatures.CherryTree
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLevelProgression.TSLPC25477
-    ClassName: CKTestSuites.TestSuiteLevelProgression
+    MethodName: CKTestSuites.AllFeatures.Events.Events_CloudyClimbKOTHC25524
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteAccessPoints.TSAPC26186
-    ClassName: CKTestSuites.TestSuiteAccessPoints
+    MethodName: CKTestSuites.AllFeatures.Events.Events_CloudyClimbKOTHC25525
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25455
-    ClassName: CKTestSuites.TestSuiteLives
+    MethodName: CKTestSuites.AllFeatures.Events.Events_CloudyClimbKOTHC25526
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25456
-    ClassName: CKTestSuites.TestSuiteLives
+    MethodName: CKTestSuites.AllFeatures.Events.Events_CloudyClimbKOTHC25527
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25457
-    ClassName: CKTestSuites.TestSuiteLives
+    MethodName: CKTestSuites.AllFeatures.Events.Events_CloudyClimbKOTHC25528
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25458
-    ClassName: CKTestSuites.TestSuiteLives
+    MethodName: CKTestSuites.AllFeatures.Events.Events_CloudyClimbKOTHC25529
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteLives.TSLivesC25459
-    ClassName: CKTestSuites.TestSuiteLives
+    MethodName: CKTestSuites.AllFeatures.Events.Events_KingsChallengeLTLEC26151
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteSettings.TSSettingsC25421
-    ClassName: CKTestSuites.TestSuiteSettings
+    MethodName: CKTestSuites.AllFeatures.Events.Events_KingsChallengeLTLEC26152
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteSettings.TSSettingsC25422
-    ClassName: CKTestSuites.TestSuiteSettings
+    MethodName: CKTestSuites.AllFeatures.Events.Events_KingsChallengeLTLEC26153
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteSettings.TSSettingsC25423
-    ClassName: CKTestSuites.TestSuiteSettings
+    MethodName: CKTestSuites.AllFeatures.Events.Events_KingsChallengeLTLEC26156
+    ClassName: CKTestSuites.AllFeatures.Events
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25412
-    ClassName: CKTestSuites.TestSuiteUsingPreexistingGold
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC25569
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25413
-    ClassName: CKTestSuites.TestSuiteUsingPreexistingGold
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC25570
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25415
-    ClassName: CKTestSuites.TestSuiteUsingPreexistingGold
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC25571
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteFTUE.TSFTUEC26195
-    ClassName: CKTestSuites.TestSuiteFTUE
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC26252
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteFTUE.TSFTUEC26196
-    ClassName: CKTestSuites.TestSuiteFTUE
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC26253
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25416
-    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC26254
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25417
-    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC26255
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25418
-    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC26266
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25420
-    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+    MethodName: CKTestSuites.AllFeatures.FTUE.FTUEC26320
+    ClassName: CKTestSuites.AllFeatures.FTUE
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteFTUE.TSFTUEC26194
-    ClassName: CKTestSuites.TestSuiteFTUE
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_AccessPointsC25588
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuitePurchasingAdditionalGold.TSPAGC25419
-    ClassName: CKTestSuites.TestSuitePurchasingAdditionalGold
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_AccessPointsC25629
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteUsingPreexistingGold.TSUPGC25414
-    ClassName: CKTestSuites.TestSuiteUsingPreexistingGold
-  - IsSelected: 1
-    MethodName: CKTestSuites.TestSuiteAccessPoints.TSAPC26185
-    ClassName: CKTestSuites.TestSuiteAccessPoints
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_AccessPointsC25648
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
   - IsSelected: 0
-    MethodName: CKTestSuites.TestSuiteUILocalization.TSUILLevel1Tutorial
-    ClassName: CKTestSuites.TestSuiteUILocalization
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_LoggingInC25663
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_LoggingInC25589
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_LoggingInC25666
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_AskForLivesC25673
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_AskForLivesC25674
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_AskForLivesC25675
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.FacebookLogin.FacebookLogin_FacebookInterstitialDialogC25690
+    ClassName: CKTestSuites.AllFeatures.FacebookLogin
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.FiveStarRatingDialog.FiveStarRatingDialogC25691
+    ClassName: CKTestSuites.AllFeatures.FiveStarRatingDialog
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.FiveStarRatingDialog.FiveStarRatingDialogC25693
+    ClassName: CKTestSuites.AllFeatures.FiveStarRatingDialog
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplayC23935
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplayC23962
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplayC23965
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplayC23980
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_PauseQuitFunctionalityC24340
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_PauseQuitFunctionalityC24343
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchingAndMatchTypesC23944
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchingAndMatchTypesC23945
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchingAndMatchTypesC23946
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchingAndMatchTypesC23947
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchingAndMatchTypesC23948
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchingAndMatchTypesC23963
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchingAndMatchTypesC24339
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchingAndMatchTypesC26314
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_MatchHintC23968
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_ShufflingC23977
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_FTUE_InGameBoostsC23950
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_FTUE_InGameBoostsC23966
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_FTUE_InGameBoostsC23961
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_FTUE_InGameBoostsC23964
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostShop_InGameBoostsC23986
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostShop_InGameBoostsC23987
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostShop_InGameBoostsC23988
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostShop_InGameBoostsC23989
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_InGameBoostsC23936
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_InGameBoostsC23976
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_InGameBoostsC23981
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_InGameBoostsC23983
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_InGameBoostsC25626
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_InGameBoostsC26318
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_FTUE_PreGameBoostsC23967
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_FTUE_PreGameBoostsC23970
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_FTUE_PreGameBoostsC23971
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostShop_PreGameBoostsC23990
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostShop_PreGameBoostsC23991
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostShop_PreGameBoostsC23992
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_PreGameBoostsC25672
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_PreGameBoostsC23940
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_PreGameBoostsC23941
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_Boosts_BoostInGameActivation_PreGameBoostsC23942
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_TorchesC26257
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_ObstaclesC26258
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_BubblesC26259
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_ChestsC26260
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_MultiplierC26261
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_MultiplierC26278
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_BarrelsFruitC26262
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_BarrelsFruitC26277
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_RainbowJarC26276
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_BeanPlotsSproutsC26275
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_NetsC26274
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_BeesFlowerBedsC26273
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_BushesC26272
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_HoneyJarC26271
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_BubblePoolsC26270
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_BuriedCrystalsC26269
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_CrystalBallsC26268
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_DragonsHoardC26267
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_MagicMirrorsC26265
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_RunestonesC26264
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_MagicCarpetsC26263
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_WishingWellsC46730
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Lives.LivesC25576
+    ClassName: CKTestSuites.AllFeatures.Lives
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Lives.LivesC25577
+    ClassName: CKTestSuites.AllFeatures.Lives
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Lives.LivesC25578
+    ClassName: CKTestSuites.AllFeatures.Lives
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Lives.LivesC25579
+    ClassName: CKTestSuites.AllFeatures.Lives
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Lives.LivesC25580
+    ClassName: CKTestSuites.AllFeatures.Lives
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Lives.LivesC26321
+    ClassName: CKTestSuites.AllFeatures.Lives
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Offline.OfflineC26307
+    ClassName: CKTestSuites.AllFeatures.Offline
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyCollectionC24345
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyCollectionC24350
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyCollectionC24351
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_SendLivesC25692
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_SendLivesC24371
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_SendLivesC24368
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_SendLivesC24369
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_SendLivesC24372
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyHarvestC24363
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyHarvestC24364
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyHarvestC24365
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyHarvestC24366
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_PassMaxLevelC24006
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_PassMaxLevelC24004
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_PassMaxLevelC24005
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyChallengeC24359
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyChallengeC24360
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyChallengeC24361
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_DailyChallengeC25697
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_RegionalStarCountC24383
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_RegionalStarCountC24380
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_RegionalStarCountC24381
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_RegionalStarCountC24382
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_QuestSystemFlowC25688
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_QuestSystemFlowC25680
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_QuestSystemFlowC24010
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_QuestSystemFlowC24012
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_QuestSystemFlowC24013
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_QuestSystemFlowC24014
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_QuestSystemFlowC25685
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_PrizeBoxesC24400
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_PrizeBoxesC24403
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.QuestSystem.QuestSystem_PrizeBoxesC24407
+    ClassName: CKTestSuites.AllFeatures.QuestSystem
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Region.Region_MapC25621
+    ClassName: CKTestSuites.AllFeatures.Region
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Region.Region_MapC25694
+    ClassName: CKTestSuites.AllFeatures.Region
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Region.Region_MapC25695
+    ClassName: CKTestSuites.AllFeatures.Region
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Region.Region_MapC25696
+    ClassName: CKTestSuites.AllFeatures.Region
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Region.Region_MapC26248
+    ClassName: CKTestSuites.AllFeatures.Region
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Region.Region_MapC26324
+    ClassName: CKTestSuites.AllFeatures.Region
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Region.Region_MapC26333
+    ClassName: CKTestSuites.AllFeatures.Region
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.RewardedVideo.RewardedVideo_CherryTreeC26198
+    ClassName: CKTestSuites.AllFeatures.RewardedVideo
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.RewardedVideo.RewardedVideo_CherryTreeC26199
+    ClassName: CKTestSuites.AllFeatures.RewardedVideo
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.SettingsC24341
+    ClassName: CKTestSuites.AllFeatures.Settings
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.SettingsC24342
+    ClassName: CKTestSuites.AllFeatures.Settings
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.SettingsC25620
+    ClassName: CKTestSuites.AllFeatures.Settings
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.SettingsC24344
+    ClassName: CKTestSuites.AllFeatures.Settings
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.SettingsC25586
+    ClassName: CKTestSuites.AllFeatures.Settings
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.SettingsC25587
+    ClassName: CKTestSuites.AllFeatures.Settings
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.SettingsC26322
+    ClassName: CKTestSuites.AllFeatures.Settings
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.UserInterfaceRevision.UserInterfaceRevision_V1_TopResourceBarC51244
+    ClassName: CKTestSuites.AllFeatures.UserInterfaceRevision
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.UserInterfaceRevision.UserInterfaceRevision_V1_BottomNavBarC51191
+    ClassName: CKTestSuites.AllFeatures.UserInterfaceRevision
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.UserInterfaceRevision.UserInterfaceRevision_V1_BottomNavBarC51193
+    ClassName: CKTestSuites.AllFeatures.UserInterfaceRevision
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.UserInterfaceRevision.UserInretfaceRevision_V1_ShopModifiedGoldShopC51248
+    ClassName: CKTestSuites.AllFeatures.UserInterfaceRevision
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.UserInterfaceRevision.UserInretfaceRevision_V1_ShopModifiedGoldShopC51245
+    ClassName: CKTestSuites.AllFeatures.UserInterfaceRevision
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.iAP.iAP_PurchasingAdditionalGoldC25656
+    ClassName: CKTestSuites.AllFeatures.iAP
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.iAP.iAP_PurchasingAdditionalGoldC25657
+    ClassName: CKTestSuites.AllFeatures.iAP
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.iAP.iAP_PurchasingAdditionalGoldC25658
+    ClassName: CKTestSuites.AllFeatures.iAP
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.iAP.iAP_PurchasingAdditionalGoldC25659
+    ClassName: CKTestSuites.AllFeatures.iAP
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.iAP.iAP_UsingPreexistingGoldC25652
+    ClassName: CKTestSuites.AllFeatures.iAP
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.iAP.iAP_UsingPreexistingGoldC25653
+    ClassName: CKTestSuites.AllFeatures.iAP
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.iAP.iAP_UsingPreexistingGoldC25654
+    ClassName: CKTestSuites.AllFeatures.iAP
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_FTUEC42327
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_FTUEC26195
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_FTUEC26196
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_LivesC25455
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_LivesC25456
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_LivesC25457
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_LivesC25458
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_LivesC25459
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_PurchasingAdditionalGoldC25416
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_PurchasingAdditionalGoldC25417
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_PurchasingAdditionalGoldC73594
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_PurchasingAdditionalGoldC25418
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_PurchasingAdditionalGoldC25419
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_UsingPreexistingGoldC25412
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_UsingPreexistingGoldC25413
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_UsingPreexistingGoldC25414
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_iAP_UsingPreexistingGoldC25415
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_AccessPointsC26184
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_AccessPointsC26186
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_AccessPointsC65240
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_LoggingInC26180
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_LoggingInC26181
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_LoggingInC26182
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_LevelLeaderboardsC26187
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_LevelLeaderboardsC26188
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_LevelLeaderboardsC26189
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_SendLivesC65241
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_AskForLivesC26177
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_MessageCenterC26174
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_MessageCenterC26175
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_MessageCenterC26176
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Launch.Launch_Online_FacebookLogin_FacebookInterstitialDialogC26183
+    ClassName: CKTestSuites.ProductionRCSweep.Launch
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Offline.OfflineC26325
+    ClassName: CKTestSuites.ProductionRCSweep.Offline
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Offline.OfflineC26326
+    ClassName: CKTestSuites.ProductionRCSweep.Offline
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Offline.OfflineC26328
+    ClassName: CKTestSuites.ProductionRCSweep.Offline
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Offline.OfflineC26329
+    ClassName: CKTestSuites.ProductionRCSweep.Offline
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Offline.OfflineC26330
+    ClassName: CKTestSuites.ProductionRCSweep.Offline
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.PauseMenuSettings.PauseMenuSettingsC25421
+    ClassName: CKTestSuites.ProductionRCSweep.PauseMenuSettings
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.PauseMenuSettings.PauseMenuSettingsC25422
+    ClassName: CKTestSuites.ProductionRCSweep.PauseMenuSettings
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.PauseMenuSettings.PauseMenuSettingsC25423
+    ClassName: CKTestSuites.ProductionRCSweep.PauseMenuSettings
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Progression.ProgressionC25379
+    ClassName: CKTestSuites.ProductionRCSweep.Progression
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Progression.Progression_LevelProgressionC25472
+    ClassName: CKTestSuites.ProductionRCSweep.Progression
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Progression.Progression_LevelProgressionC25473
+    ClassName: CKTestSuites.ProductionRCSweep.Progression
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Progression.Progression_LevelProgressionC25474
+    ClassName: CKTestSuites.ProductionRCSweep.Progression
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Progression.Progression_LevelProgressionC25475
+    ClassName: CKTestSuites.ProductionRCSweep.Progression
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Progression.Progression_LevelProgressionC25476
+    ClassName: CKTestSuites.ProductionRCSweep.Progression
+  - IsSelected: 0
+    MethodName: CKTestSuites.ProductionRCSweep.Progression.Progression_LevelProgressionC25477
+    ClassName: CKTestSuites.ProductionRCSweep.Progression
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_CoreGameplay_ShufflingC23978
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Gameplay.Gameplay_GameSpecificPieces_TorchesC23982
+    ClassName: CKTestSuites.AllFeatures.Gameplay
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.DebugTest
+    ClassName: CKTestSuites.AllFeatures.Settings
+  - IsSelected: 0
+    MethodName: CKTestSuites.AllFeatures.Settings.DebugTest2
+    ClassName: CKTestSuites.AllFeatures.Settings

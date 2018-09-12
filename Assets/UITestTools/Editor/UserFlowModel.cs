@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 
@@ -14,14 +15,14 @@ namespace PlayQ.UITestTools
     {
         private MonoBehaviour mb;
         public const string UI_TEST_SCREEN_BLOCKER = "UI_TEST_SCREEN_BLOCKER";
-        
-        private List<MethodInfoExtended> assertationMethods =
-            new List<MethodInfoExtended>();
-        
+
+        private List<Assertation> assertations =
+            new List<Assertation>();
+
         private List<MethodInfo> forceRaycastMethods =
             new List<MethodInfo>();
 
-      
+
         public List<UserActionInfo> UserActions { get; private set; }
 
         public UserFlowModel()
@@ -31,22 +32,24 @@ namespace PlayQ.UITestTools
 
         public void FetchAssertationMethods()
         {
-            assertationMethods = new List<MethodInfoExtended>();
+            assertations.Clear();
 
-            var testBaseMethods = typeof(UITestBase).GetMethods(BindingFlags.Public | BindingFlags.Static);
             var waitMethods = typeof(Wait).GetMethods(BindingFlags.Public | BindingFlags.Static);
             var checkAssertationMethods = typeof(Check).GetMethods(BindingFlags.Public | BindingFlags.Static);
             var interactionMethods = typeof(Interact).GetMethods(BindingFlags.Public | BindingFlags.Static);
+            var asyncCheckMethods = typeof(AsyncCheck).GetMethods(BindingFlags.Public | BindingFlags.Static);
+            var asyncWaitMethods = typeof(AsyncWait).GetMethods(BindingFlags.Public | BindingFlags.Static);
             
-            var forceRaycastMethods = typeof(RaycastChanger).GetMethods(BindingFlags.Public | BindingFlags.Static).ToList();
+            var forceRaycastMethodsAll = typeof(RaycastChanger).GetMethods(BindingFlags.Public | BindingFlags.Static).ToList();
 
             var allMethods = new List<MethodInfo>();
-            allMethods.AddRange(testBaseMethods);
             allMethods.AddRange(waitMethods);
             allMethods.AddRange(checkAssertationMethods);
             allMethods.AddRange(interactionMethods);
+            allMethods.AddRange(asyncCheckMethods);
+            allMethods.AddRange(asyncWaitMethods);
 
-            foreach (var raycastMethod in forceRaycastMethods)
+            foreach (var raycastMethod in forceRaycastMethodsAll)
             {
                 var attributes = raycastMethod.GetCustomAttributes(false);
                 foreach (var attr in attributes)
@@ -56,11 +59,11 @@ namespace PlayQ.UITestTools
                         var parameters = raycastMethod.GetParameters();
                         if (parameters.Length == 1 && parameters[0].ParameterType == typeof(bool))
                         {
-                            this.forceRaycastMethods.Add(raycastMethod);
+                            forceRaycastMethods.Add(raycastMethod);
                         }
                         else
                         {
-                             Debug.LogWarning("Wrong signature for method: " + raycastMethod.Name);   
+                            Debug.LogWarning("Wrong signature for method: " + raycastMethod.Name);
                         }
                     }
                 }
@@ -75,82 +78,52 @@ namespace PlayQ.UITestTools
 
                     if (showInEditorAttr != null)
                     {
-                        var helperMethodsType = showInEditorAttr.ClassType;
-
-                        var asseratationParamList = assertationMethod.GetParameters();
-                        if (showInEditorAttr.PathIsPresent && (asseratationParamList.Length == 0 ||
-                                                               asseratationParamList[0].ParameterType !=
-                                                               typeof(string)))
+                        var helper = Activator.CreateInstance(showInEditorAttr.ClassType) as ShowHelperBase;
+                        if (helper == null)
                         {
-                            Debug.LogWarning("[UserFlowModel] method " + assertationMethod.Name +
-                                             " must has first parameter type of string");
+                            Debug.LogError("assertation helper class " + showInEditorAttr.ClassType +
+                                           " is not derived from " + typeof(ShowHelperBase) +
+                                           " for method " + assertationMethod.Name);
                             continue;
                         }
 
-                        MethodInfoExtended methodInfoExtended = new MethodInfoExtended
+                        Assertation assertation = new Assertation
                         {
-                            AssertationMethod = assertationMethod,
-                            AssertationMethodDescription = showInEditorAttr.Descryption,
-                            PathIsPresent = showInEditorAttr.PathIsPresent,
-                            IsDefault = showInEditorAttr.IsDefault
+                            methodInfo = assertationMethod,
+                            AssertationMethodDescription = showInEditorAttr.Description,
+                            IsDefault = showInEditorAttr.IsDefault,
+                            Helper = helper
                         };
 
-                        if (helperMethodsType == null)
-                        {
-                            assertationMethods.Add(methodInfoExtended);
-                            continue;
-                        }
-
-//                        var helperMethods = helperMethodsType.GetMethods(BindingFlags.Public | BindingFlags.Static);
-                        methodInfoExtended.HelperMethodsType = helperMethodsType;
-                        var isAvailable = helperMethodsType.GetMethod("IsAvailable");
-                        if (isAvailable != null)
-                        {
-                            ParameterInfo[] paramList = isAvailable.GetParameters();
-                            if (paramList.Length == 1 && paramList[0].ParameterType == typeof(GameObject))
-                            {
-                                methodInfoExtended.CanShowInEditorMethod = isAvailable;
-                            }
-                        }
-
-
-                        var getDefautParams = helperMethodsType.GetMethod("GetDefautParams");
-                        if (getDefautParams != null)
-                        {
-                            ParameterInfo[] paramList = getDefautParams.GetParameters();
-                            if (paramList.Length == 1 && paramList[0].ParameterType == typeof(GameObject))
-                            {
-                                methodInfoExtended.ParametersValuesMethod = getDefautParams;
-                            }
-                        }
-
-                        assertationMethods.Add(methodInfoExtended);
+                        assertations.Add(assertation);
                     }
                 }
             }
-            
+
             Debug.Log("[UserFlowModel] OnFETCH");
         }
-        
-        
-        private GameObject FindAvailableInParents(GameObject targetGameobject, MethodInfo checkMethodInfo)
+
+
+        private GameObject FindAvailableInParents(GameObject targetGameobject, ShowHelperBase helper)
         {
             var result = false;
             var targetTransform = targetGameobject.transform;
             while (!result && targetTransform)
             {
-                result = (bool) checkMethodInfo.Invoke(null, new object[] {targetTransform.gameObject});
+                result = helper.IsAvailable(targetTransform.gameObject);
                 if (!result)
                 {
-                    targetTransform = targetTransform.parent;    
+                    targetTransform = targetTransform.parent;
                 }
             }
+
             return targetTransform ? targetTransform.gameObject : null;
         }
 
         public void CleanFlow()
         {
             UserActions.Clear();
+            WaitVariablesContainer.Clear();
         }
 
         public void ForceEnableRaycast(bool isEnabled)
@@ -163,93 +136,49 @@ namespace PlayQ.UITestTools
 
         public void CreateNoGameobjectAction()
         {
-            var newActionAssertationMethods = new List<MethodInfoExtended>();
-            foreach (var methodInfoExt in assertationMethods)
+            var gameObjectToAssertation = new Dictionary<Assertation, GameObject>();
+            foreach (var assertation in assertations)
             {
-                if (methodInfoExt.CanShowInEditorMethod == null)
+                if (assertation.Helper.IsAvailable(null))
                 {
-                    if (methodInfoExt.PathIsPresent)
-                    {
-                        continue;
-                    }
-                    List<object> paramsValues = null;
-                    var methodRetunsParams = methodInfoExt.ParametersValuesMethod;
-                    if (methodRetunsParams == null)
-                    {
-                        paramsValues = new List<object>();
-                    }
-                    else
-                    {
-                        try
-                        {
-                            paramsValues = (List<object>) methodRetunsParams.Invoke(null, new object[]{null});
-                        }
-                        catch (Exception ex)
-                        {
-                            Debug.LogWarning("can't extract parameters for: "+ methodInfoExt.AssertationMethodFullName);
-                            continue;
-                        }
-                            
-                    }
-                    var isConsistent = CheckMethodParamConsistance(methodInfoExt, paramsValues);
-                    if (!isConsistent)
-                    {
-                        continue;
-                    }
-                    var newMethodInfoExt = methodInfoExt.Clone();
-                    newMethodInfoExt.ParametersValues = paramsValues;
-                    newMethodInfoExt.MapParameterNamesToParameterValues();
-                    newActionAssertationMethods.Add(newMethodInfoExt);
+                    gameObjectToAssertation[assertation] = null;
                 }
             }
-            if (newActionAssertationMethods.Count == 0)
+
+            if (gameObjectToAssertation.Count > 0)
             {
-                Debug.LogWarning("no assertation methods found for no gameObject action");
-                return;
+                var newAction = new UserActionInfo
+                {
+                    DeviceDPI = Screen.dpi,
+                    DeviceResolution = new Vector2(Screen.width, Screen.height)
+                };
+                SetGeneratorsToUserAction(gameObjectToAssertation, newAction);
+                UserActions.Add(newAction);
             }
-            var newAction = new UserActionInfo
-            {
-                DeviceDPI = Screen.dpi,
-                DeviceResolution = new Vector2(Screen.width, Screen.height),
-                MethodsInfoExtended = newActionAssertationMethods
-            };
-            UserActions.Add(newAction);
         }
+        
 
         public UserActionInfo HandleGameObject(GameObject go)
         {
             var newAction = new UserActionInfo();
-            Dictionary<MethodInfoExtended, GameObject> gameObjectToMethodInfo = new Dictionary<MethodInfoExtended, GameObject>();
-            foreach (var methodInfoExt in assertationMethods)
+            var gameObjectToAssertation = new Dictionary<Assertation, GameObject>();
+            foreach (var assertation in assertations)
             {
-                gameObjectToMethodInfo[methodInfoExt] = go;
-            }
-            var newActionAssertationMethods = FindAvailableAssertations(gameObjectToMethodInfo); 
-
-            newAction.MethodsInfoExtended =
-                ExtractParametersValuesForMethods(newActionAssertationMethods, gameObjectToMethodInfo);
-            
-            
-            if (newAction.MethodsInfoExtended.Count > 0)
-            {
-                var selectedIndex = newAction.MethodsInfoExtended.FindIndex(assertation => assertation.IsDefault);
-                if (selectedIndex < 0)
+                var adjustedGo = FindAvailableInParents(go, assertation.Helper);
+                if (adjustedGo)
                 {
-                    selectedIndex = newAction.MethodsInfoExtended.FindIndex(
-                        assertation =>assertation.HelperMethodsType == typeof(Interact.ButtonWaitDelayAndClick));
+                    gameObjectToAssertation[assertation] = adjustedGo;
                 }
-                newAction.SelectedAssertationIndex = selectedIndex >= 0 ? selectedIndex : 0;
-                return newAction;
             }
 
-            return null;
+            SetGeneratorsToUserAction(gameObjectToAssertation, newAction);
+            return AddUserActionAndSetSelectedAssertation(newAction);
         }
 
-        
         public void HandleClick(Vector2 pixelPos)
         {
-            var gameObjectToMethodInfo = FindGameObjectsForClick(pixelPos);
-            
+            var gameObjectToAssertation = FindGameObjectToAssertationByClick(pixelPos);
+
             var percentPos = new Vector2(pixelPos.x / Screen.width, pixelPos.y / Screen.height);
             var newAction = new UserActionInfo
             {
@@ -259,211 +188,101 @@ namespace PlayQ.UITestTools
                 PercentPos = percentPos
             };
 
-            var newActionAssertationMethods = FindAvailableAssertations(gameObjectToMethodInfo); 
-
-            newAction.MethodsInfoExtended =
-                ExtractParametersValuesForMethods(newActionAssertationMethods, gameObjectToMethodInfo);
-            
-            if (newAction.MethodsInfoExtended.Count > 0)
-            {
-                var selectedIndex = newAction.MethodsInfoExtended.FindIndex(assertation => assertation.IsDefault);
-                if (selectedIndex < 0)
-                {
-                    selectedIndex = newAction.MethodsInfoExtended.FindIndex(
-                        assertation =>assertation.HelperMethodsType == typeof(Interact.ButtonWaitDelayAndClick));
-                }
-                newAction.SelectedAssertationIndex = selectedIndex >= 0 ? selectedIndex : 0;
-                UserActions.Add(newAction);
-            }
+            SetGeneratorsToUserAction(gameObjectToAssertation, newAction);
+            AddUserActionAndSetSelectedAssertation(newAction);
         }
 
 
-        private Dictionary<MethodInfoExtended, GameObject> FindGameObjectsForClick(Vector2 pos)
+        private UserActionInfo AddUserActionAndSetSelectedAssertation(UserActionInfo newAction)
         {
-            Dictionary<MethodInfoExtended, GameObject> result = new Dictionary<MethodInfoExtended, GameObject>();
-            
-            foreach (var methodInfoExt in assertationMethods)
+            if (newAction.CodeGenerators.Count > 0)
             {
-                Camera camera = null;
-                if (methodInfoExt.HelperMethodsType != null)
+                var selectedIndex = newAction.AvailableAssertations.FindIndex(assertation => assertation.IsDefault);
+                if (selectedIndex < 0)
                 {
-                    var methodInfo = methodInfoExt.HelperMethodsType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-                        .FirstOrDefault(method =>
+                    selectedIndex = newAction.CodeGenerators.FindIndex(generator =>
                     {
-                        return method.ReturnType == typeof(Camera) && method.GetParameters().Length == 0;
+                        var allGenerators = generator.CalculateGeneratorSequence();
+                        return allGenerators.Any(gen => gen.GetType() == typeof(ParameterPathToGameObject));
                     });
-
-                    if (methodInfo != null)
-                    {
-                        camera = methodInfo.Invoke(null, new object[0]) as Camera;
-                        if (camera == null)
-                        {
-                            Debug.LogWarning("Class " + methodInfoExt.HelperMethodsType + " has method returning Camera," +
-                                             " but camera is null. Method " + methodInfoExt.AssertationMethod.Name + " will be skipped");
-                            
-                            continue;
-                        }
-                    }
                 }
 
+                if (selectedIndex < 0)
+                {
+                    selectedIndex = newAction.AvailableAssertations.FindIndex(assertation =>
+                    {
+                        return assertation.Helper is Interact.ButtonWaitDelayAndClick;
+                    });
+                }
+
+                newAction.SelectedIndex = selectedIndex >= 0 ? selectedIndex : 0;
+                UserActions.Add(newAction);
+                return newAction;
+            }
+
+            return null;
+        }
+
+
+        private Dictionary<Assertation, GameObject> FindGameObjectToAssertationByClick(Vector2 pos)
+        {
+            Dictionary<Assertation, GameObject> result = new Dictionary<Assertation, GameObject>();
+
+            foreach (var assertation in assertations)
+            {
+                GameObject go = null;
+                var camera = assertation.Helper.GetCamera();
                 if (camera != null)
                 {
                     var hit = Physics2D.Raycast(camera.ScreenToWorldPoint(Input.mousePosition),
                         Vector2.zero);
                     if (hit.collider != null)
                     {
-                        result.Add(methodInfoExt, hit.collider.gameObject);
+                        go = hit.collider.gameObject;
                     }
                 }
                 else
                 {
-                    var gameObject = UITestUtils.FindObjectByPixels(pos.x, pos.y, new HashSet<string>{UI_TEST_SCREEN_BLOCKER});
-                    if (gameObject != null)
+                    go = UITestUtils.FindObjectByPixels(pos.x, pos.y, new HashSet<string> {UI_TEST_SCREEN_BLOCKER});
+                }
+
+                if (go)
+                {
+                    var adjustedGo = FindAvailableInParents(go, assertation.Helper);
+                    if (adjustedGo)
                     {
-                        result.Add(methodInfoExt, gameObject);   
+                        result[assertation] = adjustedGo;
                     }
                 }
             }
-            return result;
-        }
-        
-        private List<MethodInfoExtended> FindAvailableAssertations(
-            Dictionary<MethodInfoExtended, GameObject> gameObjectToMethodInfo, 
-            HashSet<Type> exclude = null)
-        {
-            
-            var newActionAssertationMethods = new List<MethodInfoExtended>();
 
-            foreach (var methodInfoExt in assertationMethods)
-            {
-                if (!gameObjectToMethodInfo.ContainsKey(methodInfoExt))
-                {
-                    continue;
-                }
-                    
-                if (exclude != null && exclude.Contains(methodInfoExt.HelperMethodsType))
-                {
-                    continue;
-                }
-
-                var checkMethodInfo = methodInfoExt.CanShowInEditorMethod;
-                if (checkMethodInfo == null)
-                {
-                    methodInfoExt.GameObjectFullPath = UITestUtils.GetGameObjectFullPath(gameObjectToMethodInfo[methodInfoExt]);  
-                    newActionAssertationMethods.Add(methodInfoExt);
-                }
-                else
-                {
-                    var targetGameobject = gameObjectToMethodInfo[methodInfoExt];
-                    if (targetGameobject)
-                    {
-                        targetGameobject = FindAvailableInParents(targetGameobject, checkMethodInfo);
-                        if (targetGameobject)
-                        {
-                            newActionAssertationMethods.Add(methodInfoExt);
-                            methodInfoExt.GameObjectFullPath = UITestUtils.GetGameObjectFullPath(targetGameobject);
-                            gameObjectToMethodInfo[methodInfoExt] = targetGameobject;
-                        }
-                        else
-                        {
-                            methodInfoExt.GameObjectFullPath = UITestUtils.GetGameObjectFullPath(gameObjectToMethodInfo[methodInfoExt]);   
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogWarning("gameObject is null for assertation method: " + methodInfoExt.AssertationMethodFullName);
-                    }
-                }
-            }
-            return newActionAssertationMethods;
-        }
-
-        private bool CheckMethodParamConsistance(
-            MethodInfoExtended methodInfoExtended,
-            List<object> paramsValues)
-        {
-            var assertationMethod = methodInfoExtended.AssertationMethod;
-            var paramList = assertationMethod.GetParameters();
-            int parameterValueIndex = 0;
-
-            bool firstParamWasSkipped = false;
-            foreach (var param in paramList)
-            {
-                if (!firstParamWasSkipped && param.ParameterType == typeof(string) && methodInfoExtended.PathIsPresent)
-                {
-                    firstParamWasSkipped = true;
-                    continue;
-                }
-
-                if (parameterValueIndex >= paramsValues.Count ||
-                    paramsValues[parameterValueIndex].GetType() != param.ParameterType)
-                {
-                    Debug.LogWarning("Params missmatch for asseratation method " + assertationMethod.Name);
-                    return false;
-                }
-                parameterValueIndex++;
-            }
-            return true;
-        }
-
-
-        private List<MethodInfoExtended> ExtractParametersValuesForMethods(
-            List<MethodInfoExtended> assertationMethods, 
-            Dictionary<MethodInfoExtended, GameObject> gameObjectToMethodInfo)
-        {    
-            List<MethodInfoExtended> result = new List<MethodInfoExtended>();
-            
-            foreach (var methodInfoExt in  assertationMethods)
-            {
-                if (!gameObjectToMethodInfo.ContainsKey(methodInfoExt))
-                {
-                    continue;
-                }
-                var targetGameObject = gameObjectToMethodInfo[methodInfoExt];
-                
-                List<object> paramsValues;
-                var methodRetunsParams = methodInfoExt.ParametersValuesMethod;
-                if (methodRetunsParams == null)
-                {
-                    paramsValues = new List<object>();
-                }
-                else
-                {
-                    if (targetGameObject)
-                    {
-                        paramsValues = (List<object>) methodRetunsParams.Invoke(null, new object[] {targetGameObject});
-                    }
-                    else
-                    {
-                         Debug.LogWarning("gameObject is null for method " + methodInfoExt.AssertationMethodFullName);
-                        continue;
-                    }
-                }
-
-                var isConsistent = CheckMethodParamConsistance(methodInfoExt, paramsValues);
-                
-                if (!isConsistent)
-                {
-                    continue;
-                }
-
-                var newMethodInfoExt = methodInfoExt.Clone();
-                newMethodInfoExt.ParametersValues = paramsValues;
-                newMethodInfoExt.MapParameterNamesToParameterValues();
-                result.Add(newMethodInfoExt);
-            }
-            
             return result;
         }
 
 
+        private void SetGeneratorsToUserAction(
+            Dictionary<Assertation, GameObject> gameObjectToAssertation,
+            UserActionInfo userActionInfo)
+        {
+            userActionInfo.CodeGenerators = new List<AbstractGenerator>();
+            userActionInfo.AvailableAssertations = new List<Assertation>();
+            foreach (var gameObjectToAssert in gameObjectToAssertation)
+            {
+                var generator = gameObjectToAssert.Key.Helper.CreateGenerator(gameObjectToAssert.Value);
+                userActionInfo.CodeGenerators.Add(generator);
+                userActionInfo.AvailableAssertations.Add(gameObjectToAssert.Key);
+            }
+        }
 
-        public string GeneratedCode(bool isGenerateDebugStrings)
+
+
+        public string GeneratedCode()
         {
             if (UserActions.Count == 0)
             {
                 return null;
             }
+
             var cb = new TestCodeBuilder();
             cb.NewLine("[Timeout(2000000)]");
             cb.NewLine("[UnityTest]");
@@ -473,23 +292,16 @@ namespace PlayQ.UITestTools
             for (int i = 0; i < UserActions.Count; i++)
             {
                 var action = UserActions[i];
-
-                if (isGenerateDebugStrings)
+                if (!String.IsNullOrEmpty(action.Description))
                 {
-                    cb.NewLine("Debug.Log(\"try to {0} on {1}\");",
-                        action.SelectedAssertation.AssertationMethodDescription,
-                        action.SelectedAssertation.GameObjectFullPath);   
+                    cb.NewLine("//" + action.Description);
                 }
-                if (!string.IsNullOrEmpty(action.Description))
-                {
-                    cb.NewLine("// " + action.Description);    
-                }
-                cb.NewLine(action.SelectedAssertation.GenerateMethodCode());
-                cb.NewLine();
+                cb.NewLine(action.GenerateCode());
             }
 
             cb.CloseBrace();
 
+            WaitVariablesContainer.Clear();
             return cb.ToString();
         }
 
@@ -503,41 +315,40 @@ namespace PlayQ.UITestTools
             Debug.Log("[UserFlowModel] OnAfterDeserialize");
             FetchAssertationMethods();
         }
-        
+
         public void ApplyAction(UserActionInfo userAction)
         {
-            var currentAction = userAction.SelectedAssertation;
-            if (currentAction.AssertationMethod == null)
+            var assertationToApply = userAction.SelectedAssertation;
+            if (assertationToApply.methodInfo == null)
             {
-                var assertation = assertationMethods.FirstOrDefault(assertationMethod =>
+                var fullNameToApply = AbstractGenerator.MethodFullName(assertationToApply.methodInfo);
+                var requiredAssertation = assertations.FirstOrDefault(assertation =>
                 {
-                    return assertationMethod.AssertationMethodFullName == currentAction.AssertationMethodFullName;
+                    var fullName = AbstractGenerator.MethodFullName(assertation.methodInfo);
+                    return fullName == fullNameToApply;
                 });
 
-                if (assertation != null)
+                if (requiredAssertation != null)
                 {
-                    currentAction.AssertationMethod = assertation.AssertationMethod;
+                    userAction.AvailableAssertations[userAction.SelectedIndex] = requiredAssertation;
                 }
                 else
                 {
-                    Debug.LogWarning("can't find assertation method for method with name: " +
-                                     currentAction.AssertationMethodFullName);
+                    Debug.LogWarning("can't find assertation method for method with name: " + fullNameToApply);
                     return;
-                }   
+                }
             }
-           
-            var fullParams = new List<object>();
-            if (currentAction.PathIsPresent)
+
+            var generators = userAction.SelectedCodeGenerator.CalculateGeneratorSequence();
+            var parameters = generators
+                .Where(gen => gen is AbstractParameter)
+                .Select(gen => (gen as AbstractParameter).ParameterValueToObject()).ToArray();
+
+
+
+            if (assertationToApply.methodInfo.ReturnType == typeof(IEnumerator))
             {
-                fullParams.Add(currentAction.GameObjectFullPath);
-            }
-            if (currentAction.ParametersValuesToSave != null && currentAction.ParametersValuesToSave.Count>0)
-            {
-                fullParams.AddRange(currentAction.ParametersValuesToSave.Select(data=>data.Get()));
-            }
-            if (currentAction.AssertationMethodReturnType == typeof(IEnumerator).Name)
-            {
-                var result = (IEnumerator) currentAction.AssertationMethod.Invoke(null, fullParams.ToArray());
+                var result = (IEnumerator) assertationToApply.methodInfo.Invoke(null, parameters);
                 if (!mb)
                 {
                     var go = new GameObject();
@@ -549,12 +360,12 @@ namespace PlayQ.UITestTools
             }
             else
             {
-                currentAction.AssertationMethod.Invoke(null, fullParams.ToArray());
+                assertationToApply.methodInfo.Invoke(null, parameters);
             }
-            
+
         }
     }
-    
+
     public class EmptyMono : MonoBehaviour
     {
         private void Awake()
@@ -573,30 +384,32 @@ namespace PlayQ.UITestTools
             return sb.ToString();
         }
 
-        public void NewLine(string text = null, params System.Object[] args)
+        public void NewLine(string text = null)
         {
             if (sb.Length != 0)
             {
-                sb.Append("\n");                
+                sb.Append("\n");
             }
-            
+
             for (int i = 0; i < tab; i++)
             {
-                sb.Append("\t");    
+                sb.Append("\t");
             }
+
             if (!String.IsNullOrEmpty(text))
             {
-                sb.Append(String.Format(text, args));
+                sb.Append(text);
             }
         }
-        
+
         public void NewLine(StringBuilder sb)
         {
             sb.Append("\n");
             for (int i = 0; i < tab; i++)
             {
-                sb.Append("\t");    
+                sb.Append("\t");
             }
+
             if (sb != null)
             {
                 sb.Append(sb);
@@ -608,306 +421,210 @@ namespace PlayQ.UITestTools
             sb.Append("\n");
             for (int i = 0; i < tab; i++)
             {
-                sb.Append("\t");    
+                sb.Append("\t");
             }
+
             sb.Append("{");
             tab++;
         }
-        
+
         public void CloseBrace()
         {
             sb.Append("\n");
             tab--;
             for (int i = 0; i < tab; i++)
             {
-                sb.Append("\t");    
+                sb.Append("\t");
             }
+
             sb.Append("}");
         }
 
     }
-    
-    [Serializable]
-	public class UserActionInfo
-	{
-		public Vector2 DeviceResolution;
-		public float DeviceDPI;
-	    public string Description;
-            
-		public Vector2 PixelPos;
-		public Vector2 PercentPos;
-		public Vector2 InchPos;
-		public List<MethodInfoExtended> MethodsInfoExtended;
-	    public int SelectedAssertationIndex;
-    
-		public MethodInfoExtended SelectedAssertation
-		{
-			get { return MethodsInfoExtended[SelectedAssertationIndex]; }
-		}
-        
-	    public UserActionInfo(){}
-	    
-	    public UserActionInfo(UserActionInfo copy)
-	    {
-	        DeviceResolution = new Vector2(copy.DeviceResolution.x, copy.DeviceResolution.y);
-	        DeviceDPI = copy.DeviceDPI;
-	        PixelPos = new Vector2(copy.PixelPos.x, copy.PixelPos.y);
-	        PercentPos = new Vector2(copy.PercentPos.x, copy.PercentPos.y);
-	        InchPos = new Vector2(copy.InchPos.x, copy.InchPos.y);
-	        MethodsInfoExtended = copy.MethodsInfoExtended;
-	        SelectedAssertationIndex = copy.SelectedAssertationIndex;
-	    }
 
-	    public UserActionInfo Clone()
-	    {
-	        var clone = (UserActionInfo)MemberwiseClone();
-	        if (MethodsInfoExtended != null)
-	        {
-	            clone.MethodsInfoExtended = new List<MethodInfoExtended>();
-	            for (int i = 0; i<MethodsInfoExtended.Count; i++)
-	            {
-	                clone.MethodsInfoExtended.Add(MethodsInfoExtended[i].Clone());
-	            }    
-	        }
-	        
-	        return clone;
-	    }
-	}
-    
     [Serializable]
-    public class MethodInfoExtended
+    public class UserActionInfo : ISerializationCallbackReceiver
     {
-        public bool IsDefault;
-        public string GameObjectFullPath;
-        public bool PathIsPresent;
-        
-        private Type helperMethodsType;
-        public Type HelperMethodsType
+        public Vector2 DeviceResolution;
+        public float DeviceDPI;
+        public string Description;
+
+        public Vector2 PixelPos;
+        public Vector2 PercentPos;
+        public Vector2 InchPos;
+        public List<Assertation> AvailableAssertations = new List<Assertation>();
+        public List<AbstractGenerator> CodeGenerators = new List<AbstractGenerator>();
+        private string codeGeneratorsSerialized;
+        public int SelectedIndex;
+
+        public string GenerateCode()
+        {
+            return SelectedCodeGenerator.GenerateCode(SelectedAssertation.methodInfo);
+        }
+
+        public AbstractGenerator SelectedCodeGenerator
         {
             get
             {
-                if (helperMethodsType == null)
+                if (CodeGenerators.Count == 0)
                 {
-                    helperMethodsType = typeof(UITestBase).Assembly.GetTypes()
-                        .FirstOrDefault(type => type.FullName == HelperMethodsTypeSerializable);
+                    return null;
                 }
-                return helperMethodsType;
-            }
-            set
-            {
-                helperMethodsType = value;
-                HelperMethodsTypeSerializable = helperMethodsType.FullName;
+
+                return CodeGenerators[SelectedIndex];
             }
         }
-        public string HelperMethodsTypeSerializable;
-        
-        public string AssertationMethodName;
-        public string AssertationMethodReturnType;
-        public string AssertationMethodDeclaringType;
 
-
-        private MethodInfo assertationMethod;
-        public MethodInfo AssertationMethod
+        public Assertation SelectedAssertation
         {
-            get { return assertationMethod; }
-            set
+            get
             {
-                assertationMethod = value;
-                AssertationMethodName = assertationMethod.Name;
-                AssertationMethodReturnType = TypeFullName(assertationMethod.ReturnType);
-                AssertationMethodDeclaringType = TypeFullName(assertationMethod.DeclaringType);
-                AssertationMethodFullName = assertationMethod.ToString();
-            }
-        }
-        
-        public MethodInfo ParametersValuesMethod;
-        public MethodInfo CanShowInEditorMethod;
-
-        public string AssertationMethodFullName;
-        
-        public string AssertationMethodDescription;
-        public List<MethodInfoParametrsSave> ParametersValuesToSave;
-
-        public void MapParameterNamesToParameterValues()
-        {
-            ParameterInfo[] paramInfo = assertationMethod.GetParameters();
-
-            if (PathIsPresent)
-            {
-                paramInfo = paramInfo.Skip(1).ToArray();
-            }
-            
-            if (ParametersValuesToSave != null)
-            {
-                
-                for (int i=0; i<ParametersValuesToSave.Count; i++)
+                if (AvailableAssertations.Count == 0 || SelectedIndex < 0 || SelectedIndex >= AvailableAssertations.Count)
                 {
-                    
-                    ParametersValuesToSave[i].Name = paramInfo[i].Name;
+                    return null;
+                }
+
+                return AvailableAssertations[SelectedIndex];
+            }
+        }
+
+        public UserActionInfo()
+        {
+        }
+
+        public UserActionInfo(UserActionInfo copy)
+        {
+            Description = copy.Description;
+            DeviceResolution = new Vector2(copy.DeviceResolution.x, copy.DeviceResolution.y);
+            DeviceDPI = copy.DeviceDPI;
+            PixelPos = copy.PixelPos;
+            PercentPos = copy.PercentPos;
+            InchPos = copy.InchPos;
+            SelectedIndex = copy.SelectedIndex;
+            if (copy.CodeGenerators != null)
+            {
+                CodeGenerators = new List<AbstractGenerator>();
+                foreach (var generator in copy.CodeGenerators)
+                {
+                    var copyGenerator = generator.Clone();
+                    CodeGenerators.Add(copyGenerator);
                 }
             }
-            else
-            {
-                Debug.LogWarning("you are trying to map param names, but ParametersValuesToSave is null");
-            }
+
+            AvailableAssertations = copy.AvailableAssertations;
         }
 
-        [Serializable]
-        public class MethodInfoParametrsSave
+        public void OnBeforeSerialize()
         {
-            public string Type;
-            public string Value;
-            public string Name;
-            public bool isEnum;
-
-            public MethodInfoParametrsSave(object parametr)
-            {
-                Type = parametr.GetType().ToString();
-                Value = parametr.ToString();
-                isEnum = parametr is Enum;
-            }
-
-            public MethodInfoParametrsSave Clone()
-            {
-                return (MethodInfoParametrsSave) MemberwiseClone();
-            }
-            
-            
-            public object Get()
-            {
-                if (isEnum)
+            codeGeneratorsSerialized = JToken.FromObject(CodeGenerators,
+                new JsonSerializer
                 {
-                    var enumType = typeof(UITestBase).Assembly.GetType(Type);
-                    if (enumType != null)
+                    TypeNameHandling = TypeNameHandling.All,
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                    Formatting = Formatting.Indented,
+                    NullValueHandling = NullValueHandling.Ignore
+                }).ToString();
+            Debug.Log(codeGeneratorsSerialized);
+        }
+        
+        
+        public void OnAfterDeserialize()
+        {
+            var temp = JToken.Parse(codeGeneratorsSerialized)
+                .ToObject<List<AbstractGenerator>>(new JsonSerializer
+                {
+                    TypeNameHandling = TypeNameHandling.All,
+                    PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                    Formatting = Formatting.Indented,
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+
+            
+            if (temp != null)
+            {
+                List<int> toRemove = new List<int>();
+                for (int i = 0; i < temp.Count; i++)
+                {
+                    if (temp[i] == null)
                     {
-                        return Enum.Parse(enumType, Value);
-                    }
-                    else
-                    {
-                        return null;
+                        toRemove.Add(i);
                     }
                 }
-                switch (Type)
+
+                foreach (var index in toRemove)
                 {
-                    case "System.Int32":
-                        return int.Parse(Value);
-                    case "System.Single":
-                        return float.Parse(Value);
-                    case "System.Boolean":
-                        return bool.Parse(Value);
-                    case "System.String":
-                        return Value;
-                    default:
-                        throw new ArgumentOutOfRangeException(Type);
+                    temp.RemoveAt(index);
                 }
             }
-        }
+            CodeGenerators = temp;
 
-        public List<object> ParametersValues
-        {
-            set
-            {
-                ParametersValuesToSave = new List<MethodInfoParametrsSave>();
-                foreach (var parametr in value)
-                {
-                    ParametersValuesToSave.Add(new MethodInfoParametrsSave(parametr));
-                }
-            }
-        }
-        
-        public MethodInfoExtended Clone()
-        {
-            var clone = (MethodInfoExtended)MemberwiseClone();
-            if (ParametersValuesToSave != null)
-            {
-                clone.ParametersValuesToSave = new List<MethodInfoParametrsSave>();
-                for (int i = 0; i < ParametersValuesToSave.Count; i++)
-                {
-                    clone.ParametersValuesToSave.Add(ParametersValuesToSave[i].Clone());
-                }    
-            }
-            return clone;
-        }
-        
-        
-        public string GenerateMethodCode()
-        {
-            var sb = new StringBuilder();
-
-            if (AssertationMethodReturnType == typeof(System.Collections.IEnumerator).Name)
-            {
-                sb.Append("yield return ");
-            }
-
-            if (PathIsPresent)
-            {
-                sb.Append(AssertationMethodDeclaringType + "." + AssertationMethodName + "(\"" + GameObjectFullPath + "\"");
-            }
-            else
-            {
-                sb.Append(AssertationMethodDeclaringType + "." + AssertationMethodName + "(");
-            }
-            
-            
-
-            for (int i = 0; i < ParametersValuesToSave.Count; i++)
-            {
-                if (PathIsPresent || i > 0)
-                {
-                    sb.Append(", ");    
-                }
-
-
-                switch (ParametersValuesToSave[i].Type)
-                {
-                    case "System.Single":
-                        sb.Append(ParametersValuesToSave[i].Value);
-                        sb.Append('f');
-                        break;
-                        
-                    case "System.Boolean":
-                        sb.Append(ParametersValuesToSave[i].Value.ToLower());
-                        break;
-                        
-                    case "System.String":
-                        sb.Append("\"");
-                        sb.Append(ParametersValuesToSave[i].Value);
-                        sb.Append("\"");
-                        break;
-                        
-                    default:
-                        if (ParametersValuesToSave[i].isEnum)
-                        {
-                            var type = ParametersValuesToSave[i].Get().GetType(); 
-                            sb.Append(TypeFullName(type)+"."+ParametersValuesToSave[i].Value);
-                        }
-                        else
-                        {
-                            sb.Append(ParametersValuesToSave[i].Value);    
-                        }
-                        break;
-                }
-                
-               
-            }
-            sb.Append(");");
-            return sb.ToString();
-        }
-
-        public static string TypeFullName(Type type)
-        {
-            var result = new StringBuilder();
-            Type declaringType = type;
-            while (declaringType != null)
-            {
-                result.Insert(0, declaringType.Name);
-                declaringType = declaringType.DeclaringType;
-                if (declaringType != null)
-                {
-                    result.Insert(0, '.');   
-                }
-            }
-            return result.ToString();
+            //AvailableAssertations.RemoveAll(item => item.methodInfo == null);
         }
     }
+
+    [Serializable]
+    public class Assertation : ISerializationCallbackReceiver
+    {
+        private string serialized;
+        public bool IsDefault;
+        public MethodInfo methodInfo;
+        public string AssertationMethodDescription;
+        public ShowHelperBase Helper;
+
+        private string methodName;
+        private string methodDeclareClass;
+        private string helperShowInEditorType;
+        private List<string> methodsParametersTypeNames = new List<string>();
+
+        public void OnBeforeSerialize()
+        {
+            methodName = methodInfo.Name;
+            methodDeclareClass = methodInfo.DeclaringType.FullName;
+            methodsParametersTypeNames = methodInfo.GetParameters()
+                .Select(par => par.ParameterType.FullName).ToList();
+
+            helperShowInEditorType = Helper.GetType().FullName;
+        }
+        
+        public void OnAfterDeserialize()
+        {
+            var declareType = typeof(Interact).Assembly.GetType(methodDeclareClass);
+            if (declareType == null || String.IsNullOrEmpty(helperShowInEditorType))
+            {
+                return;
+            }
+            
+            var helperType = typeof(Interact).Assembly.GetType(helperShowInEditorType);
+            if (helperType == null)
+            {
+                return;
+            }
+
+            Helper = Activator.CreateInstance(helperType) as ShowHelperBase;
+            
+           
+            var methodsInfo = declareType.GetMethods(BindingFlags.Public |  BindingFlags.Static);
+            methodInfo = methodsInfo.FirstOrDefault(method =>
+            {
+                if (method.Name == methodName)
+                {
+                    var actualParameters = method.GetParameters();
+                    if (actualParameters.Length == methodsParametersTypeNames.Count)
+                    {
+                        for (int i = 0; i < actualParameters.Length; i++)
+                        {
+                            if (actualParameters[i].ParameterType.FullName !=
+                                methodsParametersTypeNames[i])
+                            {
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                }
+                return false;
+            });
+        }
+    }
+    
 }

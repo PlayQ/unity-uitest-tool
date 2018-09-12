@@ -2,6 +2,7 @@
 
 namespace PlayQ.UITestTools
 {
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class TargetResolutionAttribute : Attribute
     {
         public readonly int Width;
