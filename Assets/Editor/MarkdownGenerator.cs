@@ -29,15 +29,13 @@ public class MarkdownGenerator : AssetPostprocessor
 
     static void Generate()
     {
-        Debug.Log("MarkdownGenerator: INITIALIZING");
-
         string path = Application.dataPath;
         string rootPath = path.Substring(0, path.LastIndexOf('/'));
         path = string.Concat(rootPath, xmlPath);
 
         if (!File.Exists(path))
         {
-            Debug.Log(string.Format("MarkdownGenerator: NO MARKDOWN FOUND AT {0}", path));
+            EditorUtility.DisplayDialog("MarkdownGenerator", string.Format("ERROR: NO MARKDOWN FOUND AT {0}", path), "Ok");
 
             return;
         }
@@ -50,7 +48,7 @@ public class MarkdownGenerator : AssetPostprocessor
 
         File.WriteAllText(path, md);
 
-        Debug.Log("MarkdownGenerator: MARKDOWN SUCCESSFULLY GENERATED");
+        EditorUtility.DisplayDialog("MarkdownGenerator", "MARKDOWN SUCCESSFULLY GENERATED!", "Ok");
     }
 }
 
