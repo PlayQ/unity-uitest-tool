@@ -101,6 +101,17 @@ When you run tests on mobile device `Play Mode Test Runner` loads `SelectedTests
 
 You can mark any test by `[SmokeTest]` attribute. When you click `Rum Smoke` only this test will run.
 
+For example:
+
+``` c#
+[SmokeTest]
+[UnityTest]
+public IEnumerator SomeTest()
+{
+	// some code 
+}
+```
+
 
 ##### Screen resolution depending tests
 
