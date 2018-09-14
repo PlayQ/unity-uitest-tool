@@ -33,9 +33,9 @@ Just copy `UITestTools` folder and paste wherever you want in `Assets` folder of
 
 ### Flow Recorder
 
-`Flow Recorder` is an Unity Editor extension, which can record user actions and generate code of test.
+`Flow Recorder` is an Unity Editor extension, which can record user actions and generate code of test from it.
 
-To use test recorder navigate to `Window => Ui test tools => Flow recorder`. Or press `Ctrl+T`.
+To use `Test Recorder` navigate to `Window => Ui test tools => Flow recorder`, or press `Ctrl+T` for Windows and `Cmd+T` for Mac.
 
 <img src="documentation/images/recorder-interface.png" width="600">
 
