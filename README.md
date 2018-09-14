@@ -147,11 +147,12 @@ public IEnumerator SomeTest()
 
 ### Command Line Arguments
 
-To run test in editor mode via console use followin command:
+To run test in Editor Mode via console use followin command:
 
 ```
 Unity.exe -projectPath project_path -executeMethod TestToolBuildScript.RunPlayModeTests -runOnlySelectedTests -runOnlySmokeTests
 ```
+
 `project_path` - absolute path to project folder
 
 `-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window.
@@ -196,13 +197,7 @@ To make test build add following parameters to previous statement:
 API methods
 --------
 
-Comming soon...
-
-
-Extending Test Tool
------------
-
-`Test Tool` common features are split in 5 static partial classes: `Check`, `Wait` and `Interact`, `AsyncCheck` and `AsyncWait`. Any of these classes contains list of methods which accordingly check state of given object, wait for resolving of specific condition and set state to given object.
+`Test Tool` common features are split in 5 static partial classes: `Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`. Any of these classes contains list of methods which accordingly check state of given object, wait for resolving of specific condition and set state to given object.
 
 For example:
 
@@ -226,22 +221,30 @@ yield return Interact.WaitDelayAndClick("LayoutComponent/ButtonCherryTree", 0, 2
 yield return soundCheck;
 ```
 
+List of all assertations Comming soon...
+
+
+Extending Test Tool
+-----------
+
+You can extend all of 5 classes with actions (`Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`) because thay are partial.
+
 
 ### Implementing own Assertation method
 
-Let's create a simple assertation method, which takes GameObject and checks whether it's present on scene.
+Let's create a simple assertation method, which takes GameObject, checks whether it has your custom component `LevelButton` and check stars count on it. We will ckreate in in own partial `Check` class.
 
 ``` c#
-public static void IsExist(string path) //path is a full path of GameObject in hierarchy on scene
+public static void StarsCount(string path, int startCount) //path is a full path of GameObject in hierarchy on scene
 {
-    //UITestUtils is a class with a bunch of helpfull methods. For example unity's 
-    //GameObject.Find searches only for enabled GameObjects.
-    //FindAnyGameObject can find disabled GameObjects as well. 
-    var go = UITestUtils.FindAnyGameObject(path);
-    if (go == null)
+    var go = IsExist(path); //if object not exist, exception will be thrown and test failed
+    var levelButton = go.GetComponent<LevelButton>();
+    //lest fail test, if component doesn't present on the object
+    if (levelButton == null)
     {
-        Assert.Fail("IsExist: Object with path " + path + " does not exist.");
+        Assert.Fail("StarsCount: " + path + " object is exist, but LevelButton component not found.");
     }
+    Assert.AreEqual(levelButton.StartCount, startCount, "Start Count is not equals.");
 }
 ```
 Now we can use this method in out test method like this:
@@ -252,17 +255,51 @@ public IEnumerator SomeIntegrationTest()
 {
 	// some code 
 	
-	Check.IsExist("UIRoot/Users_Panel/UserPic")
+	Check.StarsCount("Level3/Button", 2);
 }
 ```
 
-But it's too much of manual work to find necessary GameObject in editor's scene, copy it's full path and paste into test code. [Flow Recorder](#flow-recorder) can do this for you. Let's modify our assertation method, so it will be awailable in Flow Recorder.
+But it's too much of manual work to find necessary GameObject in editor's scene, copy it's full path and paste into test code. [Flow Recorder](#flow-recorder) can do this for you. Let's create class that show `Flow Recorder` when and how it should display it. It should be inherited from `ShowHelperBase` class and implement `CreateGenerator`.
+
+Also you can override `bool IsAvailable(GameObject go)` method. It will set, is assertation available for current `GameObject`. As default it will return `true`, event `GameObject` is `null`. You can override method `Camera GetCamera()` to use not main Camera to get game object by click on Flow Recorder not from main camera. 
+
+```c#
+private class CheckStarsCount : ShowHelperBase
+{
+    public override bool IsAvailable(GameObject go)
+    {
+        if (!go)
+        {
+            return false; //not available if game object is null
+        }
+	//not available if game object doen't containce LevelButton component
+        return go.GetComponent<LevelButton>() != null;
+    }
+
+    public override AbstractGenerator CreateGenerator(GameObject go)
+    {
+        var levelButton = go.GetComponent<LevelButton>();
+	//tell Flow Recorder about params and default values
+        return VoidMethod.Path(go).Int(levelButton.StartCount);
+	//if method is IEnumerator, use IEnumeratorMethod instead VoidMethod.
+    }
+}
+```
+
+Let's bind our method and class.
 
 ``` c#
 [ShowInEditor("Is Exist")]
 public static void IsExist(string path)
-{
-    // assertation code
+{    
+    //UITestUtils is a class with a bunch of helpfull methods. For example unity's 
+    //GameObject.Find searches only for enabled GameObjects.
+    //FindAnyGameObject can find disabled GameObjects as well. 
+    var go = UITestUtils.FindAnyGameObject(path);
+    if (go == null)
+    {
+        Assert.Fail("IsExist: Object with path " + path + " does not exist.");
+    }
 }
 ```
 
