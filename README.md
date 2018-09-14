@@ -23,23 +23,23 @@ Content
 About
 ---------------------
 
-This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on [NUnit](http://nunit.org) plugin built-in in `Unity`.
+This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on methods, atributes and logs, simular to [NUnit](http://nunit.org).
 
 
 ### Instalation
 
-Just copy `UITestTools` folder and past wherever you want in `Assets` folder of your project. 
+Just copy `UITestTools` folder and paste wherever you want in `Assets` folder of your project.
 
 
 ### Flow Recorder
 
-`Flow Recorder` is an Unity Editor extension, which can record user actions and generate code of test.
+`Flow Recorder` is an Unity Editor extension, which can record user actions and generate code of test from it.
 
-To use test recorder navigate to `Window => Ui test tools => Flow recorder`. Or press `Ctrl+T`.
+To use `Test Recorder` navigate to `Window => Ui test tools => Flow recorder`, or press `Ctrl+T` for Windows and `Cmd+T` for Mac.
 
 <img src="documentation/images/recorder-interface.png" width="600">
 
-* `Start Record` button - enables recording mode, your clicks would be recorded as actions and added to existing action list. You can select necessary assertation and edit params for each actions.
+* `Start Record` button - enables recording mode, your clicks would be recorded as actions and added to existing action list. Then you can select necessary assertation type and edit params for each recorder actions.
 * `Stop Record` - disables recording mode. All recorded actions are keep safe.
 * `Check` - enables/disables mode, in which clicks on ui buttons don't trigger them. Window will be colored green when check mode is enabled. 
 * `Pause mode` - set time scale to 0 when enabled, useful when it needs to emulate game pause and record things.
@@ -51,7 +51,7 @@ Recorded users actions are visually displayed as a list, each item of list conta
 
 <img src="documentation/images/action-item.png" width="600">
 
-* `Assertation Type` - there is a drop down menu with a list of assertation types. Each assertation has its own list of require arguments.
+* `Assertation Type` - there is a drop down menu with a list of assertation types. You can see only assertation types, available for current `GameObject`. Each assertation has its own list of require arguments.
 * `Description` - add description as a commentary above generated `assertation method`. 
 * `Path` - path in hierarchy to gameobject user interacts with.
 * `Delay`, `timeOut` - arguments list specific to selected assertation, values of these arguments could be edited by user. Arguments could be type of `enum`, `int`, `float`, `bool`, `string`.
