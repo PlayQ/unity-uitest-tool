@@ -75,6 +75,8 @@ Launch the game in editor, press `Start Record` button, perform any actions you 
 
 When test recording is over press `Stop Record` or exit play mode. Press `Generate Code and Copy` - to obtain code for test. Then you can paste generated code to your own test class.
 
+Also you can create new assertation for object by right click to it in hierarchy and select `Create Assertation`.
+
 <img src="documentation/images/recorder_window.gif" width="600">
 
 
@@ -125,8 +127,6 @@ public IEnumerator SomeTest()
 
 ##### Command line
 
-If test is run on mobile device, custom `Test Runner` will ignore with target resolution different from device resolution. If tests is run in editor custom `Test Runner` will chage Unity Game Window resolution to target resolution.
-
 To run test in editor mode via console use followin command:
 
 ```
@@ -176,7 +176,7 @@ To make test build add following parameters to previous statement:
 
 ### Helper Window
 
-`Test Helper` is an `Unity Editor Extension`, that shows list of possible assertations for selected `GameObject` in `Hierarchy`. If you use `Test Helper` in play mode, you can also obtain list of playing sound clips.
+`Test Helper` is an `Unity Editor Extension`, that shows list of possible assertations for selected `GameObject` in `Hierarchy` as completed code line. If you use `Test Helper` in play mode, you can also obtain list of playing sound clips.
 
 <img src="documentation/images/test-helper.png" width="600">
 
@@ -188,7 +188,29 @@ To make test build add following parameters to previous statement:
 Extending Test Tool
 -----------
 
-`Test Tool` common features are split in 3 static partial classes: `Check`, `Wait` and `Interact`. Any of these classes contains list of methods which accordingly check state of given object, wait for resolving of specific condition and set state to given object.
+`Test Tool` common features are split in 5 static partial classes: `Check`, `Wait` and `Interact`, `AsyncCheck` and `AsyncWait`. Any of these classes contains list of methods which accordingly check state of given object, wait for resolving of specific condition and set state to given object.
+
+For example:
+
+```
+yield return Wait.ObjectEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/speech bubble/SpeechBubble/avatar_king", 20f);
+Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/overlay_square");
+Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/overlay_square_5");
+Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/speech bubble/SpeechBubble/speech bubble");
+Check.TextMeshProEquals("UITutorial/2_1(Clone)/CCBFile/2_1_content/CCLabelBMFontv2", "Match 4 to enchant the feather charms you need in the row.");
+Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/pointer finger/SwipeAnim/pointer_finger");
+yield return Interact.SwipeCell(4, 7, Interact.SwipeCellClass.SwipeDirection.Down, true, 1f);
+```
+
+`Async` assertions used for checking and waiting during which you want to do some interactions.
+
+For example:
+
+```
+var soundCheck = AsyncCheck.CheckSoundPlaying("button_sound");
+yield return Interact.WaitDelayAndClick("LayoutComponent/ButtonCherryTree", 0, 20f);
+yield return soundCheck;
+```
 
 
 ### Implementing Assertation method
