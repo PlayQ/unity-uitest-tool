@@ -8,7 +8,11 @@ Content
 	* [How Flow Recorder works](#how-flow-recorder-works)
 	* [Recording a new test](#recording-a-new-test)
 	* [Test Runner](#test-runner)
+		* [Run specific list of tests](#run-specific-list-of-tests)
+		* [Smoke testing](#smoke-testing)
+		* [Screen resolution depending tests](#screen-resolution-depending-tests)
 	* [Helper Window](#helper-window)
+	* [Command Line Arguments](#command-line-arguments)
 * [API methods](#api-methods)
 * [Extending Test Tool](#extending-test-tool)
 	* [Implementing own Assertation method](#implementing-own-assertation-method)
@@ -130,8 +134,18 @@ public IEnumerator SomeTest()
 {....}
 ```
 
+### Helper Window
 
-##### Command line
+`Test Helper` is an `Unity Editor Extension`, that shows list of possible assertations for selected `GameObject` in `Hierarchy` as completed code line. If you use `Test Helper` in play mode, you can also obtain list of playing sound clips.
+
+<img src="documentation/images/test-helper.png" width="600">
+
+`Copy` - copyes generated code of assertation.
+`Find playing sounds` - searches for playing sound clips.
+`Select` - only for sound, focuses on `GameObject` in hierarchy which has `Audio Source` component and it's `Sound Clip` is playing.
+
+
+### Command Line Arguments
 
 To run test in editor mode via console use followin command:
 
@@ -178,17 +192,6 @@ To make test build add following parameters to previous statement:
 
 `-runOnlySmokeTests` - optional, runs test with [SmokeTest] attribute only. 
 
-
-
-### Helper Window
-
-`Test Helper` is an `Unity Editor Extension`, that shows list of possible assertations for selected `GameObject` in `Hierarchy` as completed code line. If you use `Test Helper` in play mode, you can also obtain list of playing sound clips.
-
-<img src="documentation/images/test-helper.png" width="600">
-
-`Copy` - copyes generated code of assertation.
-`Find playing sounds` - searches for playing sound clips.
-`Select` - only for sound, focuses on `GameObject` in hierarchy which has `Audio Source` component and it's `Sound Clip` is playing.
 
 
 Extending Test Tool
