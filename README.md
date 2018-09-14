@@ -192,7 +192,7 @@ Extending Test Tool
 
 For example:
 
-```
+```c#
 yield return Wait.ObjectEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/speech bubble/SpeechBubble/avatar_king", 20f);
 Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/overlay_square");
 Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/overlay_square_5");
@@ -206,7 +206,7 @@ yield return Interact.SwipeCell(4, 7, Interact.SwipeCellClass.SwipeDirection.Dow
 
 For example:
 
-```
+```c#
 var soundCheck = AsyncCheck.CheckSoundPlaying("button_sound");
 yield return Interact.WaitDelayAndClick("LayoutComponent/ButtonCherryTree", 0, 20f);
 yield return soundCheck;
