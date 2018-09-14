@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -115,11 +115,12 @@
     <Compile Include="Assets\Examples\UITestCheck.cs" />
     <Compile Include="Assets\Examples\UITestSuccess.cs" />
     <Compile Include="Assets\Examples\UITestWaitFail.cs" />
-    <Compile Include="Assets\UITestTools\AsyncCheck.cs" />
-    <Compile Include="Assets\UITestTools\AsyncWait.cs" />
-    <Compile Include="Assets\UITestTools\Check.cs" />
+    <Compile Include="Assets\UITestTools\Actions\AsyncCheck.cs" />
+    <Compile Include="Assets\UITestTools\Actions\AsyncWait.cs" />
+    <Compile Include="Assets\UITestTools\Actions\Check.cs" />
+    <Compile Include="Assets\UITestTools\Actions\Interact.cs" />
+    <Compile Include="Assets\UITestTools\Actions\Wait.cs" />
     <Compile Include="Assets\UITestTools\ClassFileFinder.cs" />
-    <Compile Include="Assets\UITestTools\Interact.cs" />
     <Compile Include="Assets\UITestTools\MockNUnit.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\ConsoleArgumentHelper.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\CurrentTestInfo.cs" />
@@ -160,7 +161,6 @@
     <Compile Include="Assets\UITestTools\Tools\WaitResults.cs" />
     <Compile Include="Assets\UITestTools\UITestAttributes.cs" />
     <Compile Include="Assets\UITestTools\UITestToolsVersionInfo.cs" />
-    <Compile Include="Assets\UITestTools\Wait.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />

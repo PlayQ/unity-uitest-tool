@@ -205,7 +205,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsNotExist("container");
+                Check.DoesNotExist("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -252,9 +252,9 @@ namespace PlayQ.UITestTools.Tests
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.DestroyImmediate(testObject);
 
-            Check.IsNotExist("container");
-            Check.IsNotExist<TestObject>();
-            Check.IsNotExist<TestObject>("container");
+            Check.DoesNotExist("container");
+            Check.DoesNotExist<TestObject>();
+            Check.DoesNotExist<TestObject>("container");
 
 
         }
@@ -267,7 +267,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsNotExist("container");
+                Check.DoesNotExist("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -280,7 +280,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsNotExist<TestObject>();
+                Check.DoesNotExist<TestObject>();
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -293,7 +293,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsNotExist<TestObject>("container");
+                Check.DoesNotExist<TestObject>("container");
             }
             catch (AssertionException ex)
             {
@@ -313,10 +313,10 @@ namespace PlayQ.UITestTools.Tests
             var testToggle = UITestUtils.FindAnyGameObject<Toggle>();
 
             testToggle.isOn = true;
-            Check.CheckToggle("container/Toggle", true);
+            Check.Toggle("container/Toggle", true);
 
             testToggle.isOn = false;
-            Check.CheckToggle("container/Toggle", false);
+            Check.Toggle("container/Toggle", false);
         }
 
         [UnityTest]
@@ -330,7 +330,7 @@ namespace PlayQ.UITestTools.Tests
             try
             {
                 testToggle.isOn = true;
-                Check.CheckToggle("container/Toggle", false);
+                Check.Toggle("container/Toggle", false);
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -343,7 +343,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.CheckToggle("container/Toggle", false);
+                Check.Toggle("container/Toggle", false);
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -366,7 +366,7 @@ namespace PlayQ.UITestTools.Tests
                 var testToggle = UITestUtils.FindAnyGameObject<Toggle>();
                 testToggle.isOn = false;
 
-                Check.CheckToggle("container/Toggle", true);
+                Check.Toggle("container/Toggle", true);
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -379,7 +379,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.CheckToggle("container", true);
+                Check.Toggle("container", true);
                 Assert.Fail();
             }
             catch (AssertionException ex)

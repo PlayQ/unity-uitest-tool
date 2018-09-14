@@ -82,7 +82,7 @@ public static class XmlToMarkdown
                     {"example", "_C# code_\n\n```c#\n{0}\n```\n\n"},
                     {"seePage", "[[{1}|{0}]]"},
                     {"seeAnchor", "[{1}]({0})"},
-                    {"param", "|Name | Description |\n|-----|------|\n|{0}: |{1}|\n" },
+                    {"param", "|Name | Description |\n|-----|------|\n|{0} |{1}|\n" },
                     {"exception", "[[{0}|{0}]]: {1}\n\n" },
                     {"returns", "Returns: {0}\n\n"},
                     {"none", ""}
@@ -292,8 +292,6 @@ public static class XmlToMarkdown
 
             if (!NodeToMarkdownMethods.ContainsKey(name))
             {
-                //Debug.LogError(string.Format("MarkdownCreator: UNABLE TO FIND KEY {0}", name));
-
                 return string.Empty;
             }
 
@@ -314,7 +312,7 @@ public static class XmlToMarkdown
 
         if (e.NodeType == XmlNodeType.Text)
         {
-            return Regex.Replace(((XText)e).Value.Replace('\n', ' '), @"\s+", " ");
+            return Regex.Replace(((XText)e).Value, @"\ +", " ");
         }
 
         return string.Empty;

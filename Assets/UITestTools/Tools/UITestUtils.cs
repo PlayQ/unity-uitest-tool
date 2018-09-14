@@ -11,21 +11,20 @@ using UnityEngine.UI;
 namespace PlayQ.UITestTools
 {
     /// <summary>
-    /// This class contains helper methods to work with GameObjects
+    /// Contains methods that are needed for multiple action methods from all classes and facilitates the test actions writing
     /// </summary>
     public static class UITestUtils
     {
         /// <summary>
-        /// Find `EventSystem` on the scene.
+        /// Finds `EventSystem` on the scene
         /// </summary>
-        /// <returns></returns>
         public static EventSystem FindCurrentEventSystem()
         {
             return GameObject.FindObjectOfType<EventSystem>();
         }
         
         /// <summary>
-        /// Loads scene by given name.
+        /// Loads scene by given name
         /// </summary>
         /// <param name="sceneName">Scene name</param>
         public static void LoadSceneForSetUp(string sceneName)
@@ -34,11 +33,10 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Return `Selectable` object from `GameObject` or his parent.
+        /// Returns `Selectable` object from `GameObject` or its parent
         /// </summary>
         /// <param name="go">`GameObject` to find selectable object</param>
         /// <param name="handlePosition">Pointer position</param>
-        /// <returns></returns>
         public static GameObject GetScrollElement(GameObject go, ref Vector2 handlePosition)
         {
             var scrollBar = go.GetComponent<Scrollbar>();
@@ -67,9 +65,8 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Prins in console log with a list of path to all GameObject on scene.
+        /// Prints console log with a list of paths to all GameObjects on scene
         /// </summary>
-        /// <returns></returns>
         public static string LogHierarchy()
         {
             var result = new StringBuilder();
@@ -101,7 +98,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find GameObject under click.
+        /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find GameObject that was clicked
         /// </summary>
         /// <param name="x">X position in pixels</param>
         /// <param name="y">Y position in pixels</param>
@@ -124,7 +121,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Get pixels coords from percent coords, then Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click.
+        /// Calculates pixels coordinates from percent coordinates, then Uses `UnityEngine.EventSystems.EventSystem` class to raycast by resulting coordinates to find `GameObject` that was clicked
         /// </summary>
         /// <param name="x">X position in percents</param>
         /// <param name="y">Y position in percents</param>
@@ -177,7 +174,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Checks if given `GameObject` has `TComponent` component on it. If not - checks it's parent recursively.
+        /// Checks if given `GameObject` has `TComponent` component attached to it. If not - performs recursive check on its parent
         /// </summary>
         /// <param name="go">Parent `GameObject`</param>
         /// <typeparam name="TComponent">Component Type</typeparam>
@@ -198,7 +195,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks if given GameObject has `TComponent` component on it. If not - checks it's parent recursively.
+        /// Checks if given GameObject has `TComponent` component attached to it. If not - performs recursive check on its parent
         /// </summary>
         /// <param name="go">Parent `GameObject`</param>
         /// <typeparam name="TComponent">Component Type</typeparam>
@@ -220,7 +217,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Find enabled `GameObject` by Path in hierarchy.
+        /// Finds enabled `GameObject` by Path in hierarchy
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <returns>Enabled `GameObject` or null.</returns>
@@ -281,7 +278,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Encode path string for Test Tools format (`/` => `%/`, `%` => `%%`).
+        /// Encodes path string for Test Tools format (`/` => `%/`, `%` => `%%`)
         /// </summary>
         /// <param name="text">String to encode</param>
         /// <returns>Encoded strings</returns>
@@ -311,7 +308,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Decode path int Test Tools format to simple path (`%/` => `/`, `%%` => `%`).
+        /// Decodes path in Test Tools format to simple path (`%/` => `/`, `%%` => `%`)
         /// </summary>
         /// <param name="text">String to encode</param>
         /// <returns>Encoded strings</returns>
@@ -335,7 +332,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Calculate and retun full path to `GameObject`.
+        /// Calculates and retuns full path to `GameObject`
         /// </summary>
         /// <param name="gameObject">`GameObject`</param>
         /// <returns>Full path to `GameObject`</returns>
@@ -365,7 +362,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Searches for GameObject that has component of T and by path in hierarchy.
+        /// Searches for GameObject that has component of the given type attached and matches the given path in hierarchy
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">Type of `GameObject`</typeparam>
@@ -406,7 +403,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Searches for GameObject by path in hierarchy.
+        /// Searches for GameObject by path in hierarchy
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <returns>active and non-active `GameObjects` or null</returns>
@@ -430,7 +427,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Searches for `GameObject` that has component of `T`.
+        /// Searches for `GameObject` that has component of `T` attached to it
         /// </summary>
         /// <typeparam name="T">Type of `GameObject`</typeparam>
         /// <returns>active and non-active `GameObjects` or null</returns>
@@ -448,7 +445,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Return center point of given `RectTransform`.
+        /// Return center point of the given `RectTransform`
         /// </summary>
         /// <param name="transform">`RectTransform` component instance</param>
         /// <returns>Center point of given `RectTransform`</returns>
@@ -468,7 +465,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Returns array of coords of screen rectangle of given `RectTransform`.
+        /// Returns array of coordinates of screen rectangle of the given `RectTransform`
         /// </summary>
         /// <param name="transform">`RectTransform` component instance</param>
         /// <returns>Array of coords of screen rectangle of given `RectTransform`</returns>
@@ -558,6 +555,12 @@ namespace PlayQ.UITestTools
             return y * Screen.height;
         }
 
+        /// <summary>
+        /// Gets the string comparator by specified text and regex option
+        /// </summary>
+        /// <returns>The string comparator</returns>
+        /// <param name="text">Text</param>
+        /// <param name="useRegEx">Is the specified text a regular expression</param>
         public static IStringComparator GetStringComparator(string text, bool useRegEx)
         {
             return StringComparatorFactory.Build(text, useRegEx);

@@ -10,6 +10,10 @@ using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
+    /// <summary>
+    /// Contains methods which allow checking the state of game components and objects on the scene asynchronously
+    /// No methods provided by default
+    /// </summary>
     public static partial class AsyncCheck
     {
     }

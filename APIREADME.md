@@ -1,9 +1,14 @@
 # API methods
+* [AsyncCheck](#asynccheck)
+* [AsyncWait](#asyncwait)
+  * [StartWaitingForLog](#startwaitingforlog)
+  * [StartWaitingForUnityAnimation](#startwaitingforunityanimation)
+  * [StopWaitingForGameLog](#stopwaitingforgamelog)
+  * [StopWaitingForUnityAnimation](#stopwaitingforunityanimation)
 * [Check](#check)
   * [AnimatorStateStarted](#animatorstatestarted)
-  * [CheckAverageFPS](#checkaveragefps)
+  * [AverageFPS](#averagefps)
   * [CheckEnabled](#checkenabled)
-  * [CheckMinFPS](#checkminfps)
   * [CheckToggle](#checktoggle)
   * [DoesNotExist](#doesnotexist)
   * [DoesNotExistOrDisabled](#doesnotexistordisabled)
@@ -12,9 +17,11 @@
   * [IsDisable](#isdisable)
   * [IsEnable](#isenable)
   * [IsExist](#isexist)
-  * [IsNotExist](#isnotexist)
+  * [MinFPS](#minfps)
+  * [SourceImage](#sourceimage)
   * [TextEquals](#textequals)
   * [TextNotEquals](#textnotequals)
+  * [Toggle](#toggle)
 * [Interact](#interact)
   * [AppendText](#appendtext)
   * [ClearFPSMetrics](#clearfpsmetrics)
@@ -28,9 +35,24 @@
   * [ObsoleteWaitClickAndDelayIfPossible](#obsoletewaitclickanddelayifpossible)
   * [ResetFPS](#resetfps)
   * [SaveFPS](#savefps)
+  * [ScrollToPosition](#scrolltoposition)
   * [SetText](#settext)
   * [SetTimescale](#settimescale)
   * [WaitDelayAndClick](#waitdelayandclick)
+* [Wait](#wait)
+  * [AnimationCompleted](#animationcompleted)
+  * [ButtonAccessible](#buttonaccessible)
+  * [Frame](#frame)
+  * [ObjectDestroyed](#objectdestroyed)
+  * [ObjectDisabled](#objectdisabled)
+  * [ObjectDisabledOrNotExist](#objectdisabledornotexist)
+  * [ObjectEnableAndInteractibleIfButton](#objectenableandinteractibleifbutton)
+  * [ObjectEnabled](#objectenabled)
+  * [ObjectEnabledInstantiatedAndDelay](#objectenabledinstantiatedanddelay)
+  * [ObjectInstantiated](#objectinstantiated)
+  * [SceneLeaded](#sceneleaded)
+  * [Seconds](#seconds)
+  * [WaitFor](#waitfor)
 * [UITestUtils](#uitestutils)
   * [CenterPointOfObject](#centerpointofobject)
   * [DecodeString](#decodestring)
@@ -44,102 +66,161 @@
   * [FindObjectByPixels](#findobjectbypixels)
   * [GetGameObjectFullPath](#getgameobjectfullpath)
   * [GetScrollElement](#getscrollelement)
+  * [GetStringComparator](#getstringcomparator)
   * [HeightPercentsToPixels](#heightpercentstopixels)
   * [LoadSceneForSetUp](#loadsceneforsetup)
   * [LogHierarchy](#loghierarchy)
   * [PercentsToPixels](#percentstopixels)
   * [ScreenVerticesOfObject](#screenverticesofobject)
-  * [WidthPercentsToPixels](#widthpercentstopixels)
-* [Wait](#wait)
-  * [ButtonAccessible](#buttonaccessible)
-  * [Frame](#frame)
-  * [ObjectDestroy](#objectdestroy)
-  * [ObjectDisabled](#objectdisabled)
-  * [ObjectEnabled](#objectenabled)
-  * [ObjectEnabledInstantiatedAndDelay](#objectenabledinstantiatedanddelay)
-  * [ObjectInstantiated](#objectinstantiated)
-  * [SceneLeaded](#sceneleaded)
-  * [Seconds](#seconds)
-  * [WaitFor](#waitfor) 
+  * [WidthPercentsToPixels](#widthpercentstopixels) 
 
-## Check 
+## AsyncCheck 
 
-#### AnimatorStateStarted
+ Contains methods which allow checking the state of game components and objects on the scene asynchronously
+ No methods provided by default
+ 
 
- Seraches for `GameObject` by given path with `Animator` component. Waits during given `timeOut` until animation state with given name becames active. 
+
+## AsyncWait 
+
+ Contains methods which allow waiting until the game components and objects on the scene reach the certain state asynchronously
+ 
+
+
+#### StartWaitingForLog
+
+
+ Starts the waiting for the log
+ 
+
+Returns: Abstract async waiter
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|stateName: |`Animator` state name|
-|timeout: |Timeout|
-Returns: 
+|message |Expected log message|
+|isRegExp |Is expected log a regular expression|
+|timeout |Timeout|
+
+
+---
+
+#### StartWaitingForUnityAnimation
+
+
+ Starts the waiting for unity animation to complete
+ 
+
+Returns: Abstract async waiter
+
+|Name | Description |
+|-----|------|
+|path |Path to `GameObject` in hierarchy|
+|animationName |Animation name|
+|timeout |Timeout|
+
+
+---
+
+#### StopWaitingForGameLog
+
+
+ Used only for generation waiting code for StartWaitingForLog 
+ 
 
 
 
 ---
 
-#### CheckAverageFPS
+#### StopWaitingForUnityAnimation
 
- Checks average fps since moment user last time called `Interact.ResetFPS()` method or since game started. If average fps less than `targetFPS` test will faled. 
+
+ Used only for generation waiting code for StartWaitingForUnityAnimation 
+ 
+
+
+
+---
+
+## Check 
+
+ Contains methods which allow checking the state of game components and objects on the scene
+ 
+
+
+#### AnimatorStateStarted
+
+
+ Seraches for `GameObject` by given path with `Animator` component. During a given `timeOut` waits for an animation state with specific name to become active
+ 
 
 |Name | Description |
 |-----|------|
-|targetFPS: |Minimum allowable value of average fps|
+|path |Path to `GameObject` in hierarchy|
+|stateName |`Animator` state name|
+|timeout |Timeout|
+
+
+---
+
+#### AverageFPS
+
+
+ Checks average fps since the last time user called `Interact.ResetFPS()` method or since the game started. If average fps is less than `targetFPS` value, test fails
+ 
+
+|Name | Description |
+|-----|------|
+|targetFPS |Minimum acceptable value of average fps|
 
 
 ---
 
 #### CheckEnabled
 
- Checks `Gameobject` by path is present on scene and it's active in hierarchy flag is equals state variable. 
+
+ Checks that `Gameobject` by given path is present on scene and its active in hierarchy flag equals to state variable
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|state: |Enable state|
-
-
----
-
-#### CheckMinFPS
-
- Checks minimum fps since moment user last time called `Interact.ResetFPS()` method or since game started. If minimum fps less than `targetFPS` test will faled. 
-
-|Name | Description |
-|-----|------|
-|targetFPS: |Minimum allowable value of minimum fps|
+|path |Path to `GameObject` in hierarchy|
+|state |Enable state|
 
 
 ---
 
 #### CheckToggle
 
- Checks thart `GameObject` by given path has `Toggle` component and it's `isOn` value is equals to expected. 
+
+ Checks that `GameObject` has `Toggle` component and its `isOn` value equals to expected
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|state: |Toggle state|
-
-
----
-
-#### CheckToggle
-
- Checks thart `GameObject` has `Toggle` component and it's `isOn` value is equals to expected. 
-
-|Name | Description |
-|-----|------|
-|go: |`GameObject` with `Toggle` component|
-|expectedIsOn: ||
+|go |`GameObject` with `Toggle` component|
+|expectedIsOn |Expected value of the toggle|
 
 
 ---
 
 #### DoesNotExist
 
- Searches for any `GameObject` on scene with component `T`. Fails if found one. 
+
+ Checks that `GameObject` by given path is not present on scene
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to `GameObject` in hierarchy|
+
+
+---
+
+#### DoesNotExist
+
+
+ Checks that no `GameObject` with component `T` is present on scene
+ 
 
 
 
@@ -147,92 +228,119 @@ Returns:
 
 #### DoesNotExist
 
- Checks `GameObject` by give path and component `T` is not present on scene. 
+
+ Checks that `GameObject` by given path with component `T` is not present on scene
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
+|path |Path to `GameObject` in hierarchy|
 
 
 ---
 
 #### DoesNotExistOrDisabled
 
- Checks `GameObject` by give path is not present on scene or it not active. 
+
+ Checks that `GameObject` by given path is not present on scene or is not active
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
+|path |Path to `GameObject` in hierarchy|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
 
 
 ---
 
 #### InputEquals
 
- Checks `GameObject` by given path has `InputField` component and it's variable text is equals to expected text. 
+
+ Checks that `GameObject` by given path has `InputField` component attached and its variable text is equal to expected text
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|expectedText: |Expected text|
+|path |Path to `GameObject` in hierarchy|
+|expectedText |Expected text|
 
 
 ---
 
 #### InputEquals
 
- Checks `GameObject` has `InputField` component and it's variable text is equals to expected text. 
+
+ Checks that `GameObject` has `InputField` component attached and its variable text is equal to expected text
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` with `InputField` component|
-|expectedText: |Expected text|
+|go |`GameObject` with `InputField` component|
+|expectedText |Expected text|
 
 
 ---
 
 #### InputNotEquals
 
- Checks `GameObject` by given path has `InputField` component and it's variable text is not equals to expected text. 
+
+ Checks that `GameObject` by given path has `InputField` component attached and its variable text is not equal to expected text
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|expectedText: |Expected text|
+|path |Path to `GameObject` in hierarchy|
+|expectedText |Expected text|
 
 
 ---
 
 #### InputNotEquals
 
- Checks `GameObject` has `InputField` component and it's variable text is not equals to expected text. 
+
+ Checks that `GameObject` has `InputField` component attached and its variable text is not equal to expected text
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` with `InputField` component|
-|expectedText: |Expected text|
+|go |`GameObject` with `InputField` component|
+|expectedText |Expected text|
 
 
 ---
 
 #### IsDisable
 
- Checks `GameObject` is not active in hierarchy. 
+
+ Checks that `GameObject` by given path is present on scene and is not active in hierarchy
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject`|
+|path |Path to `GameObject` in hierarchy|
 
 
 ---
 
 #### IsDisable
 
- Searches for `Gameobject` with component `T` and checks it is present on scene and not active in hierarchy. 
+
+ Checks that `GameObject` is not active in hierarchy
+ 
+
+|Name | Description |
+|-----|------|
+|go |`GameObject`|
+
+
+---
+
+#### IsDisable
+
+
+ Searches for `Gameobject` with component `T` and checks that it is present on scene and is not active in hierarchy
+ 
 
 
 
@@ -240,29 +348,48 @@ Returns:
 
 #### IsDisable
 
- Checks `GameObject` by path is present on scene, contains component `T` and not active in hierarchy. 
+
+ Checks that `GameObject` by given path is present on scene, contains component `T` and is not active in hierarchy
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
+|path |Path to `GameObject` in hierarchy|
 
 
 ---
 
 #### IsEnable
 
- Checks `GameObject` is active in hierarchy. 
+
+ Checks that `Gameobject` by given path is present on scene and active in hierarchy
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject`|
+|path |Path to `GameObject` in hierarchy|
 
 
 ---
 
 #### IsEnable
 
- Searches for `Gameobject` with component `T` and checks it is present on scene and active in hierarchy. 
+
+ Checks that `GameObject` is active in hierarchy
+ 
+
+|Name | Description |
+|-----|------|
+|go |`GameObject`|
+
+
+---
+
+#### IsEnable
+
+
+ Searches for `Gameobject` with component `T` and checks that it is present on scene and active in hierarchy
+ 
 
 
 
@@ -270,22 +397,26 @@ Returns:
 
 #### IsEnable
 
- Checks `Gameobject` by path is present on scene, contains component `T` and active in hierarchy. 
+
+ Checks that `Gameobject` by given path is present on scene, contains component `T` and is active in hierarchy
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
+|path |Path to `GameObject` in hierarchy|
 
 
 ---
 
 #### IsExist
 
- Checks `GameObject` by give path is present on scene. 
+
+ Checks that `GameObject` by given path is present on scene
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
+|path |Path to `GameObject` in hierarchy|
 Returns: `GameObject`
 
 
@@ -294,9 +425,11 @@ Returns: `GameObject`
 
 #### IsExist
 
- Searches for `GameObject` with component `T` on scene. 
 
-Returns: 
+ Searches for `GameObject` with component `T` on scene
+ 
+
+Returns: `GameObject`
 
 
 
@@ -304,105 +437,155 @@ Returns:
 
 #### IsExist
 
- Checks `GameObject` by give path is present on scene and contains component `T`. 
+
+ Checks that `GameObject` by given path is present on scene and contains component `T`
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-Returns: 
+|path |Path to `GameObject` in hierarchy|
+Returns: `GameObject`
 
 
 
 ---
 
-#### IsNotExist
+#### MinFPS
 
- Checks `GameObject` by give path and component `T` is not present on scene. 
+
+ Checks minimum fps since the last time user called `Interact.ResetFPS()` method or since the game started. If minimum fps is less than `targetFPS` value, test fails
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
+|targetFPS |Minimum acceptable value of minimum fps|
+
+
+---
+
+#### SourceImage
+
+
+ Seraches for `GameObject` by given path and checks the source image
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to `GameObject` in hierarchy|
+|sourceName |Source image name|
 
 
 ---
 
 #### TextEquals
 
- Checks `GameObject` by given path has `Text` component and it's variable text is equals to expected text. 
+
+ Checks that `GameObject` by given path has `Text` component attached and its variable text is equal to expected text
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|expectedText: |Expected text|
-\ 
+|path |Path to `GameObject` in hierarchy|
+|expectedText |Expected text|
+
 
 ---
 
 #### TextEquals
 
- Checks `GameObject` has `Text` component and it's variable text is equals to expected text. 
+
+ Checks that `GameObject` has `Text` component attached and its variable text is equal to expected text
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` with `Text` component|
-|expectedText: |Expected text|
+|go |`GameObject` with `Text` component|
+|expectedText |Expected text|
 
 
 ---
 
 #### TextNotEquals
 
- Checks `GameObject` by given path has `Text` component and it's variable text is not equals to expected text. 
+
+ Checks that `GameObject` by given path has `Text` component attached and its variable text is not equal to expected text
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|expectedText: |Expected text|
+|path |Path to `GameObject` in hierarchy|
+|expectedText |Expected text|
 
 
 ---
 
 #### TextNotEquals
 
- Checks `GameObject` has `Text` component and it's variable text is not equals to expected text. 
+
+ Checks that `GameObject` has `Text` component attached and its variable text is not equal to expected text
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` with `Text` component|
-|expectedText: |Expected text|
+|go |`GameObject` with `Text` component|
+|expectedText |Expected text|
+
+
+---
+
+#### Toggle
+
+
+ Checks that `GameObject` by given path has `Toggle` component and its `isOn` value equals to expected
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to `GameObject` in hierarchy|
+|state |Toggle state|
 
 
 ---
 
 ## Interact 
 
+ Contains methods which allow interacting with game components and objects on the scene
+ 
+
+
 #### AppendText
 
- Appends text to `GameObject` by path with `InputField` component. 
+
+ Appends text to `GameObject` by path with `InputField` component attached
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|text: |`Text` to set|
+|path |Path to `GameObject` in hierarchy|
+|text |`Text` to set|
 
 
 ---
 
 #### AppendText
 
- Checks if `GameObject` has `InputField` component. Fails if not. Then appends given text to text variable of `InputField` 
+
+ Checks if `GameObject` has `InputField` component attached, then appends given text to text variable of `InputField`
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` with `Text` component|
-|text: |`Text` to set|
+|go |`GameObject` with `Text` component|
+|text |`Text` to set|
 
 
 ---
 
 #### ClearFPSMetrics
 
- Store FPS data to the disc. 
+
+ Clears FPS data from the hard drive
+ 
 
 
 
@@ -410,202 +593,233 @@ Returns:
 
 #### Click
 
- Emulates click on `Unity UI` element by path. 
+
+ Emulates LMB click on `Unity UI` element by given path
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to GameObject in hierarchy|
+|path |Path to GameObject in hierarchy|
 
 
 ---
 
 #### Click
 
- Emulates click on `Unity UI GameObject`. 
+
+ Emulates LMB click on `Unity UI GameObject`
+ 
 
 |Name | Description |
 |-----|------|
-|go: |GameObject to click|
+|go |GameObject to click|
 
 
 ---
 
 #### ClickPercents
 
- Find pixel coordinates by screen percents and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform click on it. 
+
+ Finds screen space pixel coordinates by given screen size percents and uses `UnityEngine.EventSystems.EventSystem` class to raycast by resulting coordinates to find `GameObject` and perform LMB click on it
+ 
 
 |Name | Description |
 |-----|------|
-|x: |X position in screen percents|
-|y: |Y position in screen percents|
+|x |X position in screen percents|
+|y |Y position in screen percents|
 
 
 ---
 
 #### ClickPixels
 
- Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform click on it. 
+
+ Uses `UnityEngine.EventSystems.EventSystem` class to raycast UI by specified coords to find `GameObject` and perform LMB click on it
+ 
 
 |Name | Description |
 |-----|------|
-|x: |X position in screen pixels|
-|y: |Y position in screen pixels|
+|x |X position in screen pixels|
+|y |Y position in screen pixels|
 
 
 ---
 
 #### DragPercents
 
- Perform drag on `GameObject` by path. 
+
+ Obtains drag percents of `GameObject` by path
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|to: |Finish position in percents|
-|time: |Drag Time|
-Returns: 
-
+|path |Path to `GameObject` in hierarchy|
+|fromPercentX |Min percent of drag at dimension X|
+|fromPercentY |Min percent of drag at dimension Y|
+|toPercentX |Max percent of drag at dimension X|
+|toPercentY |Max percent of drag at dimension Y|
+|time |Time|
 
 
 ---
 
 #### DragPercents
 
- Perform drag on `GameObject`. 
+
+ Perform drag on `GameObject` by path
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` to drag|
-|to: |Finish position in percents|
-|time: |Drag Time|
-Returns: 
-
+|path |Path to `GameObject` in hierarchy|
+|to |Finish position in percents|
+|time |Drag Time|
 
 
 ---
 
 #### DragPercents
 
- Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform drag on it. 
+
+ Perform drag on `GameObject`
+ 
 
 |Name | Description |
 |-----|------|
-|from: |Start position in percents|
-|to: |Finish position in percents|
-|time: |Drag Time|
-Returns: 
+|go |`GameObject` to drag|
+|to |Finish position in percents|
+|time |Drag Time|
 
+
+---
+
+#### DragPercents
+
+
+ Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find `GameObject` and perform drag on it
+ 
+
+|Name | Description |
+|-----|------|
+|from |Start position in percents|
+|to |Finish position in percents|
+|time |Drag Time|
 
 
 ---
 
 #### DragPixels
 
- Perform drag on `GameObject` by path. 
+
+ Perform drag on `GameObject` by path
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to GameObject in hierarchy|
-|to: |Finish position in pixels|
-|time: |Drag Time|
-Returns: 
-
+|path |Path to GameObject in hierarchy|
+|to |Finish position in pixels|
+|time |Drag Time|
 
 
 ---
 
 #### DragPixels
 
- Perform drag on `GameObject`. 
+
+ Perform drag on `GameObject`
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` to drag|
-|from: |Start position in percents|
-|to: |Finish position in percents|
-|time: |Drag Time|
-Returns: 
-
+|go |`GameObject` to drag|
+|from |Start position in percents|
+|to |Finish position in percents|
+|time |Drag Time|
 
 
 ---
 
 #### DragPixels
 
- Perform drag on `GameObject`. 
+
+ Perform drag on `GameObject`
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` to drag|
-|to: |Finish position in pixels|
-|time: |Drag Time|
-Returns: 
-
+|go |`GameObject` to drag|
+|to |Finish position in pixels|
+|time |Drag Time|
 
 
 ---
 
 #### DragPixels
 
- Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform drag on it. 
+
+ Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find `GameObject` and perform drag on it
+ 
 
 |Name | Description |
 |-----|------|
-|from: |Start position in pixels|
-|to: |Finish position in pixels|
-|time: |Drag Time|
-Returns: 
-
+|from |Start position in pixels|
+|to |Finish position in pixels|
+|time |Drag Time|
 
 
 ---
 
 #### MakeScreenShot
 
- Makes screenshot. Saves it to persistant data folder. 
+
+ Makes a screenshot. Saves it to persistant data folder
+ 
 
 |Name | Description |
 |-----|------|
-|name: |Name of screenshot|
-Returns: 
-
+|name |Name of screenshot|
 
 
 ---
 
 #### ObsoleteWaitClickAndDelay
 
- Waits until `GameObject` by path is present on scene, active in hierarchy, the delay durin delay, then emulate click. Fails on timeout. 
+
+ Obsolete. Use WaitDelayAndClick instead
+ Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay. Fails if exceeds the given timeout
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to GameObject in hierarchy|
-|delay: |Amount of time to delay|
-|timeout: |Timeout|
-Returns: 
-
+|path |Path to GameObject in hierarchy|
+|delay |Amount of time to delay|
+|timeout |Timeout|
 
 
 ---
 
 #### ObsoleteWaitClickAndDelayIfPossible
 
- Waits until `GameObject` by path is present on scene, active in hierarchy, the delay durin delay, then emulate click. Doesn't fail on timeout. 
+
+ Obsolete. Use WaitDelayAndClick instead
+ Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to GameObject in hierarchy|
-|delay: |Amount of time to delay|
-|timeout: |Timeout|
-Returns: 
-
+|path |Path to GameObject in hierarchy|
+|delay |Amount of time to delay|
+|timeout |Timeout|
 
 
 ---
 
 #### ResetFPS
 
- Reset FPS. FPS counter counts average fps, minimum and maximum FPS since the moment this method is called. 
+
+ Resets FPS counter
+ FPS counter stores average fps, minimum and maximum FPS values since the last moment this method was called
+ 
 
 
 
@@ -613,76 +827,397 @@ Returns:
 
 #### SaveFPS
 
- Store FPS data to the disc. 
+
+ Stores FPS data on the hard drive
+ 
 
 |Name | Description |
 |-----|------|
-|tag: |Measure discription|
+|tag |Measure discription|
+
+
+---
+
+#### ScrollToPosition
+
+
+ Perform scroll on `GameObject` by path
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to `GameObject` in hierarchy|
+|horizontalPosition |Horizontal position|
+|verticalPosition |Vertical position|
+|animationDuration |Animation duration|
+|timeout |Timeout|
+|ignoreTimeScale |Should time scale be ignored or not|
 
 
 ---
 
 #### SetText
 
- Finds `GameObject` by path, checks if `GameObject` has `Text` component, fail if it has not. If not fail, then set text variable of `Text` to given value. 
+
+ Finds `GameObject` by path, checks if `GameObject` has `Text` component attached, then set text variable of `Text` to given value
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|text: |`Text` to set|
+|path |Path to `GameObject` in hierarchy|
+|text |`Text` to set|
 
 
 ---
 
 #### SetText
 
- Finds `GameObject` by path, checks if `GameObject` has `Text` component, fail if it has not. If not fail, then set text variable of `Text` to given value. 
+
+ Finds `GameObject` by path, checks if `GameObject` has `Text` component attached, then sets text variable of `Text` to given value
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` with `Text` component|
-|text: |`Text` to set|
+|go |`GameObject` with `Text` component|
+|text |`Text` to set|
 
 
 ---
 
 #### SetTimescale
 
- Sets timescale. 
+
+ Sets timescale
+ 
 
 |Name | Description |
 |-----|------|
-|scale: |New timescale|
+|scale |New timescale|
 
 
 ---
 
 #### WaitDelayAndClick
 
- Waits until `GameObject` by path is present on scene, active in hierarchy, the delay durin delay, then emulate click. Fails on timeout. 
+
+ Waits until `GameObject` by given path is present on scene and active in hierarchy then emulates LMB click after the specified delay. Fails if exceeds the given timeout
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to GameObject in hierarchy|
-|delay: |Amount of time to delay|
-|timeout: |Timeout|
-Returns: 
+|path |Path to GameObject in hierarchy|
+|delay |Amount of time to delay|
+|timeout |Timeout|
+
+
+---
+
+## Wait 
+
+ Contains methods which allow waiting until the game components and objects on the scene reach the certain state
+ 
+
+
+#### AnimationCompleted
+
+
+ Waits until animation is completed
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|animationName |Animation name|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ButtonAccessible
+
+
+ Waits until given 'GameObject' obtains component 'UnityEngine.UI.Button' or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|button |'GameObject' who should be start accessible|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### Frame
+
+
+ Waits for given amount of frames, then return
+ 
+
+|Name | Description |
+|-----|------|
+|count |Amount of frames to wait|
+
+
+---
+
+#### ObjectDestroyed
+
+
+ Waits until 'GameObject' by given path disappears from scene or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to `GameObject` in hierarchy|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectDestroyed
+
+
+ Waits until 'GameObject' by given path disappears from scene or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|gameObject |`GameObject` who should be destroyed|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectDestroyed
+
+
+ Waits until 'GameObject' with component 'T' disappears from scene or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectDisabled
+
+
+ Waits until 'GameObject' by given path becomes present on scene and disabled in hierarchy or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectDisabled
+
+
+ Waits until 'GameObject' with component 'T' becomes present on scene and disabled in hierarchy or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectDisabledOrNotExist
+
+
+ Waits until 'GameObject' by given path disappears from scene or becomes disabled in hierarchy or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectEnableAndInteractibleIfButton
+
+
+ Awaits for 'GameObject' to become enabled and interactible if it is a button
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|timeout |Timeout|
+|dontFail |Whether the test should fail upon exceeding timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectEnabled
+
+
+ Waits until 'GameObject' by given path becomes present on scene and active in hierarchy or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectEnabled
+
+
+ Waits until 'GameObject' with component 'T' becomes present on scene and active in hierarchy or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectEnabledInstantiatedAndDelay
+
+
+ Awaits for 'GameObject' to become present on scene and active in hierarchy. Then waits during given amount of time and returns after that. Method fails after exceeding the given timeout
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|delay |Amount of time to delay|
+|timeout |Timeout|
+|dontFail |If true, method will not generate exception after timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectInstantiated
+
+
+ Awaits for 'GameObject' to become present on scene or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectInstantiated
+
+
+ Waits until 'GameObject' with component 'T' becomes present on scene or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|timeout |Timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### ObjectInstantiated
+
+
+ Waits until 'GameObject' with component 'T' becomes present on scene or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|timeout |Timeout|
+
+
+---
+
+#### SceneLeaded
+
+
+ Waits until scene with given name is loaded or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|sceneName |Name of scene to load|
+|timeout ||
+|ignoreTimeScale |Should we ignore time scale or not|
+
+
+---
+
+#### Seconds
+
+
+ Waits for specified amount of seconds
+ 
+
+|Name | Description |
+|-----|------|
+|seconds |Count of seconds to wait|
+|ignoreTimescale |Count of seconds to wait ignorining unity timescalse|
+
+
+---
+
+#### WaitFor
+
+
+ Waits until given predicate returns true or fails after specified timeout
+ 
+
+|Name | Description |
+|-----|------|
+|condition |Predicate that return true, if its condition is successfuly fulfilled.|
+|timeout |Timeout|
+|testInfo | This label would be passed to logs if method fails.|
+|dontFail |If true, method will not generate exception after timeout|
+|ignoreTimeScale |Should we ignore time scale or not|
+[[T:System.Exception|T:System.Exception]]: 
 
 
 
 ---
 
 ## UITestUtils 
- This class contains helper methods to work with GameObjects 
+
+ Contains methods that are needed for multiple action methods from all classes and facilitates the test actions writing
+ 
 
 
 #### CenterPointOfObject
 
- Return center point of given `RectTransform`. 
+
+ Return center point of the given `RectTransform`
+ 
 
 |Name | Description |
 |-----|------|
-|transform: |`RectTransform` component instance|
+|transform |`RectTransform` component instance|
 Returns: Center point of given `RectTransform`
 
 
@@ -691,11 +1226,13 @@ Returns: Center point of given `RectTransform`
 
 #### DecodeString
 
- Decode path int Test Tools format to simple path (`%/` => `/`, `%%` => `%`). 
+
+ Decodes path in Test Tools format to simple path (`%/` => `/`, `%%` => `%`)
+ 
 
 |Name | Description |
 |-----|------|
-|text: |String to encode|
+|text |String to encode|
 Returns: Encoded strings
 
 
@@ -704,11 +1241,13 @@ Returns: Encoded strings
 
 #### EncodeString
 
- Encode path string for Test Tools format (`/` => `%/`, `%` => `%%`). 
+
+ Encodes path string for Test Tools format (`/` => `%/`, `%` => `%%`)
+ 
 
 |Name | Description |
 |-----|------|
-|text: |String to encode|
+|text |String to encode|
 Returns: Encoded strings
 
 
@@ -717,11 +1256,13 @@ Returns: Encoded strings
 
 #### FindAnyGameObject
 
- Searches for GameObject by path in hierarchy. 
+
+ Searches for GameObject by path in hierarchy
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
+|path |Path to `GameObject` in hierarchy|
 Returns: active and non-active `GameObjects` or null
 
 
@@ -730,7 +1271,9 @@ Returns: active and non-active `GameObjects` or null
 
 #### FindAnyGameObject
 
- Searches for `GameObject` that has component of `T`. 
+
+ Searches for `GameObject` that has component of `T` attached to it
+ 
 
 Returns: active and non-active `GameObjects` or null
 
@@ -740,11 +1283,13 @@ Returns: active and non-active `GameObjects` or null
 
 #### FindAnyGameObject
 
- Searches for GameObject that has component of T and by path in hierarchy. 
+
+ Searches for GameObject that has component of the given type attached and matches the given path in hierarchy
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
+|path |Path to `GameObject` in hierarchy|
 Returns: active and non-active `GameObjects` or null
 
 
@@ -753,11 +1298,13 @@ Returns: active and non-active `GameObjects` or null
 
 #### FindComponentInParents
 
- Checks if given GameObject has `TComponent` component on it. If not - checks it's parent recursively. 
+
+ Checks if given GameObject has `TComponent` component attached to it. If not - performs recursive check on its parent
+ 
 
 |Name | Description |
 |-----|------|
-|go: |Parent `GameObject`|
+|go |Parent `GameObject`|
 Returns: `TComponent` instance, or null.
 
 
@@ -766,9 +1313,9 @@ Returns: `TComponent` instance, or null.
 
 #### FindCurrentEventSystem
 
- Find `EventSystem` on the scene. 
 
-Returns: 
+ Finds `EventSystem` on the scene
+ 
 
 
 
@@ -776,11 +1323,13 @@ Returns:
 
 #### FindEnabledGameObjectByPath
 
- Find enabled `GameObject` by Path in hierarchy. 
+
+ Finds enabled `GameObject` by Path in hierarchy
+ 
 
 |Name | Description |
 |-----|------|
-|path: |Path to `GameObject` in hierarchy|
+|path |Path to `GameObject` in hierarchy|
 Returns: Enabled `GameObject` or null.
 
 
@@ -789,11 +1338,13 @@ Returns: Enabled `GameObject` or null.
 
 #### FindGameObjectWithComponentInParents
 
- Checks if given `GameObject` has `TComponent` component on it. If not - checks it's parent recursively. 
+
+ Checks if given `GameObject` has `TComponent` component attached to it. If not - performs recursive check on its parent
+ 
 
 |Name | Description |
 |-----|------|
-|go: |Parent `GameObject`|
+|go |Parent `GameObject`|
 Returns: `Component` or null.
 
 
@@ -802,12 +1353,14 @@ Returns: `Component` or null.
 
 #### FindObjectByPercents
 
- Get pixels coords from percent coords, then Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. 
+
+ Calculates pixels coordinates from percent coordinates, then Uses `UnityEngine.EventSystems.EventSystem` class to raycast by resulting coordinates to find `GameObject` that was clicked
+ 
 
 |Name | Description |
 |-----|------|
-|x: |X position in percents|
-|y: |Y position in percents|
+|x |X position in percents|
+|y |Y position in percents|
 Returns: GameObjects under coords or null
 
 
@@ -816,13 +1369,15 @@ Returns: GameObjects under coords or null
 
 #### FindObjectByPixels
 
- Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find GameObject under click. 
+
+ Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find GameObject that was clicked
+ 
 
 |Name | Description |
 |-----|------|
-|x: |X position in pixels|
-|y: |Y position in pixels|
-|ignoreNames: |set of names of object, that are ignored|
+|x |X position in pixels|
+|y |Y position in pixels|
+|ignoreNames |set of names of object, that are ignored|
 Returns: GameObjects under coords or null
 
 
@@ -831,11 +1386,13 @@ Returns: GameObjects under coords or null
 
 #### GetGameObjectFullPath
 
- Calculate and retun full path to `GameObject`. 
+
+ Calculates and retuns full path to `GameObject`
+ 
 
 |Name | Description |
 |-----|------|
-|gameObject: |`GameObject`|
+|gameObject |`GameObject`|
 Returns: Full path to `GameObject`
 
 [[T:System.NullReferenceException|T:System.NullReferenceException]]: 
@@ -846,25 +1403,43 @@ Returns: Full path to `GameObject`
 
 #### GetScrollElement
 
- Return `Selectable` object from `GameObject` or his parent. 
+
+ Returns `Selectable` object from `GameObject` or its parent
+ 
 
 |Name | Description |
 |-----|------|
-|go: |`GameObject` to find selectable object|
-|handlePosition: |Pointer position|
-Returns: 
+|go |`GameObject` to find selectable object|
+|handlePosition |Pointer position|
 
+
+---
+
+#### GetStringComparator
+
+
+ Gets the string comparator by specified text and regex option
+ 
+
+Returns: The string comparator
+
+|Name | Description |
+|-----|------|
+|text |Text|
+|useRegEx |Is the specified text a regular expression|
 
 
 ---
 
 #### HeightPercentsToPixels
 
- Transform screen percents to screen pixels 
+
+ Transform screen percents to screen pixels
+ 
 
 |Name | Description |
 |-----|------|
-|y: |Y percents position in screen|
+|y |Y percents position in screen|
 Returns: Screen pixels
 
 
@@ -873,20 +1448,22 @@ Returns: Screen pixels
 
 #### LoadSceneForSetUp
 
- Loads scene by given name. 
+
+ Loads scene by given name
+ 
 
 |Name | Description |
 |-----|------|
-|sceneName: |Scene name|
+|sceneName |Scene name|
 
 
 ---
 
 #### LogHierarchy
 
- Prins in console log with a list of path to all GameObject on scene. 
 
-Returns: 
+ Prints console log with a list of paths to all GameObjects on scene
+ 
 
 
 
@@ -894,14 +1471,16 @@ Returns:
 
 #### PercentsToPixels
 
- Transform screen percents to screen pixels 
+
+ Transform screen percents to screen pixels
+ 
 
 Returns: Screen percents
 
 |Name | Description |
 |-----|------|
-|x: |X percents position in screen|
-|y: |Y percents position in screen|
+|x |X percents position in screen|
+|y |Y percents position in screen|
 Returns: Screen pixels
 
 
@@ -910,11 +1489,13 @@ Returns: Screen pixels
 
 #### PercentsToPixels
 
- Transform screen percents to screen pixels 
+
+ Transform screen percents to screen pixels
+ 
 
 |Name | Description |
 |-----|------|
-|percents: |Screen percents|
+|percents |Screen percents|
 Returns: Screen pixels
 
 
@@ -923,11 +1504,13 @@ Returns: Screen pixels
 
 #### ScreenVerticesOfObject
 
- Returns array of coords of screen rectangle of given `RectTransform`. 
+
+ Returns array of coordinates of screen rectangle of the given `RectTransform`
+ 
 
 |Name | Description |
 |-----|------|
-|transform: |`RectTransform` component instance|
+|transform |`RectTransform` component instance|
 Returns: Array of coords of screen rectangle of given `RectTransform`
 
 
@@ -936,252 +1519,14 @@ Returns: Array of coords of screen rectangle of given `RectTransform`
 
 #### WidthPercentsToPixels
 
- Transform screen percents to screen pixels 
+
+ Transform screen percents to screen pixels
+ 
 
 |Name | Description |
 |-----|------|
-|x: |X percents position in screen|
+|x |X percents position in screen|
 Returns: Screen pixels
-
-
-
----
-
-## Wait 
-
-#### ButtonAccessible
-
- Waits until given 'GameObject' has component 'UnityEngine.UI.Button' attached or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|button: |'GameObject' who should be start accessible|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### Frame
-
- Waits for given amount of frames, then returns. 
-
-|Name | Description |
-|-----|------|
-|count: |Amount of frames to wait|
-Returns: 
-
-
-
----
-
-#### ObjectDestroy
-
- Waits until 'GameObject' with given path is not present in scene or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|path: |Path to `GameObject` in hierarchy|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectDestroy
-
- Waits until 'GameObject' with given path is not present in scene or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|gameObject: |`GameObject` who should be destroyed|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectDestroy
-
- Waits until 'GameObject' with component 'T' is not present in scene or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectDisabled
-
- Waits until 'GameObject' by given path is present on scene and disabled in hierarchy or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|path: |Path to 'GameObject' in hierarchy|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectDisabled
-
- Waits until 'GameObject' with component 'T' is present on scene and disabled in hierarchy or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectEnabled
-
- Waits until 'GameObject' with given path is present on scene and active in hierarchy or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|path: |Path to 'GameObject' in hierarchy|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectEnabled
-
- Waits until 'GameObject' with component 'T' is present on scene and active in hierarchy or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectEnabledInstantiatedAndDelay
-
- Awaits for 'GameObject' being present on scene and active in hierarchy. Then waits during given amount of time and returns after that. Method fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|path: |Path to 'GameObject' in hierarchy|
-|delay: |Amount of time to delay|
-|timeout: |Timeout|
-|dontFail: |If true, method will not generate exception after timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectInstantiated
-
- Awaits for 'GameObject' being present on scene or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|path: |Path to 'GameObject' in hierarchy|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectInstantiated
-
- Waits until 'GameObject' with component 'T' is present on scene or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|timeout: |Timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### ObjectInstantiated
-
- Waits until 'GameObject' with component 'T' is present on scene or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|path: |Path to 'GameObject' in hierarchy|
-|timeout: |Timeout|
-Returns: 
-
-
-
----
-
-#### SceneLeaded
-
- Waits until scene with given name is loaded or fails by timout. 
-
-|Name | Description |
-|-----|------|
-|sceneName: |Name of scene to load|
-|timeout: ||
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-
-
----
-
-#### Seconds
-
- Waits for seconds. 
-
-|Name | Description |
-|-----|------|
-|seconds: |Count of seconds to wait|
-|ignoreTimescale: |Count of seconds to wait ignorining unity timescalse|
-Returns: 
-
-
-
----
-
-#### WaitFor
-
- Waits until given predicate returns true or fails by timeout. 
-
-|Name | Description |
-|-----|------|
-|condition: |Predicate that return true, if its condition is successfuly fulfilled.|
-|timeout: |Timeout|
-|testInfo: | This label would be passed to logs if method fails.|
-|dontFail: |If true, method will not generate exception after timeout|
-|ignoreTimeScale: |Should we ignore time scale or not|
-Returns: 
-
-[[T:System.Exception|T:System.Exception]]: 
 
 
 

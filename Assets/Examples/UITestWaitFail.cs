@@ -54,7 +54,7 @@ namespace PlayQ.UITestTools.Tests
             SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-            yield return Wait.ObjectDestroy<TestObject>(1);
+            yield return Wait.ObjectDestroyed<TestObject>(1);
         }
 
         [UnityTest]
@@ -66,7 +66,7 @@ namespace PlayQ.UITestTools.Tests
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
 
             //wait during interval for object destraction by object instance
-            yield return Wait.ObjectDestroy(objectInstance);
+            yield return Wait.ObjectDestroyed(objectInstance);
         }
 
         [UnityTest]
@@ -76,7 +76,7 @@ namespace PlayQ.UITestTools.Tests
             SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
-            yield return Wait.ObjectDestroy("container");
+            yield return Wait.ObjectDestroyed("container");
         }
 
         [UnityTest]

@@ -9,15 +9,17 @@ using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools
 {
+    /// <summary>
+    /// Contains methods which allow waiting until the game components and objects on the scene reach the certain state
+    /// </summary>
     public static partial class Wait
     {
         /// <summary>
-        /// Awaits for 'GameObject' being present on scene or fails by timeout.
+        /// Awaits for 'GameObject' to become present on scene or fails after specified timeout
         /// </summary>
         /// <param name="path">Path to 'GameObject' in hierarchy</param>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
         [ShowInEditor(typeof(WaitForObjectInstantiated), "Wait/For Object Instantiated")]
         public static IEnumerator ObjectInstantiated(string path, float timeout = 2f, bool ignoreTimeScale = false)
         {
@@ -44,7 +46,15 @@ namespace PlayQ.UITestTools
                 return go != null;
             }
         }
-        
+
+        /// <summary>
+        /// Awaits for 'GameObject' to become enabled and interactible if it is a button
+        /// </summary>
+        /// <param name="path">Path to 'GameObject' in hierarchy</param>
+        /// <param name="timeout">Timeout</param>
+        /// <param name="dontFail">Whether the test should fail upon exceeding timeout</param>
+        /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
+        [ShowInEditor(typeof(ObjectEnableAndInteractibleIfButtonClass), "Wait/For Object Enabled And Interactible If Button")]
         public static IEnumerator ObjectEnableAndInteractibleIfButton(string path, float timeout = 2f, bool dontFail = false, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
@@ -81,15 +91,27 @@ namespace PlayQ.UITestTools
             }, timeout, dontFail, ignoreTimeScale: ignoreTimeScale);
         }
 
+        private class ObjectEnableAndInteractibleIfButtonClass : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return IEnumeratorMethod.Path(go).Float(2f).Bool(false).Bool(false);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                return go != null;
+            }
+        }
+
         /// <summary>
-        /// Awaits for 'GameObject' being present on scene and active in hierarchy. Then waits during given amount of time and returns after that. Method fails by timeout.
+        /// Awaits for 'GameObject' to become present on scene and active in hierarchy. Then waits during given amount of time and returns after that. Method fails after exceeding the given timeout
         /// </summary>
         /// <param name="path">Path to 'GameObject' in hierarchy</param>
         /// <param name="delay">Amount of time to delay</param>
         /// <param name="timeout">Timeout</param>
         /// <param name="dontFail">If true, method will not generate exception after timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
         [ShowInEditor(typeof(WaitObjectEnabledWithDelay), "Wait/For Object Enabled With Delay")]
         public static IEnumerator ObjectEnabledInstantiatedAndDelay(string path, float delay, float timeout = 2f, bool dontFail = true, bool ignoreTimeScale = false)
         {
@@ -142,10 +164,9 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Waits for given amount of frames, then returns.
+        /// Waits for given amount of frames, then return
         /// </summary>
         /// <param name="count">Amount of frames to wait</param>
-        /// <returns></returns>
         [ShowInEditor(typeof(WaitForFrameClass), "Wait/For Frame", false)]
         public static IEnumerator Frame(int count = 1)
         {
@@ -157,14 +178,13 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until given predicate returns true or fails by timeout.
+        /// Waits until given predicate returns true or fails after specified timeout
         /// </summary>
         /// <param name="condition">Predicate that return true, if its condition is successfuly fulfilled.</param>
         /// <param name="timeout">Timeout</param>
         /// <param name="testInfo"> This label would be passed to logs if method fails.</param>
         /// <param name="dontFail">If true, method will not generate exception after timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public static IEnumerator WaitFor(Func<WaitResult> condition, float timeout, bool dontFail = false, bool ignoreTimeScale = false)
         {
@@ -193,12 +213,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' with component 'T' is present on scene or fails by timeout.
+        /// Waits until 'GameObject' with component 'T' becomes present on scene or fails after specified timeout
         /// </summary>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
         /// <typeparam name="T">Type of component</typeparam>
-        /// <returns></returns>
         public static IEnumerator ObjectInstantiated<T>(float timeout = 2f, bool ignoreTimeScale = false) where T : Component
         {
             yield return WaitFor(() =>
@@ -213,12 +232,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' with component 'T' is present on scene or fails by timeout.
+        /// Waits until 'GameObject' with component 'T' becomes present on scene or fails after specified timeout
         /// </summary>
         /// <param name="path">Path to 'GameObject' in hierarchy</param>
         /// <param name="timeout">Timeout</param>
         /// <typeparam name="T">Type of component</typeparam>
-        /// <returns></returns>
         public static IEnumerator ObjectInstantiated<T>(string path, float timeout = 2f, bool ignoreTimeScale = false) where T : Component
         {
             yield return WaitFor(() =>
@@ -233,13 +251,12 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' with component 'T' is not present in scene or fails by timeout.
+        /// Waits until 'GameObject' with component 'T' disappears from scene or fails after specified timeout
         /// </summary>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
         /// <typeparam name="T">Type of component</typeparam>
-        /// <returns></returns>
-        public static IEnumerator ObjectDestroy<T>(float timeout = 2f, bool ignoreTimeScale = false) where T : Component
+        public static IEnumerator ObjectDestroyed<T>(float timeout = 2f, bool ignoreTimeScale = false) where T : Component
         {
             yield return WaitFor(() =>
             {
@@ -253,7 +270,7 @@ namespace PlayQ.UITestTools
             }, timeout, ignoreTimeScale: ignoreTimeScale);
         }
 
-        private class WaitForObjectEnableOrDestroy : ShowHelperBase
+        private class WaitForObjectEnableOrDestroyed : ShowHelperBase
         {
             public override AbstractGenerator CreateGenerator(GameObject go)
             {
@@ -267,14 +284,13 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' with given path is not present in scene or fails by timeout.
+        /// Waits until 'GameObject' by given path disappears from scene or fails after specified timeout
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="timeout">Timeout</param>
-/// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
-        [ShowInEditor(typeof(WaitForObjectEnableOrDestroy), "Wait/For Object Destroy")]
-        public static IEnumerator ObjectDestroy(string path, float timeout = 2f, bool ignoreTimeScale = false)
+        /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
+        [ShowInEditor(typeof(WaitForObjectEnableOrDestroyed), "Wait/For Object Destroy")]
+        public static IEnumerator ObjectDestroyed(string path, float timeout = 2f, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
             {
@@ -289,13 +305,12 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' with given path is not present in scene or fails by timeout.
+        /// Waits until 'GameObject' by given path disappears from scene or fails after specified timeout
         /// </summary>
         /// <param name="gameObject">`GameObject` who should be destroyed</param>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
-        public static IEnumerator ObjectDestroy(GameObject gameObject, float timeout = 2f, bool ignoreTimeScale = false)
+        public static IEnumerator ObjectDestroyed(GameObject gameObject, float timeout = 2f, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
             {
@@ -308,12 +323,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until given 'GameObject' has component 'UnityEngine.UI.Button' attached or fails by timeout.
+        /// Waits until given 'GameObject' obtains component 'UnityEngine.UI.Button' or fails after specified timeout
         /// </summary>
         /// <param name="button">'GameObject' who should be start accessible</param>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
         public static IEnumerator ButtonAccessible(GameObject button, float timeout = 2f, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
@@ -327,13 +341,12 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' with given path is present on scene and active in hierarchy or fails by timeout.
+        /// Waits until 'GameObject' by given path becomes present on scene and active in hierarchy or fails after specified timeout
         /// </summary>
         /// <param name="path">Path to 'GameObject' in hierarchy</param>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
-        [ShowInEditor(typeof(WaitForObjectEnableOrDestroy), "Wait/For Object Enabled")]
+        [ShowInEditor(typeof(WaitForObjectEnableOrDestroyed), "Wait/For Object Enabled")]
         public static IEnumerator ObjectEnabled(string path, float timeout = 2f, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
@@ -349,12 +362,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' with component 'T' is present on scene and active in hierarchy or fails by timeout.
+        /// Waits until 'GameObject' with component 'T' becomes present on scene and active in hierarchy or fails after specified timeout
         /// </summary>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
         /// <typeparam name="T">Type of component</typeparam>
-        /// <returns></returns>
         public static IEnumerator ObjectEnabled<T>(float timeout = 2f, bool ignoreTimeScale = false) where T : Component
         {
             yield return WaitFor(() =>
@@ -370,12 +382,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' with component 'T' is present on scene and disabled in hierarchy or fails by timeout.
+        /// Waits until 'GameObject' with component 'T' becomes present on scene and disabled in hierarchy or fails after specified timeout
         /// </summary>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
         /// <typeparam name="T">Type of component</typeparam>
-        /// <returns></returns>
         public static IEnumerator ObjectDisabled<T>(float timeout = 2f, bool ignoreTimeScale = false) where T : Component
         {
             yield return WaitFor(() =>
@@ -391,13 +402,12 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until 'GameObject' by given path is present on scene and disabled in hierarchy or fails by timeout.
+        /// Waits until 'GameObject' by given path becomes present on scene and disabled in hierarchy or fails after specified timeout
         /// </summary>
         /// <param name="path">Path to 'GameObject' in hierarchy</param>
         /// <param name="timeout">Timeout</param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
-        [ShowInEditor(typeof(WaitForObjectEnableOrDestroy), "Wait/For Object Disabled")]
+        [ShowInEditor(typeof(WaitForObjectEnableOrDestroyed), "Wait/For Object Disabled")]
         public static IEnumerator ObjectDisabled(string path, float timeout = 2f, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
@@ -411,8 +421,14 @@ namespace PlayQ.UITestTools
 
             }, timeout, ignoreTimeScale: ignoreTimeScale);
         }
-        
-        [ShowInEditor(typeof(WaitForObjectEnableOrDestroy), "Wait/For Object Disabled Or Not Exist")]
+
+        /// <summary>
+        /// Waits until 'GameObject' by given path disappears from scene or becomes disabled in hierarchy or fails after specified timeout
+        /// </summary>
+        /// <param name="path">Path to 'GameObject' in hierarchy</param>
+        /// <param name="timeout">Timeout</param>
+        /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
+        [ShowInEditor(typeof(WaitForObjectEnableOrDestroyed), "Wait/For Object Disabled Or Not Exist")]
         public static IEnumerator ObjectDisabledOrNotExist(string path, float timeout = 2f, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
@@ -433,11 +449,10 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits for seconds.
+        /// Waits for specified amount of seconds
         /// </summary>
         /// <param name="seconds">Count of seconds to wait</param>
         /// <param name="ignoreTimescale">Count of seconds to wait ignorining unity timescalse</param>
-        /// <returns></returns>
         [ShowInEditor(typeof(WaitForSecondClass), "Wait/For Second", false)]
         public static IEnumerator Seconds(float seconds, bool ignoreTimescale = false)
         {
@@ -452,12 +467,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until scene with given name is loaded or fails by timout.
+        /// Waits until scene with given name is loaded or fails after specified timeout
         /// </summary>
         /// <param name="sceneName">Name of scene to load</param>
         /// <param name="timeout"></param>
         /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
         //todo add ShowInEditor 
         public static IEnumerator SceneLeaded(string sceneName, float timeout = 2f, bool ignoreTimeScale = false)
         {
@@ -482,7 +496,14 @@ namespace PlayQ.UITestTools
                 return new WaitFailed("WhaitSceneLeaded name: " + sceneName);
             }, timeout, ignoreTimeScale: ignoreTimeScale);
         }
-        
+
+        /// <summary>
+        /// Waits until animation is completed
+        /// </summary>
+        /// <param name="path">Path to 'GameObject' in hierarchy</param>
+        /// <param name="animationName">Animation name</param>
+        /// <param name="timeout">Timeout</param>
+        /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
         [ShowInEditor(typeof(WaitingForAnimationCompleteClass), "Wait/Animation Completed", false)]
         public static IEnumerator AnimationCompleted(string path, string animationName, float timeout = 10, bool ignoreTimeScale = false)
         {

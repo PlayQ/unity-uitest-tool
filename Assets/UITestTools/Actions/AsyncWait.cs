@@ -4,8 +4,18 @@ using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
+    /// <summary>
+    /// Contains methods which allow waiting until the game components and objects on the scene reach the certain state asynchronously
+    /// </summary>
     public static partial class AsyncWait
     {
+        /// <summary>
+        /// Starts the waiting for the log
+        /// </summary>
+        /// <returns>Abstract async waiter</returns>
+        /// <param name="message">Expected log message</param>
+        /// <param name="isRegExp">Is expected log a regular expression</param>
+        /// <param name="timeout">Timeout</param>
         [ShowInEditor(typeof(StartWaitingForLogClass), "Async Wait/Start Waiting For Log", false)]
         public static AbstractAsyncWaiter StartWaitingForLog(string message, bool isRegExp,
             float timeout = 10)
@@ -13,16 +23,34 @@ namespace PlayQ.UITestTools
             return new LogWaiter(message, isRegExp, timeout);
         }
 
+        /// <summary>
+        /// Starts the waiting for unity animation to complete
+        /// </summary>
+        /// <returns>Abstract async waiter</returns>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="animationName">Animation name</param>
+        /// <param name="timeout">Timeout</param>
         [ShowInEditor(typeof(StartWaitingForUnityAnimationClass), "Async Wait/Start Waiting For Unity Animation", false)]
         public static AbstractAsyncWaiter StartWaitingForUnityAnimation(string path, string animationName, float timeout = 10)
         {
             return new UnityAnimationStartWaiter(path, animationName, timeout);
         }
 
+        /// <summary>
+        /// Used only for generation waiting code for StartWaitingForLog 
+        /// </summary>
         [ShowInEditor(typeof(StopWaitingForLogClass), "Async Wait/Stop Waiting For Log", false)]
         public static void StopWaitingForGameLog()
         {
             throw new Exception("StopWaitingForGameLog method is only for code generation, don't use it");
+        }
+        /// <summary>
+        /// Used only for generation waiting code for StartWaitingForUnityAnimation 
+        /// </summary>
+        [ShowInEditor(typeof(StopWaitingForAnimationClass), "Async Wait/Stop Waiting For Unity Animation", false)]
+        public static void StopWaitingForUnityAnimation()
+        {
+            throw new Exception("StopWaitingForUnityAnimation method is only for code generation, don't use it");
         }
 
         private class UnityAnimationStartWaiter : AbstractAsyncWaiter
@@ -200,6 +228,15 @@ namespace PlayQ.UITestTools
             {
                 return
                     new WaitForVariable<LogWaiter>();
+            }
+        }
+
+        private class StopWaitingForAnimationClass : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return
+                    new WaitForVariable<UnityAnimationStartWaiter>();
             }
         }
         

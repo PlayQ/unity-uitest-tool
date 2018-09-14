@@ -75,13 +75,13 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
             Object.Destroy(objectInstance);
 
             //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-            yield return Wait.ObjectDestroy<TestObject>();
+            yield return Wait.ObjectDestroyed<TestObject>();
 
             //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
-            yield return Wait.ObjectDestroy("container");
+            yield return Wait.ObjectDestroyed("container");
 
             //wait during interval for object destraction by object instance
-            yield return Wait.ObjectDestroy(objectInstance);
+            yield return Wait.ObjectDestroyed(objectInstance);
         }
 
         [UnityTest]
