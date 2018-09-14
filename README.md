@@ -193,6 +193,11 @@ To make test build add following parameters to previous statement:
 `-runOnlySmokeTests` - optional, runs test with [SmokeTest] attribute only. 
 
 
+API methods
+--------
+
+Comming soon...
+
 
 Extending Test Tool
 -----------
@@ -478,9 +483,3 @@ static class MapLocationClick
 * `bool isDefault` = false - optional, very often several assertation could be applied to selected `GameObject`.  If isDefault is true, recorder tries to show this assertation as a first one.
 
 To add more features, which are not common and related only to your project, extend these classes by creating new partial classes and add new `assertation methods`. If you want to add `assertation method` to `Flow Recorder` - add class helper near the `assertation method`. Try to separate methods by its assignment: if method checks some condition - it has to be added to `Check` class, if methods awaits for some action - it has to be added to `Wait` class, and if method changes some values in game - it has to be added to `Interact` class.
-
-
-API methods
---------
-
-Comming soon...
