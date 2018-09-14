@@ -9,15 +9,10 @@ Content
 	* [Recording a new test](#recording-a-new-test)
 	* [Test Runner](#test-runner)
 	* [Helper Window](#helper-window)
-* [Extending Test Tool](#extending-test-tool)
-	* [Implementing Assertation method](#implementing-assertation-method)
-	* [ShowInEditor custom attribute](#showineditor-custom-attribute)
 * [API methods](#api-methods)
-	* [Wait class](#wait-class)
-	* [Check class](#check-class)
-	* [Interact class](#interact-class)
-	* [UITestUtils class](#uitestutils-class)
-	* [Screen resolution depending tests](#screen-resolution-depending-tests)
+* [Extending Test Tool](#extending-test-tool)
+	* [Implementing own Assertation method](#implementing-own-assertation-method)
+	* [ShowInEditor custom attribute](#showineditor-custom-attribute)
 
 
 About
@@ -213,7 +208,7 @@ yield return soundCheck;
 ```
 
 
-### Implementing Assertation method
+### Implementing own Assertation method
 
 Let's create a simple assertation method, which takes GameObject and checks whether it's present on scene.
 
