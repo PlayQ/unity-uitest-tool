@@ -47,18 +47,21 @@ To use `Test Recorder` navigate to `Window => Ui test tools => Flow recorder`, o
 * `+` button - added new "empty" user action. You can select only assertations, which don't require gameobject to proceed to such action.
 * `Generate Code and Copy` - generate code for test from recorded user actions.
 
-Recorded users actions are visually displayed as a list, each item of list contains next information:
+Recorded users actions are visually displayed as a list. 
+You can reorder already recorded actions by drag and drop.
+
+Each item of list contains next information:
 
 <img src="documentation/images/action-item.png" width="600">
 
+* `6` - index of assertation in list.
 * `Assertation Type` - there is a drop down menu with a list of assertation types. You can see only assertation types, available for current `GameObject`. Each assertation has its own list of require arguments.
 * `Description` - add description as a commentary above generated `assertation method`. 
-* `Path` - path in hierarchy to gameobject user interacts with.
-* `Delay`, `timeOut` - arguments list specific to selected assertation, values of these arguments could be edited by user. Arguments could be type of `enum`, `int`, `float`, `bool`, `string`.
+* `Path` - path in hierarchy to `GameObject` user interacts with. `Select` button will select current `GameObject` in hierarchy.
+* `TimeOut`, `IgnoreTimeScale` - arguments list specific to selected assertation, values of these arguments could be edited by user. Arguments could be type of `enum`, `int`, `float`, `bool`, `string`.
 * `►` - this button applies assertation in runtime.
+* `Copy` - create a copy of this asertation and set it next to it. Also you can make by selection asertation and press `Ctrl+D` for Windows and `Cmd+D` for Mac.
 * `x` - button removes action from list.
-
-You can reorder already recorded actions by drag and drop.
 
 
 ### How Flow Recorder works
