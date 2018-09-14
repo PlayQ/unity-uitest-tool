@@ -23,12 +23,12 @@ Content
 About
 ---------------------
 
-This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on [NUnit](http://nunit.org) plugin built-in in `Unity`.
+This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on methods, atributes and logs, simular to [NUnit](http://nunit.org).
 
 
 ### Instalation
 
-Just copy `UITestTools` folder and past wherever you want in `Assets` folder of your project. 
+Just copy `UITestTools` folder and paste wherever you want in `Assets` folder of your project.
 
 
 ### Flow Recorder
