@@ -73,6 +73,8 @@ When you clicks on `GameObject` during `Unity` playmode `Flow Recorder` takes cl
 
 Launch the game in editor, press `start record` button, perform any actions you need in game, then press `stop record` or exit play mode. Press `Generate code and copy` - to obtain code for test. Then you can paste generated code to your own test class.
 
+<img src="documentation/images/recorder_window.gif" width="600">
+
 
 ### Test Runner
 
