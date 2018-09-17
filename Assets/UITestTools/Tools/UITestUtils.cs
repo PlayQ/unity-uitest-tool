@@ -96,13 +96,13 @@ namespace PlayQ.UITestTools
                 LogHierarchyRecursive(child.gameObject, result, fullPath);
             }
         }
-        
+
         /// <summary>
         /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find GameObject that was clicked
         /// </summary>
         /// <param name="x">X position in pixels</param>
         /// <param name="y">Y position in pixels</param>
-        /// <param name="ignoreNames">set of names of object, that are ignored</param>
+        /// <param name="ignoreNames">set of names of object, that are ignored(optional)</param>
         /// <returns>GameObjects under coords or null</returns>
         public static GameObject FindObjectByPixels(float x, float y, HashSet<string> ignoreNames = null)
         {

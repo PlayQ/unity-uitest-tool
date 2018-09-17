@@ -149,8 +149,6 @@
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\TargetResolutionAttribute.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\TestCoroutiner.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\TestStep.cs" />
-    <Compile Include="Assets\UITestTools\PlayModeTestRunner\UnitTestClass.cs" />
-    <Compile Include="Assets\UITestTools\PlayModeTestRunner\UnitTestMethod.cs" />
     <Compile Include="Assets\UITestTools\Tools\AsyncWait.cs" />
     <Compile Include="Assets\UITestTools\Tools\CoroutineProvider.cs" />
     <Compile Include="Assets\UITestTools\Tools\FPSCounter.cs" />
