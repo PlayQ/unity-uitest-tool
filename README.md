@@ -3,7 +3,7 @@ UI Test Tool
 Content
 ----
 * [About](#about)
-	* [Instalation](#instalation)
+	* [Installation](#installation)
 	* [Flow Recorder](#flow-recorder)
 	* [How Flow Recorder works](#how-flow-recorder-works)
 	* [Recording a new test](#recording-a-new-test)
@@ -20,10 +20,10 @@ Content
 About
 ---------------------
 
-This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on methods, atributes and logs, simular to [NUnit](http://nunit.org).
+This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on methods, attributes, and logs, similar to [NUnit](http://nunit.org).
 
 
-### Instalation
+### Installation
 
 Just copy `UITestTools` folder and paste wherever you want in `Assets` folder of your project.
 
