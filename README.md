@@ -37,24 +37,24 @@ To use `Test Recorder` navigate to `Window => Ui test tools => Flow recorder`, o
 <img src="documentation/images/recorder-interface.png" width="600">
 
 * `Start Record` button - enables recording mode, your clicks would be recorded as actions and added to existing action list. Then you can select necessary assertation type and edit params for each recorder actions.
-* `Stop Record` - disables recording mode. All recorded actions are keep safe.
-* `Check` - enables/disables mode, in which clicks on ui buttons don't trigger them. Window will be colored green when check mode is enabled. 
-* `Pause mode` - set time scale to 0 when enabled, useful when it needs to emulate game pause and record things.
+* `Stop Record` - disables recording mode. All recorded actions will be kept in safe.
+* `Check` - enables/disables mode, in which clicks on UI buttons don't trigger them. The window will be colored green when check mode is enabled.
+* `Pause mode` - set timescale to 0 when enabled, useful when it needs to emulate game pause but continue to write actions.
 * `Clean` - deletes all recorded actions.
-* `+` button - added new "empty" user action. You can select only assertations, which don't require gameobject to proceed to such action.
+* `+` button - added new "empty" user action. You can select only assertations, which don't require `GameObject` to proceed to such action.
 * `Generate Code and Copy` - generate code for test from recorded user actions.
 
 Recorded users actions are visually displayed as a list. 
 You can reorder already recorded actions by drag and drop.
 
-Each item of list contains next information:
+Each item of the list contains next information:
 
 <img src="documentation/images/action-item.png" width="600">
 
-* `6` - index of assertation in list.
-* `Assertation Type` - there is a drop down menu with a list of assertation types. You can see only assertation types, available for current `GameObject`. Each assertation has its own list of require arguments.
-* `Description` - add description as a commentary above generated `assertation method`. 
-* `Path` - path in hierarchy to `GameObject` user interacts with. `Select` button will select current `GameObject` in hierarchy.
+* `6` - index of assertation in the list.
+* `Assertation Type` - there is a drop-down menu with a list of assertation types. You can see only assertation types, available for current `GameObject`. Each assertation has its own list of required arguments.
+* `Description` - add a description as a commentary above generated `assertation method`. 
+* `Path` - path in the hierarchy to `GameObject` user interacts with. `Select` button will select current `GameObject` in the hierarchy.
 * `TimeOut`, `IgnoreTimeScale` - arguments list specific to selected assertation, values of these arguments could be edited by user. Arguments could be type of `enum`, `int`, `float`, `bool`, `string`.
 * `►` - this button applies assertation in runtime.
 * `Copy` - create a copy of this asertation and set it next to it. Also you can make by selection asertation and press `Ctrl+D` for Windows and `Cmd+D` for Mac.
