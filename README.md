@@ -63,16 +63,18 @@ Each item of the list contains next information:
 
 ### How Flow Recorder works
 
-When you clicks on `GameObject` during `Unity` playmode `Flow Recorder` takes click coords and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. Then `Flow Recorder` looks through list of all existing `assertations` and checks which `assertation` could be applied to `GameObject`. For example, if you clicks on text - all `assertations` that compares text labels would be available. Common `assertations`, like `Is Enable` or `Is Exist` are available for any `GameObject`. By default `Flow Recorder` supports only `Unity UI`, if you want support `GameObjects` that doesn't contain any UI components or use custom `assertations` you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
+When you click on `GameObject` during `Unity` play mode, `Flow Recorder` takes click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find `GameObject` under click. Then `Flow Recorder` looks through a list of all existing `assertations` and checks which `assertation` could be applied to `GameObject`.
+
+For example, if you click on text - all `assertations` that compares text labels would be available. Common `assertations`, like `Is Enable` or `Is Exist` are available for any `GameObject`. By default, `Flow Recorder` supports only `Unity UI`. If you want support `GameObjects` that doesn't contain any UI components or use custom `assertations` you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
 
 
 ### Recording a new test
 
-Launch the game in editor, press `Start Record` button, perform any actions you need in game. You can chang assertation types or paramerts and change ordering during recording or after it. 
+Launch the game in editor, press `Start Record` button, perform any actions you need in the game. You can change assertation types or parameters and change order during test recording or after it. 
 
 When test recording is over press `Stop Record` or exit play mode. Press `Generate Code and Copy` - to obtain code for test. Then you can paste generated code to your own test class.
 
-Also you can create new assertation for object by right click to it in hierarchy and select `Create Assertation`.
+Also, you can create new assertation for the object by `Right Click` to it in the hierarchy and select `Create Assertation`.
 
 <img src="documentation/images/recorder_window.gif" width="600">
 
@@ -83,20 +85,20 @@ To open `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
 <img src="documentation/images/play-mode-testrunner.png" width="600">
 
-`Test Runner` searches for all methods with custom attribute `[UnityTest]` and shows them like a folding list. Press `Run all` to run all tests.
+`Test Runner` searches for all methods with attribute `[UnityTest]` and shows them like a folding list. Press `Run all` to run all tests.
 
-You can select the amount of times each test is run. For it move `Repeat Tests N Times` slider.
+You can select the number of times each test will run. For it move `Repeat Tests N Times` slider.
 
-Also you can change TimeScalse of tests by moving `Default Timescale` slider.
+Also, you can change the `TimeScale` of tests by moving `Default Timescale` slider.
 
-One of greates feature of the `Test Runner` - run test on devices. See command line arguments for it in [Command line](#command-line) section.
+One of the greatest feature of the `Test Runner` - run test on devices. See command line arguments for it in [Command line](#command-line-arguments) section.
 
 
 ##### Run specific list of tests
 
-You can select test that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. 
+You can select tests that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. 
 
-When you run tests on mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` is not exists - all tests will executed.
+When you run tests on the mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` do not exist - all tests will be executed.
 
 
 ##### Smoke testing
