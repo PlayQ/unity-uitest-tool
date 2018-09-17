@@ -477,7 +477,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="from">Start position in pixels</param>
         /// <param name="to">Finish position in pixels</param>
-        /// <param name="time">Drag Time(optional)</param>
+        /// <param name="time">Drag Time (optional)</param>
         public static IEnumerator DragPixels(Vector2 from, Vector2 to, float time = 1)
         {
             var go = UITestUtils.FindObjectByPixels(from.x, from.y);
@@ -494,7 +494,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="from">Start position in percents</param>
         /// <param name="to">Finish position in percents</param>
-        /// <param name="time">Drag Time(optional)</param>
+        /// <param name="time">Drag Time (optional)</param>
         public static IEnumerator DragPercents(Vector2 from, Vector2 to, float time = 1)
         {
             var startPixel = new Vector2(Screen.width * from.x, Screen.height * from.y);
@@ -507,7 +507,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="go">`GameObject` to drag</param>
         /// <param name="to">Finish position in pixels</param>
-        /// <param name="time">Drag Time(optional)</param>
+        /// <param name="time">Drag Time (optional)</param>
         public static IEnumerator DragPixels(GameObject go, Vector2 to, float time = 1)
         {
             var rectTransform = go.transform as RectTransform;
@@ -523,7 +523,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="go">`GameObject` to drag</param>
         /// <param name="to">Finish position in percents</param>
-        /// <param name="time">Drag Time(optional)</param>
+        /// <param name="time">Drag Time (optional)</param>
         public static IEnumerator DragPercents(GameObject go, Vector2 to, float time = 1)
         {
             yield return DragPixels(go, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
@@ -535,7 +535,7 @@ namespace PlayQ.UITestTools
         /// <param name="go">`GameObject` to drag</param>
         /// <param name="from">Start position in percents</param>
         /// <param name="to">Finish position in percents</param>
-        /// <param name="time">Drag Time(optional)</param>
+        /// <param name="time">Drag Time (optional)</param>
         public static IEnumerator DragPixels(GameObject go, Vector2? from, Vector2 to, float time = 1)
         {
             if (!go.activeInHierarchy)
@@ -612,7 +612,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="path">Path to GameObject in hierarchy</param>
         /// <param name="to">Finish position in pixels</param>
-        /// <param name="time">Drag Time(optional)</param>
+        /// <param name="time">Drag Time (optional)</param>
         public static IEnumerator DragPixels(string path, Vector2 to, float time = 1)
         {
             GameObject go = UITestUtils.FindAnyGameObject(path);
@@ -628,7 +628,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="to">Finish position in percents</param>
-        /// <param name="time">Drag Time(optional)</param>
+        /// <param name="time">Drag Time (optional)</param>
         public static IEnumerator DragPercents(string path, Vector2 to, float time = 1)
         {
             yield return DragPixels(path, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
@@ -640,9 +640,9 @@ namespace PlayQ.UITestTools
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="horizontalPosition">Horizontal position</param>
         /// <param name="verticalPosition">Vertical position</param>
-        /// <param name="animationDuration">Animation duration(optional)</param>
-        /// <param name="timeout">Timeout(optional)</param>
-        /// <param name="ignoreTimeScale">Should time scale be ignored or not(optional)</param>
+        /// <param name="animationDuration">Animation duration (optional)</param>
+        /// <param name="timeout">Timeout (optional)</param>
+        /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
         [ShowInEditor(typeof(ScrollToPositionClass), "Scroll To Position")]
         public static IEnumerator ScrollToPosition(string path,
             float horizontalPosition,
@@ -705,7 +705,7 @@ namespace PlayQ.UITestTools
         /// <param name="fromPercentY">Min percent of drag at dimension Y</param>
         /// <param name="toPercentX">Max percent of drag at dimension X</param>
         /// <param name="toPercentY">Max percent of drag at dimension Y</param>
-        /// <param name="time">Time(optional)</param>
+        /// <param name="time">Time (optional)</param>
         [ShowInEditor(typeof(DragPercentsClass), "Drag percents")]
         public static IEnumerator DragPercents(string path,
             float fromPercentX, float fromPercentY,

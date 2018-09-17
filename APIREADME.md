@@ -99,7 +99,7 @@ Returns: Abstract async waiter
 |-----|------|
 |message |Expected log message|
 |isRegExp |Is expected log a regular expression|
-|timeout |Timeout(optional)|
+|timeout |Timeout (optional)|
 
 
 ---
@@ -116,7 +116,7 @@ Returns: Abstract async waiter
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
 |animationName |Animation name|
-|timeout |Timeout(optional)|
+|timeout |Timeout (optional)|
 
 
 ---
@@ -184,7 +184,7 @@ Returns: Abstract async waiter
 |Name | Description |
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
-|state |Enable state(optional)|
+|state |Enable state (optional)|
 
 
 ---
@@ -248,8 +248,8 @@ Returns: Abstract async waiter
 |Name | Description |
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -658,7 +658,7 @@ Returns: `GameObject`
 |fromPercentY |Min percent of drag at dimension Y|
 |toPercentX |Max percent of drag at dimension X|
 |toPercentY |Max percent of drag at dimension Y|
-|time |Time(optional)|
+|time |Time (optional)|
 
 
 ---
@@ -673,7 +673,7 @@ Returns: `GameObject`
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
 |to |Finish position in percents|
-|time |Drag Time(optional)|
+|time |Drag Time (optional)|
 
 
 ---
@@ -688,7 +688,7 @@ Returns: `GameObject`
 |-----|------|
 |go |`GameObject` to drag|
 |to |Finish position in percents|
-|time |Drag Time(optional)|
+|time |Drag Time (optional)|
 
 
 ---
@@ -703,7 +703,7 @@ Returns: `GameObject`
 |-----|------|
 |from |Start position in percents|
 |to |Finish position in percents|
-|time |Drag Time(optional)|
+|time |Drag Time (optional)|
 
 
 ---
@@ -718,7 +718,7 @@ Returns: `GameObject`
 |-----|------|
 |path |Path to GameObject in hierarchy|
 |to |Finish position in pixels|
-|time |Drag Time(optional)|
+|time |Drag Time (optional)|
 
 
 ---
@@ -734,7 +734,7 @@ Returns: `GameObject`
 |go |`GameObject` to drag|
 |from |Start position in percents|
 |to |Finish position in percents|
-|time |Drag Time(optional)|
+|time |Drag Time (optional)|
 
 
 ---
@@ -749,7 +749,7 @@ Returns: `GameObject`
 |-----|------|
 |go |`GameObject` to drag|
 |to |Finish position in pixels|
-|time |Drag Time(optional)|
+|time |Drag Time (optional)|
 
 
 ---
@@ -764,7 +764,7 @@ Returns: `GameObject`
 |-----|------|
 |from |Start position in pixels|
 |to |Finish position in pixels|
-|time |Drag Time(optional)|
+|time |Drag Time (optional)|
 
 
 ---
@@ -849,9 +849,9 @@ Returns: `GameObject`
 |path |Path to `GameObject` in hierarchy|
 |horizontalPosition |Horizontal position|
 |verticalPosition |Vertical position|
-|animationDuration |Animation duration(optional)|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|animationDuration |Animation duration (optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -928,8 +928,8 @@ Returns: `GameObject`
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
 |animationName |Animation name|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -943,8 +943,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |button |'GameObject' who should be start accessible|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -957,7 +957,7 @@ Returns: `GameObject`
 
 |Name | Description |
 |-----|------|
-|count |Amount of frames to wait(optional)|
+|count |Amount of frames to wait (optional)|
 
 
 ---
@@ -971,8 +971,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -986,8 +986,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |gameObject |`GameObject` who should be destroyed|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1000,8 +1000,8 @@ Returns: `GameObject`
 
 |Name | Description |
 |-----|------|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1015,8 +1015,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1029,8 +1029,8 @@ Returns: `GameObject`
 
 |Name | Description |
 |-----|------|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1044,8 +1044,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1059,9 +1059,9 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
-|timeout |Timeout(optional)|
-|dontFail |Whether the test should fail upon exceeding timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|dontFail |Whether the test should fail upon exceeding timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1075,8 +1075,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1089,8 +1089,8 @@ Returns: `GameObject`
 
 |Name | Description |
 |-----|------|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1105,9 +1105,9 @@ Returns: `GameObject`
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
 |delay |Amount of time to delay|
-|timeout |Timeout(optional)|
-|dontFail |If true, method will not generate exception after timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|dontFail |If true, method will not generate exception after timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1121,8 +1121,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1135,8 +1135,8 @@ Returns: `GameObject`
 
 |Name | Description |
 |-----|------|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1150,8 +1150,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1165,8 +1165,8 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |sceneName |Name of scene to load|
-|timeout |Timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|timeout |Timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1180,7 +1180,7 @@ Returns: `GameObject`
 |Name | Description |
 |-----|------|
 |seconds |Count of seconds to wait|
-|ignoreTimescale |Should time scale be ignored or not(optional)|
+|ignoreTimescale |Should time scale be ignored or not (optional)|
 
 
 ---
@@ -1196,8 +1196,8 @@ Returns: `GameObject`
 |condition |Predicate that return true, if its condition is successfuly fulfilled|
 |timeout |Timeout|
 |testInfo | This label would be passed to logs if method fails|
-|dontFail |If true, method will not generate exception after timeout(optional)|
-|ignoreTimeScale |Should time scale be ignored or not(optional)|
+|dontFail |If true, method will not generate exception after timeout (optional)|
+|ignoreTimeScale |Should time scale be ignored or not (optional)|
 [[T:System.Exception|T:System.Exception]]: 
 
 
@@ -1378,7 +1378,7 @@ Returns: GameObjects under coords or null
 |-----|------|
 |x |X position in pixels|
 |y |Y position in pixels|
-|ignoreNames |set of names of object, that are ignored(optional)|
+|ignoreNames |set of names of object, that are ignored (optional)|
 Returns: GameObjects under coords or null
 
 

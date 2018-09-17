@@ -333,7 +333,7 @@ namespace PlayQ.UITestTools
         /// Checks that `Gameobject` by given path is present on scene and its active in hierarchy flag equals to state variable
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
-        /// <param name="state">Enable state(optional)</param>
+        /// <param name="state">Enable state (optional)</param>
         [ShowInEditor(typeof(CheckEnabledState), "Check Enabled State")]
         public static void CheckEnabled(string path, bool state = true)
         {
@@ -460,8 +460,8 @@ namespace PlayQ.UITestTools
         /// Checks that `GameObject` by given path is not present on scene or is not active
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
-        /// <param name="timeout">Timeout(optional)</param>
-        /// <param name="ignoreTimeScale">Should time scale be ignored or not(optional)</param>
+        /// <param name="timeout">Timeout (optional)</param>
+        /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
         [ShowInEditor(typeof(DoesNotExistOrDisabledClass), "Does Not Exist Or Disabled")]
         public static IEnumerator DoesNotExistOrDisabled(string path, float timeout = 2, bool ignoreTimeScale = false)
         {

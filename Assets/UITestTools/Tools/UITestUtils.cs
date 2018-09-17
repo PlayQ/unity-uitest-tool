@@ -102,7 +102,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="x">X position in pixels</param>
         /// <param name="y">Y position in pixels</param>
-        /// <param name="ignoreNames">set of names of object, that are ignored(optional)</param>
+        /// <param name="ignoreNames">set of names of object, that are ignored (optional)</param>
         /// <returns>GameObjects under coords or null</returns>
         public static GameObject FindObjectByPixels(float x, float y, HashSet<string> ignoreNames = null)
         {

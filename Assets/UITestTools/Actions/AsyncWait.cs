@@ -15,7 +15,7 @@ namespace PlayQ.UITestTools
         /// <returns>Abstract async waiter</returns>
         /// <param name="message">Expected log message</param>
         /// <param name="isRegExp">Is expected log a regular expression</param>
-        /// <param name="timeout">Timeout(optional)</param>
+        /// <param name="timeout">Timeout (optional)</param>
         [ShowInEditor(typeof(StartWaitingForLogClass), "Async Wait/Start Waiting For Log", false)]
         public static AbstractAsyncWaiter StartWaitingForLog(string message, bool isRegExp,
             float timeout = 10)
@@ -29,7 +29,7 @@ namespace PlayQ.UITestTools
         /// <returns>Abstract async waiter</returns>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="animationName">Animation name</param>
-        /// <param name="timeout">Timeout(optional)</param>
+        /// <param name="timeout">Timeout (optional)</param>
         [ShowInEditor(typeof(StartWaitingForUnityAnimationClass), "Async Wait/Start Waiting For Unity Animation", false)]
         public static AbstractAsyncWaiter StartWaitingForUnityAnimation(string path, string animationName, float timeout = 10)
         {
