@@ -232,7 +232,7 @@ You can extend all of 5 classes with actions (`Check`, `Wait`, `Interact`, `Asyn
 
 ### Implementing own Assertation method
 
-Let's create a simple assertation method, which takes GameObject, checks whether it has your custom component `LevelButton` and check stars count on it. We will ckreate in in own partial `Check` class.
+Let's create a simple assertation method, which takes GameObject, checks whether it has your custom component `LevelButton` and check stars count on it. We will create iе in own partial `Check` class.
 
 ``` c#
 public static void StarsCount(string path, int startCount) //path is a full path of GameObject in hierarchy on scene
@@ -259,9 +259,9 @@ public IEnumerator SomeIntegrationTest()
 }
 ```
 
-But it's too much of manual work to find necessary GameObject in editor's scene, copy it's full path and paste into test code. [Flow Recorder](#flow-recorder) can do this for you. Let's create class that show `Flow Recorder` when and how it should display it. It should be inherited from `ShowHelperBase` class and implement `CreateGenerator`.
+Let's create class that show [Flow Recorder](#flow-recorder) when and how it should display it. It should be inherited from `ShowHelperBase` class and implement `CreateGenerator()` method. `CreateGenerator` desribe what entered paramets has method, what default parametrs should be used and how to generate code. 
 
-Also you can override `bool IsAvailable(GameObject go)` method. It will set, is assertation available for current `GameObject`. As default it will return `true`, event `GameObject` is `null`. You can override method `Camera GetCamera()` to use not main Camera to get game object by click on Flow Recorder not from main camera. 
+Also you can override `bool IsAvailable(GameObject go)` method. It will set, is assertation available for current `GameObject`. As default it will return `true`, even if `GameObject` is `null`. You can override method `Camera GetCamera()` to use not main Camera to get game object by click on Flow Recorder not from main camera.
 
 ```c#
 private class CheckStarsCount : ShowHelperBase
@@ -289,26 +289,27 @@ private class CheckStarsCount : ShowHelperBase
 Let's bind our method and class.
 
 ``` c#
-[ShowInEditor("Is Exist")]
-public static void IsExist(string path)
-{    
-    //UITestUtils is a class with a bunch of helpfull methods. For example unity's 
-    //GameObject.Find searches only for enabled GameObjects.
-    //FindAnyGameObject can find disabled GameObjects as well. 
-    var go = UITestUtils.FindAnyGameObject(path);
-    if (go == null)
+[ShowInEditor(typeof(CheckStarsCount), "Check Start Count on Button")]
+public static void StarsCount(string path, int startCount) //path is a full path of GameObject in hierarchy on scene
+{
+    var go = IsExist(path); //if object not exist, exception will be thrown and test failed
+    var levelButton = go.GetComponent<LevelButton>();
+    //lest fail test, if component doesn't present on the object
+    if (levelButton == null)
     {
-        Assert.Fail("IsExist: Object with path " + path + " does not exist.");
+        Assert.Fail("StarsCount: " + path + " object is exist, but LevelButton component not found.");
     }
+    Assert.AreEqual(levelButton.StartCount, startCount, "Start Count is not equals.");
 }
 ```
 
-Custom attribute `ShowInEditor` means, that this method is shown in Flow Recorder. The first `string` parameter of attribute constructor is a description. Description is shown in Flow Recorder, when you pick assertation method you want to use. 
+Done! Now this action will be shown in `Flow Recorder` as `Check Start Count on Button` and will apeared only by clicking to `GameObject` with `LevelButton` component.
 
-Let's define another assertation method which checks some specific game mechanics: lets assume we have a `ScreenManager` monobehaviour on scene with a string property of current active screen, and we want to check if lobby screen is active.
+
+Let's define another assertation method which checks some specific game mechanics: lets assume we have a `ScreenManager` `MonoBehaviour` on scene with a string property of current active screen, and we want to check if lobby screen is active.
 
 ``` c#
-[ShowInEditor("Check current screen", false)]
+[ShowInEditor(typeof(CheckIsScreenActive), "Check Current Screen")]
 public static void IsScreenActive(string screenName)
 {
     // FindAnyGameObject has overload to seach for GameObject with given type of component.
@@ -317,8 +318,15 @@ public static void IsScreenActive(string screenName)
     {
         Assert.Fail("IsScreenActive: no ScreenManager found");
     }
-	Assert.AreEquals(screenManager.CurrentScreen, screenName);
-	
+    Assert.AreEquals(screenManager.CurrentScreen, screenName);
+}
+
+private class CheckIsScreenActive : ShowHelperBase
+{
+    public override AbstractGenerator CreateGenerator(GameObject go)
+    {
+        return VoidMethod.String(ScreenManager.CurrentScreen);
+    }
 }
 ```
 
@@ -333,6 +341,8 @@ public IEnumerator SomeIntegrationTest()
 	Check.IsScreenActive("Lobby_Screen");
 }
 ```
+
+ classType, string description, bool isDefault = false
 
 The second parameter of ShowInEditor's constructor is a `string pathInPresent` and it's set to `false`. Parameter `pathInPresent` is set to `true` by default and means that if the first argument of assertation method is type of `string` - it's a path to GameObject. In our case it's just a string value and not a path, so you have to set it to `false`. That doesn't looks very nice, but it's important for code generation, and spares you from unnecessary description of assertation methods parameters. You can read more about it below.
 
