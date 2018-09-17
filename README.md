@@ -205,7 +205,7 @@ yield return Interact.WaitDelayAndClick("LayoutComponent/ButtonCherryTree", 0, 2
 yield return soundCheck;
 ```
 
-List of all assertations Comming soon...
+[See full list of all assertations here!](APIREADME.md)
 
 
 Extending Test Tool
