@@ -15,8 +15,6 @@ Content
 	* [Command Line Arguments](#command-line-arguments)
 * [API methods](#api-methods)
 * [Extending Test Tool](#extending-test-tool)
-	* [Implementing own Assertation method](#implementing-own-assertation-method)
-	* [ShowInEditor custom attribute](#showineditor-custom-attribute)
 
 
 About
@@ -150,48 +148,34 @@ public IEnumerator SomeTest()
 To run test in Editor Mode via console use followin command:
 
 ```
-Unity.exe -projectPath project_path -executeMethod TestToolBuildScript.RunPlayModeTests -runOnlySelectedTests -runOnlySmokeTests
+Unity.exe 
+ -projectPath project_path
+ -executeMethod TestToolBuildScript.RunPlayModeTests
+ -runOnlySelectedTests 
+ -runOnlySmokeTests
+ -timeScale time_scale
+`-buildNumber` - build_numer
 ```
 
-`project_path` - absolute path to project folder
+`-project_path` - absolute path to project folder (Unity attribute);
+`-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window;
+`-runOnlySmokeTests` - optional, runs test with `SmokeTest` attribute only;
+`-timeScale` - timescale for tests;
+`-buildNumber` - used as postfix for file with test metrics.
 
-`-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window.
 
-`-runOnlySmokeTests` - optional, runs test with [SmokeTest] attribute only.
+To make test build to run test on the device use `TestToolBuildScript.TestBuild` method instead of `TestToolBuildScript.RunPlayModeTests`:
 
-This is common script, which we use on teamcity to make build:
 ```
-%UNITY_PATH% \
- -quit \
- -batchmode \
- -serial $USINGSERIAL \
- -username $USINGUSER \
- -password $USINGPASS \
- -out %teamcity.build.checkoutDir%/builds/android/CharmKing.apk \
- -projectPath %teamcity.build.checkoutDir% \
- -logFile %teamcity.build.checkoutDir%/unity.log \
- -buildNumber $intversion \
- -keystoreName "%ANDROID_KEYSTORE_FILE%" \
- -keystorePass "%ANDROID_KEYSTORE_PASS%" \
- -keyaliasName "%ANDROID_KEYALIAS_NAME%" \
- -keyaliasPass "%ANDROID_KEYALIAS_PASS%" \
- -addDefines $ADD_DEFINES \
- -buildMode $BUILD_MODE \
- -reporter TeamCity \
- -buildTarget android \
- -target %TARGET_ANDROID% \
- -androidSDKPath %ANDROID_SDK_HOME% \
- -jdkPath %env.JAVA_HOME% \
- -executeMethod PlayQ.Build.CommandLineBuild.Build \
+Unity.exe 
+ -projectPath project_path 
+ -testBuildPath result_path
+ -executeMethod TestToolBuildScript.TestBuild
+ -runOnlySelectedTests 
+ -runOnlySmokeTests
+ -buildNumber build_numer
+ -timeScale time_scale
 ```
-
-To make test build add following parameters to previous statement:
-
-`-makeTestBuild` - it will run tests when your app starts.
-
-`-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window.
-
-`-runOnlySmokeTests` - optional, runs test with [SmokeTest] attribute only. 
 
 
 API methods
@@ -229,8 +213,6 @@ Extending Test Tool
 
 You can extend all of 5 classes with actions (`Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`) because thay are partial.
 
-
-### Implementing own Assertation method
 
 Let's create a simple assertation method, which takes GameObject, checks whether it has your custom component `LevelButton` and check stars count on it. We will create iе in own partial `Check` class.
 
