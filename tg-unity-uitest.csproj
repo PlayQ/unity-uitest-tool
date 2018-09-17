@@ -126,6 +126,7 @@
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\CurrentTestInfo.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\EditorTargetResolution.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\GameViewResizer.cs" />
+    <Compile Include="Assets\UITestTools\PlayModeTestRunner\ITestRunnerCallbackReceiver.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\LogSaver.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\Nodes\ClassNode.cs" />
     <Compile Include="Assets\UITestTools\PlayModeTestRunner\Nodes\CustomResolution.cs" />
