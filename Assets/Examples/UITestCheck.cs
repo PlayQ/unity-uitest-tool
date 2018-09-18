@@ -1,23 +1,67 @@
 ﻿using System;
 using System.Collections;
-using System.Linq;
-using NUnit.Framework;
-using UnityEngine.TestTools;
-using PlayQ.UITestTools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using AssertionException = PlayQ.UITestTools.Assert.AssertionException;
 using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools.Tests
 {
     public class UITestCheck
     {
+        [SetUp]
+        public IEnumerator LoadSceneSetUp()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
+            sceneLoaded = false;
+
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
+
+            while (!sceneLoaded)
+            {
+                yield return null;
+            }
+        }
+
+        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            sceneLoaded = true;
+
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private bool sceneLoaded;
+
+        [TearDown]
+        public IEnumerator UnloadSceneTearDown()
+        {
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+            sceneUnloaded = false;
+
+            SceneManager.UnloadSceneAsync("1");
+
+            while (!sceneUnloaded)
+            {
+                yield return null;
+            }
+        }
+
+        void OnSceneUnloaded(Scene scene)
+        {
+            sceneUnloaded = true;
+
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+        }
+
+        private bool sceneUnloaded;
+
         [UnityTest]
         public IEnumerator CheckObjectDisabled()
         {
             yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive); // unload scene in tearsdown
 
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             testObject.gameObject.SetActive(false);
@@ -39,7 +83,6 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckObjectDisabledFailCases()
         {
             yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             testObject.gameObject.SetActive(true);
@@ -94,6 +137,7 @@ namespace PlayQ.UITestTools.Tests
                 {
                     throw ex;
                 }
+
             }
         }
 
@@ -102,7 +146,6 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckObjectEnabled()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             //get manual reference to the object
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
@@ -125,7 +168,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckObjectEnabledFailCases()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
+           
 
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             testObject.gameObject.SetActive(false);
@@ -187,8 +230,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckObjectExists()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
+           
             Check.IsExist("container");
             Check.IsExist<TestObject>();
             Check.IsExist<TestObject>("container");
@@ -198,14 +240,13 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckObjectExistsFailCases()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
+           
             var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             Object.DestroyImmediate(testObject.gameObject);
 
             try
             {
-                Check.IsNotExist("container");
+                Check.IsExist("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -247,14 +288,13 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckObjectDontExists()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
+           
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.DestroyImmediate(testObject);
 
-            Check.IsNotExist("container");
-            Check.IsNotExist<TestObject>();
-            Check.IsNotExist<TestObject>("container");
+            Check.DoesNotExist("container");
+            Check.DoesNotExist<TestObject>();
+            Check.DoesNotExist<TestObject>("container");
 
 
         }
@@ -263,11 +303,10 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckObjectDontExistsFailCases()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
+           
             try
             {
-                Check.IsNotExist("container");
+                Check.DoesNotExist("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -280,7 +319,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsNotExist<TestObject>();
+                Check.DoesNotExist<TestObject>();
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -293,7 +332,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsNotExist<TestObject>("container");
+                Check.DoesNotExist<TestObject>("container");
             }
             catch (AssertionException ex)
             {
@@ -308,42 +347,42 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckForToggle()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
+           
             var testToggle = UITestUtils.FindAnyGameObject<Toggle>();
 
             testToggle.isOn = true;
-            Check.CheckToggle("container/Toggle", true);
+            Check.Toggle("container/Toggle", true);
 
             testToggle.isOn = false;
-            Check.CheckToggle("container/Toggle", false);
+            Check.Toggle("container/Toggle", false);
         }
 
         [UnityTest]
         public IEnumerator CheckForToggleOffFailCases()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
+           
             var testToggle = UITestUtils.FindAnyGameObject<Toggle>();
 
             try
             {
                 testToggle.isOn = true;
-                Check.CheckToggle("container/Toggle", false);
+                Check.Toggle("container/Toggle", false);
                 Assert.Fail();
             }
             catch (AssertionException ex)
             {
-                if (!ex.Message.EndsWith("is ON."))
+                if (!ex.Message.EndsWith("but expected is Off"))
                 {
                     throw ex;
                 }
             }
 
+            Object.DestroyImmediate(testToggle);
+
             try
             {
-                Check.CheckToggle("container/Toggle", false);
+                Check.Toggle("container/Toggle", false);
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -359,27 +398,30 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckForToggleOnFailCases()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
+
+            Toggle testToggle = null;
 
             try
             {
-                var testToggle = UITestUtils.FindAnyGameObject<Toggle>();
+                testToggle = UITestUtils.FindAnyGameObject<Toggle>();
                 testToggle.isOn = false;
 
-                Check.CheckToggle("container/Toggle", true);
+                Check.Toggle("container/Toggle", true);
                 Assert.Fail();
             }
             catch (AssertionException ex)
             {
-                if (!ex.Message.EndsWith("is OFF."))
+                if (!ex.Message.EndsWith("but expected is On"))
                 {
                     throw ex;
                 }
             }
 
+            Object.DestroyImmediate(testToggle);
+
             try
             {
-                Check.CheckToggle("container", true);
+                Check.Toggle("container", true);
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -395,8 +437,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator CheckTextEquals()
         {
             yield return null;
-           SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
+           
             var testText = UITestUtils.FindAnyGameObject<Text>();
             testText.text = "text";
 

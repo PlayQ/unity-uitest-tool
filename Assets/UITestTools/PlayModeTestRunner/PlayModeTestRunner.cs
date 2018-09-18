@@ -20,16 +20,16 @@ namespace PlayQ.UITestTools
         public enum SpecificTestType { Class, Method }
 
         public static bool IsTestUIEnabled = true;
-        
+
         public static event Action<string, List<string>> OnTestPassed;
         public static event Action<string, List<string>> OnTestIgnored;
         public static event Action<string, List<string>> OnTestFailed;
-        
+
         public static bool IsRunning
         {
             get { return isRunning && Application.isPlaying; }
         }
-        
+
         public const string TEST_NAME_SCENE = "RuntimeTestScene.unity";
         private const string LOG_FILE_NAME = "runtimeTests.txt";
 
@@ -83,9 +83,9 @@ namespace PlayQ.UITestTools
         private LogSaver logSaver;
         private PlayModeTestRunnerGUI screenGUIDrawer;
         private static bool isRunning;
-        
-        
-        private static SelectedTestsSerializable serializedTests;
+
+
+        //private static SelectedTestsSerializable serializedTests;
         public static SelectedTestsSerializable SerializedTests
         {
             get
@@ -105,7 +105,7 @@ namespace PlayQ.UITestTools
 #endif
             }
         }
-        
+
         private void Awake()
         {
             Debug.Log("--------Playmode test runner awakes");
@@ -113,7 +113,7 @@ namespace PlayQ.UITestTools
             playModeLogger = new PlayModeLogger();
             screenGUIDrawer = new PlayModeTestRunnerGUI();
             logSaver = new LogSaver(Path.Combine(Application.persistentDataPath, LOG_FILE_NAME));
-            serializedTests = SelectedTestsSerializable.Load();
+            //serializedTests = SelectedTestsSerializable.Load();
             testInfoData = new TestInfoData();
 
             if (testsRootNode == null)
@@ -167,7 +167,7 @@ namespace PlayQ.UITestTools
                 {
                     methodsToTest.Add(methodNode.FullName, methodNode);
 
-                    if (runMode == RunTestsMode.RunTestsModeEnum.All 
+                    if (runMode == RunTestsMode.RunTestsModeEnum.All
                         || (runMode == RunTestsMode.RunTestsModeEnum.Smoke && methodNode.TestSettings.IsSmoke))
                     {
                         var testInfo = selectedTests.GetTest(methodNode.FullName);
@@ -184,7 +184,7 @@ namespace PlayQ.UITestTools
                                                       ClassName = classNode.FullName,
                                                       IsSelected = true
                                                   });
-                        }   
+                        }
                     }
                 }
             }
@@ -198,12 +198,12 @@ namespace PlayQ.UITestTools
                     testsToRemove.Add(methodName);
                 }
             }
-            
+
             foreach (var key in testsToRemove)
             {
                 selectedTests.RemoveTest(key);
             }
-            
+
             AssetDatabase.SaveAssets();
         }
 
@@ -327,7 +327,7 @@ namespace PlayQ.UITestTools
 
                 return;
             }
-            
+
             var enumerable = result as IEnumerable;
 
             if (enumerable != null)
@@ -380,7 +380,7 @@ namespace PlayQ.UITestTools
         private void StartProcessingTests()
         {
             isRunning = true;
-            
+
             logSaver.StartWrite();
 
             Application.logMessageReceived += ApplicationOnLogMessageReceived;
@@ -393,8 +393,8 @@ namespace PlayQ.UITestTools
             logSaver.Write(condition, stackTrace);
             if ((logType == LogType.Exception || logType == LogType.Error))
             {
-                if (logType == LogType.Error && 
-                    (stackTrace == "UnityEditor.AsyncHTTPClient:Done(State, Int32)\n" 
+                if (logType == LogType.Error &&
+                    (stackTrace == "UnityEditor.AsyncHTTPClient:Done(State, Int32)\n"
                      || PermittedErrors.IsPermitted(condition)))
                 {
                     return;
@@ -409,9 +409,12 @@ namespace PlayQ.UITestTools
 
         private IEnumerator ProcessTestQueue()
         {
+
             Debug.Log("QA: Process classesForTest #: " + testsRootNode.Children.Count());
 
             ClassNode previousClassNode = null;
+
+            ITestRunnerCallbackReceiver[] callbackables = TriggerBeforeTestRunEvent(Callbackables);
 
             //foreach (MethodNode methodNode in methodsToTestQueue)
             for (int i = 0; i < methodsToTestQueue.Count; i++)
@@ -438,7 +441,7 @@ namespace PlayQ.UITestTools
 #if UNITY_EDITOR
                 if (methodNode.TestSettings.EditorTargetResolution != null)
                 {
-                    Tests.CustomResolution resolution = methodNode.TestSettings.EditorTargetResolution;
+                    CustomResolution resolution = methodNode.TestSettings.EditorTargetResolution;
 
                     if (resolution.Width != Screen.width ||
                         resolution.Height != Screen.height)
@@ -487,9 +490,8 @@ namespace PlayQ.UITestTools
                     continue;
                 }
 
-#if UNITY_EDITOR
                 Time.timeScale = PlayModeTestRunner.DefaultTimescale;
-#endif
+
                 Debug.Log("QA: Running testClass: " + classNode.Type);
                 currentTestState = TestState.InProgress;
 
@@ -557,7 +559,55 @@ namespace PlayQ.UITestTools
                 }
             }
 
+            TriggerAfterTestRunEvent(callbackables);
+
             FinalizeTest();
+        }
+
+        private IEnumerable<Type> Callbackables
+        {
+            get
+            {
+                var interfaceType = typeof(ITestRunnerCallbackReceiver);
+
+                return Assembly.GetAssembly(typeof(ITestRunnerCallbackReceiver)).GetTypes().Where(p => p != interfaceType && interfaceType.IsAssignableFrom(p));
+            }
+        }
+
+        private ITestRunnerCallbackReceiver[] TriggerBeforeTestRunEvent(IEnumerable<Type> classTypes)
+        {
+            List<ITestRunnerCallbackReceiver> result = new List<ITestRunnerCallbackReceiver>();
+
+            foreach (var classType in classTypes)
+            {
+                ITestRunnerCallbackReceiver callbackableInstance = null;
+
+                try
+                {
+                    callbackableInstance = (ITestRunnerCallbackReceiver)Activator.CreateInstance(classType);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogErrorFormat("Can't instantiate class \"{0}\". Exception: \"{1}\"",
+                                         classType.FullName, ex.Message);
+
+                    continue;
+                }
+
+                result.Add(callbackableInstance);
+
+                callbackableInstance.OnBeforeTestsRunEvent();
+            }
+
+            return result.ToArray();
+        }
+
+        private void TriggerAfterTestRunEvent(ITestRunnerCallbackReceiver[] callbackableInstances)
+        {
+            foreach (ITestRunnerCallbackReceiver callbackableInstance in callbackableInstances)
+            {
+                callbackableInstance.OnAfterTestsRunEvent();
+            }
         }
 
         private void ProcessIgnore(MethodNode method)

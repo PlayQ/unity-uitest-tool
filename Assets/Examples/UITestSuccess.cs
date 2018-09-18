@@ -1,20 +1,67 @@
 ﻿﻿using System;
  using System.Collections;
-using NUnit.Framework;
-using UnityEngine.TestTools;
  using UnityEngine;
  using UnityEngine.SceneManagement;
  using Object = UnityEngine.Object;
+using AssertionException = PlayQ.UITestTools.Assert.AssertionException;
 
 namespace PlayQ.UITestTools.Tests
 {
     public class UITestSuccess
     {
+        [SetUp]
+        public IEnumerator LoadSceneSetUp()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
+            sceneLoaded = false;
+
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
+
+            while (!sceneLoaded)
+            {
+                yield return null;
+            }
+        }
+
+        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            sceneLoaded = true;
+
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private bool sceneLoaded;
+
+        [TearDown]
+        public IEnumerator UnloadSceneTearDown()
+        {
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+            sceneUnloaded = false;
+
+            SceneManager.UnloadSceneAsync("1");
+
+            while (!sceneUnloaded)
+            {
+                yield return null;
+            }
+        }
+
+        void OnSceneUnloaded(Scene scene)
+        {
+            sceneUnloaded = true;
+
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+        }
+
+        private bool sceneUnloaded;
+
+
         [UnityTest]
         public IEnumerator Screen()
         {
             yield return null;
-SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             Interact.MakeScreenShot("some path");
         }
@@ -24,8 +71,6 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         public IEnumerator FindObjectByPixels()
         {
             yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-            yield return Wait.Frame();
 
             var obj = UITestUtils.FindObjectByPixels(630.0f, 325.0f);
             Assert.IsNotNull(obj);
@@ -37,8 +82,6 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         public IEnumerator ClickOnObject()
         {
             yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-            yield return Wait.Frame();
 
             Interact.ClickPixels(512, 41);
             var openedWindow = UITestUtils.FindAnyGameObject("Window");
@@ -48,9 +91,6 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         [UnityTest]
         public IEnumerator WaitForObjectOnScene()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             //search for object with name "child_enabled" in parent object "container"
             //if object is not found - waits for object appearing for duration
             yield return Wait.ObjectInstantiated("container");
@@ -67,29 +107,23 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         [UnityTest]
         public IEnumerator WaitForObjectDestraction()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             //manually search for object in scene
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.Destroy(objectInstance);
 
             //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-            yield return Wait.ObjectDestroy<TestObject>();
+            yield return Wait.ObjectDestroyed<TestObject>();
 
             //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
-            yield return Wait.ObjectDestroy("container");
+            yield return Wait.ObjectDestroyed("container");
 
             //wait during interval for object destraction by object instance
-            yield return Wait.ObjectDestroy(objectInstance);
+            yield return Wait.ObjectDestroyed(objectInstance);
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectDisabled()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             //get manual reference to the object
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>();
 
@@ -108,9 +142,6 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         [UnityTest]
         public IEnumerator WaitForObjectEnabled()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             //get manual reference to the object
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>();
 
@@ -128,10 +159,8 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         [UnityTest]
         public IEnumerator WaitForButtonAccesible()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             var button = UITestUtils.FindAnyGameObject("container/Button");
+
             yield return Wait.ButtonAccessible(button);
         }
 
@@ -139,7 +168,6 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         public IEnumerator CheckAppendText()
         {
             yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
 
             Interact.AppendText("container/InputField", "appednend text");
             Interact.SetText("container/InputField", "appednend text");
@@ -175,18 +203,14 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         [TargetResolution(1024, 768)]
         public IEnumerator DragByCoords()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-            yield return Wait.Frame();
-
             Vector2 from = new Vector2(45, 526);
-            Vector2 delta = new Vector2(934, 0);
-            yield return Interact.DragPixels(from, delta);
+            Vector2 to = new Vector2(934, 0);
+            yield return Interact.DragPixels(from, to);
 
             var handle = UITestUtils.FindAnyGameObject("Handle");
             var center = UITestUtils.CenterPointOfObject(handle.transform as RectTransform);
 
-            Assert.AreEqual(center.x, 967, 0.1f);
+            Assert.AreEqual(center.x, 934, 0.1f);
             Assert.AreEqual(center.y, 526, 0.1f);
         }
 
@@ -194,17 +218,13 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         [TargetResolution(1024, 768)]
         public IEnumerator DragByReference()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-            yield return Wait.Frame();
-
-            Vector2 delta = new Vector2(934, 0);
+            Vector2 to = new Vector2(934, 0);
 
             var handle = UITestUtils.FindAnyGameObject("Handle");
-            yield return Interact.DragPixels(handle, delta);
+            yield return Interact.DragPixels(handle, to);
             var center = UITestUtils.CenterPointOfObject(handle.transform as RectTransform);
 
-            Assert.AreEqual(center.x, 967, 0.1f);
+            Assert.AreEqual(center.x, 934, 0.1f);
             Assert.AreEqual(center.y, 526, 0.1f);
         }
 
@@ -212,17 +232,13 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         [TargetResolution(1024, 768)]
         public IEnumerator DragByPath()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-            yield return Wait.Frame();
-
-            Vector2 delta = new Vector2(934, 0);
+            Vector2 to = new Vector2(934, 0);
 
             var handle = UITestUtils.FindAnyGameObject("Handle");
-            yield return Interact.DragPixels("container/Slider/Handle Slide Area/Handle", delta);
+            yield return Interact.DragPixels("container/Slider/Handle Slide Area/Handle", to);
             var center = UITestUtils.CenterPointOfObject(handle.transform as RectTransform);
 
-            Assert.AreEqual(center.x, 967, 0.1f);
+            Assert.AreEqual(center.x, 934, 0.1f);
             Assert.AreEqual(center.y, 526, 0.1f);
         }
 
@@ -231,8 +247,6 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         public IEnumerator ClickOnObjectFail()
         {
             yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-            yield return Wait.Frame();
 
             try
             {
@@ -250,8 +264,7 @@ SceneManager.LoadScene("1", LoadSceneMode.Additive);
         public IEnumerator FindObjectByPixelsFail()
         {
             yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-            yield return Wait.Frame();
+
             var obj = UITestUtils.FindObjectByPixels(20, 20);
             Assert.IsNull(obj);
         }

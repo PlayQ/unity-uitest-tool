@@ -1,0 +1,994 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Assembly-CSharp</name>
+    </assembly>
+    <members>
+        <member name="T:PlayQ.UITestTools.AsyncCheck">
+            <summary>
+            Contains methods which allow checking the state of game components and objects on the scene asynchronously
+            No methods provided by default
+            </summary>
+        </member>
+        <member name="T:PlayQ.UITestTools.AsyncWait">
+            <summary>
+            Contains methods which allow waiting until the game components and objects on the scene reach the certain state asynchronously
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForLog(System.String,System.Boolean,System.Single)">
+            <summary>
+            Starts the waiting for the log
+            </summary>
+            <returns>Abstract async waiter</returns>
+            <param name="message">Expected log message</param>
+            <param name="isRegExp">Is expected log a regular expression</param>
+            <param name="timeout">Timeout (optional, default = 10)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForUnityAnimation(System.String,System.String,System.Single)">
+            <summary>
+            Starts the waiting for unity animation to complete
+            </summary>
+            <returns>Abstract async waiter</returns>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="animationName">Animation name</param>
+            <param name="timeout">Timeout (optional, default = 10)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.AsyncWait.StopWaitingForGameLog">
+            <summary>
+            Used only for generation waiting code for StartWaitingForLog 
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.AsyncWait.StopWaitingForUnityAnimation">
+            <summary>
+            Used only for generation waiting code for StartWaitingForUnityAnimation 
+            </summary>
+        </member>
+        <member name="T:PlayQ.UITestTools.Check">
+            <summary>
+            Contains methods which allow checking the state of game components and objects on the scene
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.TextEquals(System.String,System.String)">
+            <summary>
+            Checks that `GameObject` by given path has `Text` component attached and its variable text is equal to expected text
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="expectedText">Expected text</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.TextNotEquals(System.String,System.String)">
+            <summary>
+            Checks that `GameObject` by given path has `Text` component attached and its variable text is not equal to expected text
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="expectedText">Expected text</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.TextEquals(UnityEngine.GameObject,System.String)">
+            <summary>
+            Checks that `GameObject` has `Text` component attached and its variable text is equal to expected text
+            </summary>
+            <param name="go">`GameObject` with `Text` component</param>
+            <param name="expectedText">Expected text</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.TextNotEquals(UnityEngine.GameObject,System.String)">
+            <summary>
+            Checks that `GameObject` has `Text` component attached and its variable text is not equal to expected text
+            </summary>
+            <param name="go">`GameObject` with `Text` component</param>
+            <param name="expectedText">Expected text</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.InputEquals(UnityEngine.GameObject,System.String)">
+            <summary>
+            Checks that `GameObject` has `InputField` component attached and its variable text is equal to expected text
+            </summary>
+            <param name="go">`GameObject` with `InputField` component</param>
+            <param name="expectedText">Expected text</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.InputNotEquals(UnityEngine.GameObject,System.String)">
+            <summary>
+            Checks that `GameObject` has `InputField` component attached and its variable text is not equal to expected text
+            </summary>
+            <param name="go">`GameObject` with `InputField` component</param>
+            <param name="expectedText">Expected text</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.InputEquals(System.String,System.String)">
+            <summary>
+            Checks that `GameObject` by given path has `InputField` component attached and its variable text is equal to expected text
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="expectedText">Expected text</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.InputNotEquals(System.String,System.String)">
+            <summary>
+            Checks that `GameObject` by given path has `InputField` component attached and its variable text is not equal to expected text
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="expectedText">Expected text</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsEnable(System.String)">
+            <summary>
+            Checks that `Gameobject` by given path is present on scene and active in hierarchy
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsEnable``1(System.String)">
+            <summary>
+            Checks that `Gameobject` by given path is present on scene, contains component `T` and is active in hierarchy
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <typeparam name="T">`Type` of object</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsEnable``1">
+            <summary>
+            Searches for `Gameobject` with component `T` and checks that it is present on scene and active in hierarchy
+            </summary>
+            <typeparam name="T">`Type` of object</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsEnable(UnityEngine.GameObject)">
+            <summary>
+            Checks that `GameObject` is active in hierarchy
+            </summary>
+            <param name="go">`GameObject`</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsDisable(System.String)">
+            <summary>
+            Checks that `GameObject` by given path is present on scene and is not active in hierarchy
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsDisable``1(System.String)">
+            <summary>
+            Checks that `GameObject` by given path is present on scene, contains component `T` and is not active in hierarchy
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <typeparam name="T">`Type` of object</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsDisable``1">
+            <summary>
+            Searches for `Gameobject` with component `T` and checks that it is present on scene and is not active in hierarchy
+            </summary>
+            <typeparam name="T">`Type` of object</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsDisable(UnityEngine.GameObject)">
+            <summary>
+            Checks that `GameObject` is not active in hierarchy
+            </summary>
+            <param name="go">`GameObject`</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.CheckEnabled(System.String,System.Boolean)">
+            <summary>
+            Checks that `Gameobject` by given path is present on scene and its active in hierarchy flag equals to state variable
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="state">Enable state (optional, default = true)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsExist(System.String)">
+            <summary>
+            Checks that `GameObject` by given path is present on scene
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <returns>`GameObject`</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsExist``1(System.String)">
+            <summary>
+            Checks that `GameObject` by given path is present on scene and contains component `T`
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <typeparam name="T">`Type` of object</typeparam>
+            <returns>`GameObject`</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.IsExist``1">
+            <summary>
+            Searches for `GameObject` with component `T` on scene
+            </summary>
+            <typeparam name="T">`Type` of object</typeparam>
+            <returns>`GameObject`</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.DoesNotExist(System.String)">
+            <summary>
+            Checks that `GameObject` by given path is not present on scene
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.DoesNotExistOrDisabled(System.String,System.Single,System.Boolean)">
+            <summary>
+            Checks that `GameObject` by given path is not present on scene or is not active
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.DoesNotExist``1(System.String)">
+            <summary>
+            Checks that `GameObject` by given path with component `T` is not present on scene
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <typeparam name="T">`Type` of object</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.DoesNotExist``1">
+            <summary>
+            Checks that no `GameObject` with component `T` is present on scene
+            </summary>
+            <typeparam name="T">`Type` of object</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.CheckToggle(UnityEngine.GameObject,System.Boolean)">
+            <summary>
+            Checks that `GameObject` has `Toggle` component and its `isOn` value equals to expected
+            </summary>
+            <param name="go">`GameObject` with `Toggle` component</param>
+            <param name="expectedIsOn">Expected value of the toggle</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.Toggle(System.String,System.Boolean)">
+            <summary>
+            Checks that `GameObject` by given path has `Toggle` component and its `isOn` value equals to expected
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="state">Toggle state</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.AnimatorStateStarted(System.String,System.String,System.Single)">
+            <summary>
+            Seraches for `GameObject` by given path with `Animator` component. During a given `timeOut` waits for an animation state with specific name to become active
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="stateName">`Animator` state name</param>
+            <param name="timeout">Timeout</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.AverageFPS(System.Single)">
+            <summary>
+            Checks average fps since the last time user called `Interact.ResetFPS()` method or since the game started. If average fps is less than `targetFPS` value, test fails
+            </summary>
+            <param name="targetFPS">Minimum acceptable value of average fps</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.MinFPS(System.Single)">
+            <summary>
+            Checks minimum fps since the last time user called `Interact.ResetFPS()` method or since the game started. If minimum fps is less than `targetFPS` value, test fails
+            </summary>
+            <param name="targetFPS">Minimum acceptable value of minimum fps</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.SourceImage(System.String,System.String)">
+            <summary>
+            Seraches for `GameObject` by given path and checks the source image
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="sourceName">Source image name</param>
+        </member>
+        <member name="T:PlayQ.UITestTools.Interact">
+            <summary>
+            Contains methods which allow interacting with game components and objects on the scene
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.MakeScreenShot(System.String)">
+            <summary>
+            Makes a screenshot. Saves it to persistant data folder
+            </summary>
+            <param name="name">Name of screenshot</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.ResetFPS">
+            <summary>
+            Resets FPS counter
+            FPS counter stores average fps, minimum and maximum FPS values since the last moment this method was called
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.ClearFPSMetrics">
+            <summary>
+            Clears FPS data from the hard drive
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.SaveFPS(System.String)">
+            <summary>
+            Stores FPS data on the hard drive
+            </summary>
+            <param name="tag">Measure discription</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.SetTimescale(System.Single)">
+            <summary>
+            Sets timescale
+            </summary>
+            <param name="scale">New timescale</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.Click(System.String)">
+            <summary>
+            Emulates LMB click on `Unity UI` element by given path
+            </summary>
+            <param name="path">Path to GameObject in hierarchy</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.Click(UnityEngine.GameObject)">
+            <summary>
+            Emulates LMB click on `Unity UI GameObject`
+            </summary>
+            <param name="go">GameObject to click</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.WaitDelayAndClick(System.String,System.Single,System.Single)">
+            <summary>
+            Waits until `GameObject` by given path is present on scene and active in hierarchy then emulates LMB click after the specified delay. Fails if exceeds the given timeout
+            </summary>
+            <param name="path">Path to GameObject in hierarchy</param>
+            <param name="delay">Amount of time to delay</param>
+            <param name="timeout">Timeout</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.ObsoleteWaitClickAndDelay(System.String,System.Single,System.Single)">
+            <summary>
+            Obsolete. Use WaitDelayAndClick instead
+            Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay. Fails if exceeds the given timeout
+            </summary>
+            <param name="path">Path to GameObject in hierarchy</param>
+            <param name="delay">Amount of time to delay</param>
+            <param name="timeout">Timeout</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.ObsoleteWaitClickAndDelayIfPossible(System.String,System.Single,System.Single)">
+            <summary>
+            Obsolete. Use WaitDelayAndClick instead
+            Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay
+            </summary>
+            <param name="path">Path to GameObject in hierarchy</param>
+            <param name="delay">Amount of time to delay</param>
+            <param name="timeout">Timeout</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.ClickPixels(System.Int32,System.Int32)">
+            <summary>
+            Uses `UnityEngine.EventSystems.EventSystem` class to raycast UI by specified coords to find `GameObject` and perform LMB click on it
+            </summary>
+            <param name="x">X position in screen pixels</param>
+            <param name="y">Y position in screen pixels</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.ClickPercents(System.Single,System.Single)">
+            <summary>
+            Finds screen space pixel coordinates by given screen size percents and uses `UnityEngine.EventSystems.EventSystem` class to raycast by resulting coordinates to find `GameObject` and perform LMB click on it
+            </summary>
+            <param name="x">X position in screen percents</param>
+            <param name="y">Y position in screen percents</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.DragPixels(UnityEngine.Vector2,UnityEngine.Vector2,System.Single)">
+            <summary>
+            Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find `GameObject` and perform drag on it
+            </summary>
+            <param name="from">Start position in pixels</param>
+            <param name="to">Finish position in pixels</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.DragPercents(UnityEngine.Vector2,UnityEngine.Vector2,System.Single)">
+            <summary>
+            Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find `GameObject` and perform drag on it
+            </summary>
+            <param name="from">Start position in percents</param>
+            <param name="to">Finish position in percents</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.DragPixels(UnityEngine.GameObject,UnityEngine.Vector2,System.Single)">
+            <summary>
+            Perform drag on `GameObject`
+            </summary>
+            <param name="go">`GameObject` to drag</param>
+            <param name="to">Finish position in pixels</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.DragPercents(UnityEngine.GameObject,UnityEngine.Vector2,System.Single)">
+            <summary>
+            Perform drag on `GameObject`
+            </summary>
+            <param name="go">`GameObject` to drag</param>
+            <param name="to">Finish position in percents</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.DragPixels(UnityEngine.GameObject,System.Nullable{UnityEngine.Vector2},UnityEngine.Vector2,System.Single)">
+            <summary>
+            Perform drag on `GameObject`
+            </summary>
+            <param name="go">`GameObject` to drag</param>
+            <param name="from">Start position in percents</param>
+            <param name="to">Finish position in percents</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.DragPixels(System.String,UnityEngine.Vector2,System.Single)">
+            <summary>
+            Perform drag on `GameObject` by path
+            </summary>
+            <param name="path">Path to GameObject in hierarchy</param>
+            <param name="to">Finish position in pixels</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.DragPercents(System.String,UnityEngine.Vector2,System.Single)">
+            <summary>
+            Perform drag on `GameObject` by path
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="to">Finish position in percents</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.ScrollToPosition(System.String,System.Single,System.Single,System.Single,System.Single,System.Boolean)">
+            <summary>
+            Perform scroll on `GameObject` by path
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="horizontalPosition">Horizontal position</param>
+            <param name="verticalPosition">Vertical position</param>
+            <param name="animationDuration">Animation duration (optional, default = 1)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.DragPercents(System.String,System.Single,System.Single,System.Single,System.Single,System.Single)">
+            <summary>
+            Obtains drag percents of `GameObject` by path
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="fromPercentX">Min percent of drag at dimension X</param>
+            <param name="fromPercentY">Min percent of drag at dimension Y</param>
+            <param name="toPercentX">Max percent of drag at dimension X</param>
+            <param name="toPercentY">Max percent of drag at dimension Y</param>
+            <param name="time">Time (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.SetText(UnityEngine.GameObject,System.String)">
+            <summary>
+            Finds `GameObject` by path, checks if `GameObject` has `Text` component attached, then sets text variable of `Text` to given value
+            </summary>
+            <param name="go">`GameObject` with `Text` component</param>
+            <param name="text">`Text` to set</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.SetText(System.String,System.String)">
+            <summary>
+            Finds `GameObject` by path, checks if `GameObject` has `Text` component attached, then set text variable of `Text` to given value
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="text">`Text` to set</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.AppendText(UnityEngine.GameObject,System.String)">
+            <summary>
+            Checks if `GameObject` has `InputField` component attached, then appends given text to text variable of `InputField`
+            </summary>
+            <param name="go">`GameObject` with `Text` component</param>
+            <param name="text">`Text` to set</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.AppendText(System.String,System.String)">
+            <summary>
+            Appends text to `GameObject` by path with `InputField` component attached
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="text">`Text` to set</param>
+        </member>
+        <member name="T:PlayQ.UITestTools.Wait">
+            <summary>
+            Contains methods which allow waiting until the game components and objects on the scene reach the certain state
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectInstantiated(System.String,System.Single,System.Boolean)">
+            <summary>
+            Awaits for 'GameObject' to become present on scene or fails after specified timeout
+            </summary>
+            <param name="path">Path to 'GameObject' in hierarchy</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectEnableAndInteractibleIfButton(System.String,System.Single,System.Boolean,System.Boolean)">
+            <summary>
+            Awaits for 'GameObject' to become enabled and interactible if it is a button
+            </summary>
+            <param name="path">Path to 'GameObject' in hierarchy</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="dontFail">Whether the test should fail upon exceeding timeout (optional, default = false)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectEnabledInstantiatedAndDelay(System.String,System.Single,System.Single,System.Boolean,System.Boolean)">
+            <summary>
+            Awaits for 'GameObject' to become present on scene and active in hierarchy. Then waits during given amount of time and returns after that. Method fails after exceeding the given timeout
+            </summary>
+            <param name="path">Path to 'GameObject' in hierarchy</param>
+            <param name="delay">Amount of time to delay</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="dontFail">If true, method will not generate exception after timeout (optional, default = true)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.Frame(System.Int32)">
+            <summary>
+            Waits for given amount of frames, then return
+            </summary>
+            <param name="count">Amount of frames to wait (optional, default = 1)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.WaitFor(System.Func{PlayQ.UITestTools.WaitResults.WaitResult},System.Single,System.Boolean,System.Boolean)">
+            <summary>
+            Waits until given predicate returns true or fails after specified timeout
+            </summary>
+            <param name="condition">Predicate that return true, if its condition is successfuly fulfilled</param>
+            <param name="timeout">Timeout</param>
+            <param name="testInfo"> This label would be passed to logs if method fails</param>
+            <param name="dontFail">If true, method will not generate exception after timeout (optional, default = false)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectInstantiated``1(System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' with component 'T' becomes present on scene or fails after specified timeout
+            </summary>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+            <typeparam name="T">Type of component</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectInstantiated``1(System.String,System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' with component 'T' becomes present on scene or fails after specified timeout
+            </summary>
+            <param name="path">Path to 'GameObject' in hierarchy</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+            <typeparam name="T">Type of component</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectDestroyed``1(System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' with component 'T' disappears from scene or fails after specified timeout
+            </summary>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+            <typeparam name="T">Type of component</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectDestroyed(System.String,System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' by given path disappears from scene or fails after specified timeout
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectDestroyed(UnityEngine.GameObject,System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' by given path disappears from scene or fails after specified timeout
+            </summary>
+            <param name="gameObject">`GameObject` who should be destroyed</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ButtonAccessible(UnityEngine.GameObject,System.Single,System.Boolean)">
+            <summary>
+            Waits until given 'GameObject' obtains component 'UnityEngine.UI.Button' or fails after specified timeout
+            </summary>
+            <param name="button">'GameObject' who should be start accessible</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectEnabled(System.String,System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' by given path becomes present on scene and active in hierarchy or fails after specified timeout
+            </summary>
+            <param name="path">Path to 'GameObject' in hierarchy</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectEnabled``1(System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' with component 'T' becomes present on scene and active in hierarchy or fails after specified timeout
+            </summary>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+            <typeparam name="T">Type of component</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectDisabled``1(System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' with component 'T' becomes present on scene and disabled in hierarchy or fails after specified timeout
+            </summary>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+            <typeparam name="T">Type of component</typeparam>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectDisabled(System.String,System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' by given path becomes present on scene and disabled in hierarchy or fails after specified timeout
+            </summary>
+            <param name="path">Path to 'GameObject' in hierarchy</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectDisabledOrNotExist(System.String,System.Single,System.Boolean)">
+            <summary>
+            Waits until 'GameObject' by given path disappears from scene or becomes disabled in hierarchy or fails after specified timeout
+            </summary>
+            <param name="path">Path to 'GameObject' in hierarchy</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.Seconds(System.Single,System.Boolean)">
+            <summary>
+            Waits for specified amount of seconds
+            </summary>
+            <param name="seconds">Count of seconds to wait</param>
+            <param name="ignoreTimescale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.SceneLeaded(System.String,System.Single,System.Boolean)">
+            <summary>
+            Waits until scene with given name is loaded or fails after specified timeout
+            </summary>
+            <param name="sceneName">Name of scene to load</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.AnimationCompleted(System.String,System.String,System.Single,System.Boolean)">
+            <summary>
+            Waits until animation is completed
+            </summary>
+            <param name="path">Path to 'GameObject' in hierarchy</param>
+            <param name="animationName">Animation name</param>
+            <param name="timeout">Timeout (optional, default = 10)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.TimeoutAttribute.#ctor(System.Int32)">
+            <summary>
+            Construct a TimeoutAttribute given a time in milliseconds
+            </summary>
+            <param name="timeout">The timeout value in milliseconds</param>
+        </member>
+        <member name="T:PlayQ.UITestTools.Assert.FloatComparer">
+            <summary>
+              <para>A float comparer used by Assertions.Assert performing approximate comparison.</para>
+            </summary>
+        </member>
+        <member name="F:PlayQ.UITestTools.Assert.FloatComparer.s_ComparerWithDefaultTolerance">
+            <summary>
+              <para>Default instance of a comparer class with deafult error epsilon and absolute error check.</para>
+            </summary>
+        </member>
+        <member name="F:PlayQ.UITestTools.Assert.FloatComparer.kEpsilon">
+            <summary>
+              <para>Default epsilon used by the comparer.</para>
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.FloatComparer.#ctor">
+            <summary>
+              <para>Creates an instance of the comparer.</para>
+            </summary>
+            <param name="relative">Should a relative check be used when comparing values? By default, an absolute check will be used.</param>
+            <param name="error">Allowed comparison error. By default, the FloatComparer.kEpsilon is used.</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.FloatComparer.#ctor(System.Boolean)">
+            <summary>
+              <para>Creates an instance of the comparer.</para>
+            </summary>
+            <param name="relative">Should a relative check be used when comparing values? By default, an absolute check will be used.</param>
+            <param name="error">Allowed comparison error. By default, the FloatComparer.kEpsilon is used.</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.FloatComparer.#ctor(System.Single)">
+            <summary>
+              <para>Creates an instance of the comparer.</para>
+            </summary>
+            <param name="relative">Should a relative check be used when comparing values? By default, an absolute check will be used.</param>
+            <param name="error">Allowed comparison error. By default, the FloatComparer.kEpsilon is used.</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.FloatComparer.#ctor(System.Single,System.Boolean)">
+            <summary>
+              <para>Creates an instance of the comparer.</para>
+            </summary>
+            <param name="relative">Should a relative check be used when comparing values? By default, an absolute check will be used.</param>
+            <param name="error">Allowed comparison error. By default, the FloatComparer.kEpsilon is used.</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.FloatComparer.AreEqual(System.Single,System.Single,System.Single)">
+            <summary>
+              <para>Performs equality check with absolute error check.</para>
+            </summary>
+            <param name="expected">Expected value.</param>
+            <param name="actual">Actual value.</param>
+            <param name="error">Comparison error.</param>
+            <returns>
+              <para>Result of the comparison.</para>
+            </returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.FloatComparer.AreEqualRelative(System.Single,System.Single,System.Single)">
+            <summary>
+              <para>Performs equality check with relative error check.</para>
+            </summary>
+            <param name="expected">Expected value.</param>
+            <param name="actual">Actual value.</param>
+            <param name="error">Comparison error.</param>
+            <returns>
+              <para>Result of the comparison.</para>
+            </returns>
+        </member>
+        <member name="T:PlayQ.UITestTools.Assert.AssertionException">
+            <summary>
+              <para>An exception that is thrown on a failure. Assertions.Assert._raiseExceptions needs to be set to true.</para>
+            </summary>
+        </member>
+        <member name="F:PlayQ.UITestTools.Assert.raiseExceptions">
+            <summary>
+              <para>Should an exception be thrown on a failure.</para>
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.IsTrue(System.Boolean)">
+            <summary>
+              <para>Asserts that the condition is true.</para>
+            </summary>
+            <param name="condition"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.IsTrue(System.Boolean,System.String)">
+            <summary>
+              <para>Asserts that the condition is true.</para>
+            </summary>
+            <param name="condition"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.IsFalse(System.Boolean)">
+            <summary>
+              <para>Asserts that the condition is false.</para>
+            </summary>
+            <param name="condition"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.IsFalse(System.Boolean,System.String)">
+            <summary>
+              <para>Asserts that the condition is false.</para>
+            </summary>
+            <param name="condition"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreApproximatelyEqual(System.Single,System.Single)">
+            <summary>
+                    <para>Asserts that the values are approximately equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.
+            
+            Note: Every time you call the method with tolerance specified, a new instance of Assertions.Comparers.FloatComparer is created. For performance reasons you might want to instance your own comparer and pass it to the AreEqual method. If the tolerance is not specifies, a default comparer is used and the issue does not occur.</para>
+                  </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreApproximatelyEqual(System.Single,System.Single,System.String)">
+            <summary>
+                    <para>Asserts that the values are approximately equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.
+            
+            Note: Every time you call the method with tolerance specified, a new instance of Assertions.Comparers.FloatComparer is created. For performance reasons you might want to instance your own comparer and pass it to the AreEqual method. If the tolerance is not specifies, a default comparer is used and the issue does not occur.</para>
+                  </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreEqual(System.Single,System.Single,System.Single)">
+            <summary>
+                    <para>Asserts that the values are approximately equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.
+            
+            Note: Every time you call the method with tolerance specified, a new instance of Assertions.Comparers.FloatComparer is created. For performance reasons you might want to instance your own comparer and pass it to the AreEqual method. If the tolerance is not specifies, a default comparer is used and the issue does not occur.</para>
+                  </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreApproximatelyEqual(System.Single,System.Single,System.Single)">
+            <summary>
+                    <para>Asserts that the values are approximately equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.
+            
+            Note: Every time you call the method with tolerance specified, a new instance of Assertions.Comparers.FloatComparer is created. For performance reasons you might want to instance your own comparer and pass it to the AreEqual method. If the tolerance is not specifies, a default comparer is used and the issue does not occur.</para>
+                  </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreApproximatelyEqual(System.Single,System.Single,System.Single,System.String)">
+            <summary>
+                    <para>Asserts that the values are approximately equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.
+            
+            Note: Every time you call the method with tolerance specified, a new instance of Assertions.Comparers.FloatComparer is created. For performance reasons you might want to instance your own comparer and pass it to the AreEqual method. If the tolerance is not specifies, a default comparer is used and the issue does not occur.</para>
+                  </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreNotApproximatelyEqual(System.Single,System.Single)">
+            <summary>
+              <para>Asserts that the values are approximately not equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.</para>
+            </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreNotApproximatelyEqual(System.Single,System.Single,System.String)">
+            <summary>
+              <para>Asserts that the values are approximately not equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.</para>
+            </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreNotApproximatelyEqual(System.Single,System.Single,System.Single)">
+            <summary>
+              <para>Asserts that the values are approximately not equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.</para>
+            </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Assert.AreNotApproximatelyEqual(System.Single,System.Single,System.Single,System.String)">
+            <summary>
+              <para>Asserts that the values are approximately not equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.</para>
+            </summary>
+            <param name="tolerance">Tolerance of approximation.</param>
+            <param name="expected"></param>
+            <param name="actual"></param>
+            <param name="message"></param>
+        </member>
+        <member name="T:PlayQ.UITestTools.PlayModeLogger">
+            <summary>
+            https://confluence.jetbrains.com/display/TCD9/Build+Script+Interaction+with+TeamCity
+            </summary>
+        </member>
+        <member name="T:PlayQ.UITestTools.UITestUtils">
+            <summary>
+            Contains methods that are needed for multiple action methods from all classes and facilitates the test actions writing
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindCurrentEventSystem">
+            <summary>
+            Finds `EventSystem` on the scene
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.LoadSceneForSetUp(System.String)">
+            <summary>
+            Loads scene by given name
+            </summary>
+            <param name="sceneName">Scene name</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.GetScrollElement(UnityEngine.GameObject,UnityEngine.Vector2@)">
+            <summary>
+            Returns `Selectable` object from `GameObject` or its parent
+            </summary>
+            <param name="go">`GameObject` to find selectable object</param>
+            <param name="handlePosition">Pointer position</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.LogHierarchy">
+            <summary>
+            Prints console log with a list of paths to all GameObjects on scene
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindObjectByPixels(System.Single,System.Single,System.Collections.Generic.HashSet{System.String})">
+            <summary>
+            Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find GameObject that was clicked
+            </summary>
+            <param name="x">X position in pixels</param>
+            <param name="y">Y position in pixels</param>
+            <param name="ignoreNames">set of names of object, that are ignored (optional, default = null)</param>
+            <returns>GameObjects under coords or null</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindObjectByPercents(System.Single,System.Single)">
+            <summary>
+            Calculates pixels coordinates from percent coordinates, then Uses `UnityEngine.EventSystems.EventSystem` class to raycast by resulting coordinates to find `GameObject` that was clicked
+            </summary>
+            <param name="x">X position in percents</param>
+            <param name="y">Y position in percents</param>
+            <returns>GameObjects under coords or null</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindGameObjectWithComponentInParents``1(UnityEngine.GameObject)">
+            <summary>
+            Checks if given `GameObject` has `TComponent` component attached to it. If not - performs recursive check on its parent
+            </summary>
+            <param name="go">Parent `GameObject`</param>
+            <typeparam name="TComponent">Component Type</typeparam>
+            <returns>`Component` or null.</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindComponentInParents``1(UnityEngine.GameObject)">
+            <summary>
+            Checks if given GameObject has `TComponent` component attached to it. If not - performs recursive check on its parent
+            </summary>
+            <param name="go">Parent `GameObject`</param>
+            <typeparam name="TComponent">Component Type</typeparam>
+            <returns>`TComponent` instance, or null.</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindEnabledGameObjectByPath(System.String)">
+            <summary>
+            Finds enabled `GameObject` by Path in hierarchy
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <returns>Enabled `GameObject` or null.</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.EncodeString(System.String)">
+            <summary>
+            Encodes path string for Test Tools format (`/` => `%/`, `%` => `%%`)
+            </summary>
+            <param name="text">String to encode</param>
+            <returns>Encoded strings</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.DecodeString(System.String)">
+            <summary>
+            Decodes path in Test Tools format to simple path (`%/` => `/`, `%%` => `%`)
+            </summary>
+            <param name="text">String to encode</param>
+            <returns>Encoded strings</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.GetGameObjectFullPath(UnityEngine.GameObject)">
+            <summary>
+            Calculates and retuns full path to `GameObject`
+            </summary>
+            <param name="gameObject">`GameObject`</param>
+            <returns>Full path to `GameObject`</returns>
+            <exception cref="T:System.NullReferenceException"></exception>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindAnyGameObject``1(System.String)">
+            <summary>
+            Searches for GameObject that has component of the given type attached and matches the given path in hierarchy
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <typeparam name="T">Type of `GameObject`</typeparam>
+            <returns>active and non-active `GameObjects` or null</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindAnyGameObject(System.String)">
+            <summary>
+            Searches for GameObject by path in hierarchy
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <returns>active and non-active `GameObjects` or null</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.FindAnyGameObject``1">
+            <summary>
+            Searches for `GameObject` that has component of `T` attached to it
+            </summary>
+            <typeparam name="T">Type of `GameObject`</typeparam>
+            <returns>active and non-active `GameObjects` or null</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.CenterPointOfObject(UnityEngine.RectTransform)">
+            <summary>
+            Return center point of the given `RectTransform`
+            </summary>
+            <param name="transform">`RectTransform` component instance</param>
+            <returns>Center point of given `RectTransform`</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.ScreenVerticesOfObject(UnityEngine.RectTransform)">
+            <summary>
+            Returns array of coordinates of screen rectangle of the given `RectTransform`
+            </summary>
+            <param name="transform">`RectTransform` component instance</param>
+            <returns>Array of coords of screen rectangle of given `RectTransform`</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.PercentsToPixels(UnityEngine.Vector2)">
+            <summary>
+            Transform screen percents to screen pixels
+            </summary>
+            <param name="percents">Screen percents</param>
+            <returns>Screen pixels</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.PercentsToPixels(System.Single,System.Single)">
+            <summary>
+            Transform screen percents to screen pixels
+            </summary>
+            <returns>Screen percents</returns>
+            <param name="x">X percents position in screen</param>
+            <param name="y">Y percents position in screen</param>
+            <returns>Screen pixels</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.WidthPercentsToPixels(System.Single)">
+            <summary>
+            Transform screen percents to screen pixels
+            </summary>
+            <param name="x">X percents position in screen</param>
+            <returns>Screen pixels</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.HeightPercentsToPixels(System.Single)">
+            <summary>
+            Transform screen percents to screen pixels
+            </summary>
+            <param name="y">Y percents position in screen</param>
+            <returns>Screen pixels</returns>
+        </member>
+        <member name="M:PlayQ.UITestTools.UITestUtils.GetStringComparator(System.String,System.Boolean)">
+            <summary>
+            Gets the string comparator by specified text and regex option
+            </summary>
+            <returns>The string comparator</returns>
+            <param name="text">Text</param>
+            <param name="useRegEx">Is the specified text a regular expression</param>
+        </member>
+        <member name="T:Tests.Nodes.Node">
+            <summary>
+            Node in a tree
+            </summary>
+        </member>
+        <member name="F:Tests.Nodes.Node.parent">
+            <summary>
+            Parent node
+            </summary>
+        </member>
+        <member name="F:Tests.Nodes.Node.children">
+            <summary>
+            Child nodes
+            </summary>
+        </member>
+    </members>
+</doc>

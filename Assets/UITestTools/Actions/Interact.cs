@@ -12,6 +12,9 @@ using UnityEngine.UI;
 
 namespace PlayQ.UITestTools
 {
+    /// <summary>
+    /// Contains methods which allow interacting with game components and objects on the scene
+    /// </summary>
     public static partial class Interact
     {
         private static string GenerateScreenshotDirectoryPath()
@@ -31,10 +34,9 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Makes screenshot. Saves it to persistant data folder.
+        /// Makes a screenshot. Saves it to persistant data folder
         /// </summary>
         /// <param name="name">Name of screenshot</param>
-        /// <returns></returns>
         [ShowInEditor(typeof(MakeScreenshot), "Screenshot/Make Screenshot", false)]
         public static IEnumerator MakeScreenShot(string name)
         {
@@ -63,8 +65,8 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Reset FPS.
-        /// FPS counter counts average fps, minimum and maximum FPS since the moment this method is called.
+        /// Resets FPS counter
+        /// FPS counter stores average fps, minimum and maximum FPS values since the last moment this method was called
         /// </summary>
         [ShowInEditor(typeof(ResetFPSClass), "FPS/Reset FPS", false)]
         public static void ResetFPS()
@@ -86,7 +88,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Store FPS data to the disc.
+        /// Clears FPS data from the hard drive
         /// </summary>
         public static void ClearFPSMetrics()
         {
@@ -97,7 +99,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Store FPS data to the disc.
+        /// Stores FPS data on the hard drive
         /// </summary>
         /// <param name="tag">Measure discription</param>
         [ShowInEditor(typeof(SaveFPSClass), "FPS/Save FPS", false)]
@@ -197,7 +199,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Sets timescale.
+        /// Sets timescale
         /// </summary>
         /// <param name="scale">New timescale</param>
         [ShowInEditor(typeof(SetTimescaleClass), "Timescale", false)]
@@ -223,7 +225,7 @@ namespace PlayQ.UITestTools
         
 #region Click
         /// <summary>
-        /// Emulates click on `Unity UI` element by path.
+        /// Emulates LMB click on `Unity UI` element by given path
         /// </summary>
         /// <param name="path">Path to GameObject in hierarchy</param>
         [ShowInEditor(typeof(ButtonClick), "Button Click")]
@@ -256,7 +258,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Emulates click on `Unity UI GameObject`.
+        /// Emulates LMB click on `Unity UI GameObject`
         /// </summary>
         /// <param name="go">GameObject to click</param>
         public static void Click(GameObject go)
@@ -283,12 +285,11 @@ namespace PlayQ.UITestTools
         } 
         
         /// <summary>
-        /// Waits until `GameObject` by path is present on scene, active in hierarchy, the delay durin delay, then emulate click. Fails on timeout.
+        /// Waits until `GameObject` by given path is present on scene and active in hierarchy then emulates LMB click after the specified delay. Fails if exceeds the given timeout
         /// </summary>
         /// <param name="path">Path to GameObject in hierarchy</param>
         /// <param name="delay">Amount of time to delay</param>
         /// <param name="timeout">Timeout</param>
-        /// <returns></returns>
         [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Wait, Delay and Click", true)]
         public static IEnumerator WaitDelayAndClick(string path, float delay, float timeout)
         {
@@ -299,14 +300,14 @@ namespace PlayQ.UITestTools
             }
             Click(path);
         }
-        
+
         /// <summary>
-        /// Waits until `GameObject` by path is present on scene, active in hierarchy, the delay durin delay, then emulate click. Fails on timeout.
+        /// Obsolete. Use WaitDelayAndClick instead
+        /// Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay. Fails if exceeds the given timeout
         /// </summary>
         /// <param name="path">Path to GameObject in hierarchy</param>
         /// <param name="delay">Amount of time to delay</param>
         /// <param name="timeout">Timeout</param>
-        /// <returns></returns>
         //todo make it by desing
         [Obsolete]
         [ShowInEditor(typeof(ObsoleteButtonWaitClickAndDelay), "Obsolete Wait, Click And Delay")]
@@ -324,12 +325,12 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Waits until `GameObject` by path is present on scene, active in hierarchy, the delay durin delay, then emulate click. Doesn't fail on timeout.
+        /// Obsolete. Use WaitDelayAndClick instead
+        /// Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay
         /// </summary>
         /// <param name="path">Path to GameObject in hierarchy</param>
         /// <param name="delay">Amount of time to delay</param>
         /// <param name="timeout">Timeout</param>
-        /// <returns></returns>
         //todo remove it
         [Obsolete]
         [ShowInEditor(typeof(ObsoleteButtonWaitClickAndDelay), "Obsolete Wait, Click And Delay if Possible")]
@@ -397,7 +398,7 @@ namespace PlayQ.UITestTools
         
       
         /// <summary>
-        /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform click on it.
+        /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast UI by specified coords to find `GameObject` and perform LMB click on it
         /// </summary>
         /// <param name="x">X position in screen pixels</param>
         /// <param name="y">Y position in screen pixels</param>
@@ -434,7 +435,7 @@ namespace PlayQ.UITestTools
         
         
         /// <summary>
-        /// Find pixel coordinates by screen percents and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform click on it.
+        /// Finds screen space pixel coordinates by given screen size percents and uses `UnityEngine.EventSystems.EventSystem` class to raycast by resulting coordinates to find `GameObject` and perform LMB click on it
         /// </summary>
         /// <param name="x">X position in screen percents</param>
         /// <param name="y">Y position in screen percents</param>
@@ -472,12 +473,11 @@ namespace PlayQ.UITestTools
 
 #region Drag
         /// <summary>
-        /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform drag on it.
+        /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find `GameObject` and perform drag on it
         /// </summary>
         /// <param name="from">Start position in pixels</param>
         /// <param name="to">Finish position in pixels</param>
-        /// <param name="time">Drag Time</param>
-        /// <returns></returns>
+        /// <param name="time">Drag Time (optional, default = 1)</param>
         public static IEnumerator DragPixels(Vector2 from, Vector2 to, float time = 1)
         {
             var go = UITestUtils.FindObjectByPixels(from.x, from.y);
@@ -488,14 +488,13 @@ namespace PlayQ.UITestTools
             }
             yield return DragPixels(go, from, to, time);
         }
-        
+
         /// <summary>
-        /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` and perform drag on it.
+        /// Uses `UnityEngine.EventSystems.EventSystem` class to raycast by given coordinates to find `GameObject` and perform drag on it
         /// </summary>
         /// <param name="from">Start position in percents</param>
         /// <param name="to">Finish position in percents</param>
-        /// <param name="time">Drag Time</param>
-        /// <returns></returns>
+        /// <param name="time">Drag Time (optional, default = 1)</param>
         public static IEnumerator DragPercents(Vector2 from, Vector2 to, float time = 1)
         {
             var startPixel = new Vector2(Screen.width * from.x, Screen.height * from.y);
@@ -504,42 +503,39 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Perform drag on `GameObject`.
+        /// Perform drag on `GameObject`
         /// </summary>
         /// <param name="go">`GameObject` to drag</param>
         /// <param name="to">Finish position in pixels</param>
-        /// <param name="time">Drag Time</param>
-        /// <returns></returns>
+        /// <param name="time">Drag Time (optional, default = 1)</param>
         public static IEnumerator DragPixels(GameObject go, Vector2 to, float time = 1)
         {
             var rectTransform = go.transform as RectTransform;
             if (rectTransform == null)
             {
-                Assert.Fail("Can't find rect transform on object \"{0}\"", go.name);
+                Assert.Fail("Can't find rect transform on object \"" + go.name + "\"");
             }
             yield return DragPixels(go, null, to, time);
         }
 
         /// <summary>
-        /// Perform drag on `GameObject`.
+        /// Perform drag on `GameObject`
         /// </summary>
         /// <param name="go">`GameObject` to drag</param>
         /// <param name="to">Finish position in percents</param>
-        /// <param name="time">Drag Time</param>
-        /// <returns></returns>
+        /// <param name="time">Drag Time (optional, default = 1)</param>
         public static IEnumerator DragPercents(GameObject go, Vector2 to, float time = 1)
         {
             yield return DragPixels(go, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
         }
 
         /// <summary>
-        /// Perform drag on `GameObject`.
+        /// Perform drag on `GameObject`
         /// </summary>
         /// <param name="go">`GameObject` to drag</param>
         /// <param name="from">Start position in percents</param>
         /// <param name="to">Finish position in percents</param>
-        /// <param name="time">Drag Time</param>
-        /// <returns></returns>
+        /// <param name="time">Drag Time (optional, default = 1)</param>
         public static IEnumerator DragPixels(GameObject go, Vector2? from, Vector2 to, float time = 1)
         {
             if (!go.activeInHierarchy)
@@ -552,7 +548,7 @@ namespace PlayQ.UITestTools
 
             if (scrollElement == null)
             {
-                Assert.Fail("Can't find draggable object for \"{0}\"", go.name);
+                Assert.Fail("Can't find draggable object for \"" + go.name + "\"");
             }
 
             if (from != null)
@@ -564,7 +560,7 @@ namespace PlayQ.UITestTools
 
             if (!raycaster)
             {
-                Assert.Fail("Can't find GraphicRaycaster object for \"{0}\"", go.name);
+                Assert.Fail("Can't find GraphicRaycaster object for \"" + go.name + "\"");
             }
 
             var initialize = new PointerEventData(EventSystem.current)
@@ -580,9 +576,11 @@ namespace PlayQ.UITestTools
             ExecuteEvents.Execute(scrollElement, initialize, ExecuteEvents.beginDragHandler);
             
             var currentTime = 0f;
+
             while (currentTime <= time)
             {
                 yield return null;
+
                 var targetPos = Vector2.Lerp(fromPos, to, currentTime / time);
                 var drag = new PointerEventData(EventSystem.current)
                 {
@@ -593,6 +591,7 @@ namespace PlayQ.UITestTools
                         module = raycaster    
                     }
                 };
+
                 ExecuteEvents.Execute(scrollElement, drag, ExecuteEvents.dragHandler);
                 currentTime += Time.deltaTime;
             }
@@ -610,14 +609,13 @@ namespace PlayQ.UITestTools
            
             ExecuteEvents.Execute(scrollElement, finalDrag, ExecuteEvents.endDragHandler);
         }
-        
+
         /// <summary>
-        /// Perform drag on `GameObject` by path.
+        /// Perform drag on `GameObject` by path
         /// </summary>
         /// <param name="path">Path to GameObject in hierarchy</param>
         /// <param name="to">Finish position in pixels</param>
-        /// <param name="time">Drag Time</param>
-        /// <returns></returns>
+        /// <param name="time">Drag Time (optional, default = 1)</param>
         public static IEnumerator DragPixels(string path, Vector2 to, float time = 1)
         {
             GameObject go = UITestUtils.FindAnyGameObject(path);
@@ -629,17 +627,25 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Perform drag on `GameObject` by path.
+        /// Perform drag on `GameObject` by path
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="to">Finish position in percents</param>
-        /// <param name="time">Drag Time</param>
-        /// <returns></returns>
+        /// <param name="time">Drag Time (optional, default = 1)</param>
         public static IEnumerator DragPercents(string path, Vector2 to, float time = 1)
         {
             yield return DragPixels(path, new Vector2(Screen.width * to.x, Screen.height * to.y), time);
         }
-        
+
+        /// <summary>
+        /// Perform scroll on `GameObject` by path
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="horizontalPosition">Horizontal position</param>
+        /// <param name="verticalPosition">Vertical position</param>
+        /// <param name="animationDuration">Animation duration (optional, default = 1)</param>
+        /// <param name="timeout">Timeout (optional, default = 2)</param>
+        /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         [ShowInEditor(typeof(ScrollToPositionClass), "Scroll To Position")]
         public static IEnumerator ScrollToPosition(string path,
             float horizontalPosition,
@@ -693,8 +699,16 @@ namespace PlayQ.UITestTools
                 return scrollRect != null;
             } 
         }
-        
-        
+
+        /// <summary>
+        /// Obtains drag percents of `GameObject` by path
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="fromPercentX">Min percent of drag at dimension X</param>
+        /// <param name="fromPercentY">Min percent of drag at dimension Y</param>
+        /// <param name="toPercentX">Max percent of drag at dimension X</param>
+        /// <param name="toPercentY">Max percent of drag at dimension Y</param>
+        /// <param name="time">Time (optional, default = 1)</param>
         [ShowInEditor(typeof(DragPercentsClass), "Drag percents")]
         public static IEnumerator DragPercents(string path,
             float fromPercentX, float fromPercentY,
@@ -736,7 +750,7 @@ namespace PlayQ.UITestTools
 
 #region Text      
         /// <summary>
-        /// Finds `GameObject` by path, checks if `GameObject` has `Text` component, fail if it has not. If not fail, then set text variable of `Text` to given value.
+        /// Finds `GameObject` by path, checks if `GameObject` has `Text` component attached, then sets text variable of `Text` to given value
         /// </summary>
         /// <param name="go">`GameObject` with `Text` component</param>
         /// <param name="text">`Text` to set</param>
@@ -751,7 +765,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Finds `GameObject` by path, checks if `GameObject` has `Text` component, fail if it has not. If not fail, then set text variable of `Text` to given value.
+        /// Finds `GameObject` by path, checks if `GameObject` has `Text` component attached, then set text variable of `Text` to given value
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="text">`Text` to set</param>
@@ -780,7 +794,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks if `GameObject` has `InputField` component. Fails if not. Then appends given text to text variable of `InputField`
+        /// Checks if `GameObject` has `InputField` component attached, then appends given text to text variable of `InputField`
         /// </summary>
         /// <param name="go">`GameObject` with `Text` component</param>
         /// <param name="text">`Text` to set</param>
@@ -795,7 +809,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Appends text to `GameObject` by path with `InputField` component.
+        /// Appends text to `GameObject` by path with `InputField` component attached
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="text">`Text` to set</param>

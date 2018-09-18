@@ -193,7 +193,7 @@ namespace PlayQ.UITestTools
         /// <summary>
         ///   <para>An exception that is thrown on a failure. Assertions.Assert._raiseExceptions needs to be set to true.</para>
         /// </summary>
-        private class AssertionException : Exception
+        public class AssertionException : Exception
         {
             private string m_UserMessage;
 
@@ -208,7 +208,7 @@ namespace PlayQ.UITestTools
                 get
                 {
                     string str = base.Message;
-                    if (this.m_UserMessage != null)
+                    if (!string.IsNullOrEmpty(this.m_UserMessage))
                         str = str + (object) '\n' + this.m_UserMessage;
                     return str;
                 }
@@ -255,10 +255,16 @@ namespace PlayQ.UITestTools
         /// </summary>
         public static bool raiseExceptions = true;
 
+        public static void Fail()
+        {
+            Fail(string.Empty, string.Empty);
+        }
+
         public static void Fail(string message)
         {
             Fail(message, string.Empty);
         }
+
         public static void Fail(string message, string userMessage)
         {
             if (Debugger.IsAttached)
@@ -269,6 +275,7 @@ namespace PlayQ.UITestTools
                 message = "Assertion has failed\n";
             if (userMessage != null)
                 message = userMessage + (object) '\n' + message;
+
             UnityEngine.Debug.LogAssertion((object) message);
         }
 
@@ -344,6 +351,20 @@ namespace PlayQ.UITestTools
         {
             Assert.AreEqual<float>(expected, actual, message,
                 (IEqualityComparer<float>) FloatComparer.s_ComparerWithDefaultTolerance);
+        }
+
+        /// <summary>
+        ///         <para>Asserts that the values are approximately equal. An absolute error check is used for approximate equality check (|a-b| &lt; tolerance). Default tolerance is 0.00001f.
+        /// 
+        /// Note: Every time you call the method with tolerance specified, a new instance of Assertions.Comparers.FloatComparer is created. For performance reasons you might want to instance your own comparer and pass it to the AreEqual method. If the tolerance is not specifies, a default comparer is used and the issue does not occur.</para>
+        ///       </summary>
+        /// <param name="tolerance">Tolerance of approximation.</param>
+        /// <param name="expected"></param>
+        /// <param name="actual"></param>
+        /// <param name="message"></param>
+        public static void AreEqual(float expected, float actual, float tolerance)
+        {
+            Assert.AreApproximatelyEqual(expected, actual, tolerance, (string)null);
         }
 
         /// <summary>

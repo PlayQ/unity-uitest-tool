@@ -1,20 +1,64 @@
 ﻿﻿using System.Collections;
-using NUnit.Framework;
-using UnityEngine.TestTools;
-using PlayQ.UITestTools;
  using UnityEngine.SceneManagement;
  using Object = UnityEngine.Object;
+using AssertionException = PlayQ.UITestTools.Assert.AssertionException;
 
 namespace PlayQ.UITestTools.Tests
 {
     public class UITestWaitFail
     {
+        [SetUp]
+        public IEnumerator LoadSceneSetUp()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
+            sceneLoaded = false;
+
+            SceneManager.LoadScene("1", LoadSceneMode.Additive);
+
+            while (!sceneLoaded)
+            {
+                yield return null;
+            }
+        }
+
+        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            sceneLoaded = true;
+
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private bool sceneLoaded;
+
+        [TearDown]
+        public IEnumerator UnloadSceneTearDown()
+        {
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+            sceneUnloaded = false;
+
+            SceneManager.UnloadSceneAsync("1");
+
+            while (!sceneUnloaded)
+            {
+                yield return null;
+            }
+        }
+
+        void OnSceneUnloaded(Scene scene)
+        {
+            sceneUnloaded = true;
+
+            SceneManager.sceneUnloaded -= OnSceneUnloaded;
+        }
+
+        private bool sceneUnloaded;
+
+
         [UnityTest]
         public IEnumerator WaitForObjectByName()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.DestroyImmediate(testObject);
 
@@ -26,10 +70,7 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectByComponent()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
-            var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
+            var testObject = UITestUtils.FindAnyGameObject<TestObject>();
             Object.DestroyImmediate(testObject);
 
             yield return Wait.ObjectInstantiated<TestObject>();
@@ -38,9 +79,6 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectByComponentAndName()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             Object.DestroyImmediate(testObject);
 
@@ -50,41 +88,29 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectDestractionByComponent()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             //wait during interval for destraction of object with component "ObjectThatWillBeDestroyedInSecond"
-            yield return Wait.ObjectDestroy<TestObject>(1);
+            yield return Wait.ObjectDestroyed<TestObject>(1);
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectDestractionByInstance()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
 
             //wait during interval for object destraction by object instance
-            yield return Wait.ObjectDestroy(objectInstance);
+            yield return Wait.ObjectDestroyed(objectInstance);
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectDestractionByName()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             //wait during interval for object destraction by object name "Object_that_will_be_destroyed_in_second"
-            yield return Wait.ObjectDestroy("container");
+            yield return Wait.ObjectDestroyed("container");
         }
 
         [UnityTest]
         public IEnumerator WaitForObjectDisabledByName()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             //check for disabled
             yield return Wait.ObjectDisabled("Object_enabled_at_start");
 
@@ -94,9 +120,6 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectDisabledByComponent()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             //check for disabled
             yield return Wait.ObjectDisabled<TestObject>();
 
@@ -106,9 +129,6 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectEnabledByComponent()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             testObject.SetActive(false);
             //check for enabled by component type
@@ -119,9 +139,6 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForObjectEnabledByName()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
             testObject.SetActive(false);
 
@@ -133,9 +150,6 @@ namespace PlayQ.UITestTools.Tests
         [UnityTest]
         public IEnumerator WaitForButtonAccesible()
         {
-            yield return null;
-            SceneManager.LoadScene("1", LoadSceneMode.Additive);
-
             var button = UITestUtils.FindAnyGameObject("container");
             yield return Wait.ButtonAccessible(button);
         }

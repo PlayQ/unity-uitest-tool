@@ -9,15 +9,18 @@ using UnityEngine.UI;
 
 namespace PlayQ.UITestTools
 {
+    /// <summary>
+    /// Contains methods which allow checking the state of game components and objects on the scene
+    /// </summary>
     public static partial class Check
     {
         #region Text
 
         /// <summary>
-        /// Checks `GameObject` by given path has `Text` component and it's variable text is equals to expected text.
+        /// Checks that `GameObject` by given path has `Text` component attached and its variable text is equal to expected text
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
-        /// <param name="expectedText">Expected text</param>\
+        /// <param name="expectedText">Expected text</param>
         [ShowInEditor(typeof(CheckTextEquals), "Text Equals")]
         public static void TextEquals(string path, string expectedText)
         {
@@ -27,7 +30,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` by given path has `Text` component and it's variable text is not equals to expected text.
+        /// Checks that `GameObject` by given path has `Text` component attached and its variable text is not equal to expected text
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="expectedText">Expected text</param>
@@ -58,7 +61,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` has `Text` component and it's variable text is equals to expected text.
+        /// Checks that `GameObject` has `Text` component attached and its variable text is equal to expected text
         /// </summary>
         /// <param name="go">`GameObject` with `Text` component</param>
         /// <param name="expectedText">Expected text</param>
@@ -77,7 +80,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` has `Text` component and it's variable text is not equals to expected text.
+        /// Checks that `GameObject` has `Text` component attached and its variable text is not equal to expected text
         /// </summary>
         /// <param name="go">`GameObject` with `Text` component</param>
         /// <param name="expectedText">Expected text</param>
@@ -100,7 +103,7 @@ namespace PlayQ.UITestTools
         #region Input
         
         /// <summary>
-        /// Checks `GameObject` has `InputField` component and it's variable text is equals to expected text.
+        /// Checks that `GameObject` has `InputField` component attached and its variable text is equal to expected text
         /// </summary>
         /// <param name="go">`GameObject` with `InputField` component</param>
         /// <param name="expectedText">Expected text</param>
@@ -119,7 +122,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` has `InputField` component and it's variable text is not equals to expected text.
+        /// Checks that `GameObject` has `InputField` component attached and its variable text is not equal to expected text
         /// </summary>
         /// <param name="go">`GameObject` with `InputField` component</param>
         /// <param name="expectedText">Expected text</param>
@@ -138,7 +141,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` by given path has `InputField` component and it's variable text is equals to expected text.
+        /// Checks that `GameObject` by given path has `InputField` component attached and its variable text is equal to expected text
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="expectedText">Expected text</param>
@@ -151,7 +154,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` by given path has `InputField` component and it's variable text is not equals to expected text.
+        /// Checks that `GameObject` by given path has `InputField` component attached and its variable text is not equal to expected text
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="expectedText">Expected text</param>
@@ -197,7 +200,11 @@ namespace PlayQ.UITestTools
                 return go != null;
             }
         }
-        
+
+        /// <summary>
+        /// Checks that `Gameobject` by given path is present on scene and active in hierarchy
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
         [ShowInEditor(typeof(IsEnableGenerator), "Is Enable")]
         public static void IsEnable(string path)
         {
@@ -210,7 +217,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `Gameobject` by path is present on scene, contains component `T` and active in hierarchy.
+        /// Checks that `Gameobject` by given path is present on scene, contains component `T` and is active in hierarchy
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">`Type` of object</typeparam>
@@ -225,7 +232,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Searches for `Gameobject` with component `T` and checks it is present on scene and active in hierarchy.
+        /// Searches for `Gameobject` with component `T` and checks that it is present on scene and active in hierarchy
         /// </summary>
         /// <typeparam name="T">`Type` of object</typeparam>
         public static void IsEnable<T>() where T : Component
@@ -239,7 +246,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` is active in hierarchy.
+        /// Checks that `GameObject` is active in hierarchy
         /// </summary>
         /// <param name="go">`GameObject`</param>
         public static void IsEnable(GameObject go)
@@ -250,11 +257,6 @@ namespace PlayQ.UITestTools
                             " Game Object disabled");
             }
         }
-
-        /// <summary>
-        /// Checks `GameObject` by path is present on scene and not active in hierarchy.
-        /// </summary>
-        /// <param name="path">Path to `GameObject` in hierarchy</param>
 
         private class IsDisableGenerator : ShowHelperBase
         {
@@ -269,6 +271,10 @@ namespace PlayQ.UITestTools
             }
         }
 
+        /// <summary>
+        /// Checks that `GameObject` by given path is present on scene and is not active in hierarchy
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
         [ShowInEditor(typeof(IsDisableGenerator), "Is Disable")]
         public static void IsDisable(string path)
         {
@@ -281,7 +287,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` by path is present on scene, contains component `T` and not active in hierarchy.
+        /// Checks that `GameObject` by given path is present on scene, contains component `T` and is not active in hierarchy
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">`Type` of object</typeparam>
@@ -297,7 +303,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Searches for `Gameobject` with component `T` and checks it is present on scene and not active in hierarchy.
+        /// Searches for `Gameobject` with component `T` and checks that it is present on scene and is not active in hierarchy
         /// </summary>
         /// <typeparam name="T">`Type` of object</typeparam>
         public static void IsDisable<T>() where T : Component
@@ -311,7 +317,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` is not active in hierarchy.
+        /// Checks that `GameObject` is not active in hierarchy
         /// </summary>
         /// <param name="go">`GameObject`</param>
         public static void IsDisable(GameObject go)
@@ -324,10 +330,10 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `Gameobject` by path is present on scene and it's active in hierarchy flag is equals state variable.
+        /// Checks that `Gameobject` by given path is present on scene and its active in hierarchy flag equals to state variable
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
-        /// <param name="state">Enable state</param>
+        /// <param name="state">Enable state (optional, default = true)</param>
         [ShowInEditor(typeof(CheckEnabledState), "Check Enabled State")]
         public static void CheckEnabled(string path, bool state = true)
         {
@@ -371,7 +377,7 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Checks `GameObject` by give path is present on scene.
+        /// Checks that `GameObject` by given path is present on scene
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <returns>`GameObject`</returns>
@@ -388,11 +394,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` by give path is present on scene and contains component `T`.
+        /// Checks that `GameObject` by given path is present on scene and contains component `T`
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">`Type` of object</typeparam>
-        /// <returns></returns>
+        /// <returns>`GameObject`</returns>
         public static GameObject IsExist<T>(string path) where T : Component
         {
             var go = UITestUtils.FindAnyGameObject<T>(path);
@@ -406,10 +412,10 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Searches for `GameObject` with component `T` on scene.
+        /// Searches for `GameObject` with component `T` on scene
         /// </summary>
         /// <typeparam name="T">`Type` of object</typeparam>
-        /// <returns></returns>
+        /// <returns>`GameObject`</returns>
         public static GameObject IsExist<T>() where T : Component
         {
             var go = UITestUtils.FindAnyGameObject<T>();
@@ -422,7 +428,7 @@ namespace PlayQ.UITestTools
             return go.gameObject;
         }
 
-        private class IsNotExistsGenerator : ShowHelperBase
+        private class DoesNotExistsGenerator : ShowHelperBase
         {
             public override AbstractGenerator CreateGenerator(GameObject go)
             {
@@ -434,8 +440,12 @@ namespace PlayQ.UITestTools
                 return go != null;
             }
         }
-        
-        [ShowInEditor(typeof(IsNotExistsGenerator), "Does Not Exist")]
+
+        /// <summary>
+        /// Checks that `GameObject` by given path is not present on scene
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        [ShowInEditor(typeof(DoesNotExistsGenerator), "Does Not Exist")]
         public static void DoesNotExist(string path)
         {
             var go = UITestUtils.FindAnyGameObject(path);
@@ -447,13 +457,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` by give path is not present on scene or it not active.
+        /// Checks that `GameObject` by given path is not present on scene or is not active
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
-        /// <param name="timeout">Timeout</param>
-        /// <param name="ignoreTimeScale">Should we ignore time scale or not</param>
-        /// <returns></returns>
-        /// 
+        /// <param name="timeout">Timeout (optional, default = 2)</param>
+        /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         [ShowInEditor(typeof(DoesNotExistOrDisabledClass), "Does Not Exist Or Disabled")]
         public static IEnumerator DoesNotExistOrDisabled(string path, float timeout = 2, bool ignoreTimeScale = false)
         {
@@ -483,7 +491,7 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks `GameObject` by give path and component `T` is not present on scene.
+        /// Checks that `GameObject` by given path with component `T` is not present on scene
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">`Type` of object</typeparam>
@@ -493,12 +501,12 @@ namespace PlayQ.UITestTools
 
             if (go != null)
             {
-                Assert.Fail("IsNotExist<" + typeof(T) + ">: Object with path " + path + " exists.");
+                Assert.Fail("DoesNotExist<" + typeof(T) + ">: Object with path " + path + " exists.");
             }
         }
 
         /// <summary>
-        /// Searches for any `GameObject` on scene with component `T`. Fails if found one.
+        /// Checks that no `GameObject` with component `T` is present on scene
         /// </summary>
         /// <typeparam name="T">`Type` of object</typeparam>
         public static void DoesNotExist<T>() where T : Component
@@ -507,7 +515,7 @@ namespace PlayQ.UITestTools
 
             if (go != null)
             {
-                Assert.Fail("IsNotExist<" + typeof(T) + ">: Object exists.");
+                Assert.Fail("DoesNotExist<" + typeof(T) + ">: Object exists.");
             }
         }
 
@@ -516,10 +524,10 @@ namespace PlayQ.UITestTools
         #region Toggle
 
         /// <summary>
-        /// Checks thart `GameObject` has `Toggle` component and it's `isOn` value is equals to expected.
+        /// Checks that `GameObject` has `Toggle` component and its `isOn` value equals to expected
         /// </summary>
         /// <param name="go">`GameObject` with `Toggle` component</param>
-        /// <param name="expectedIsOn"></param>
+        /// <param name="expectedIsOn">Expected value of the toggle</param>
         public static void CheckToggle(GameObject go, bool expectedIsOn)
         {
             var toggle = UITestUtils.FindGameObjectWithComponentInParents<Toggle>(go);
@@ -558,19 +566,24 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks thart `GameObject` by given path has `Toggle` component and it's `isOn` value is equals to expected.
+        /// Checks that `GameObject` by given path has `Toggle` component and its `isOn` value equals to expected
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="state">Toggle state</param>
         [ShowInEditor(typeof(CheckToggleState), "Check Toggle State")]
-        public static void CheckToggle(string path, bool state)
+        public static void Toggle(string path, bool state)
         {
             var go = IsExist(path);
             Toggle toggle = go.GetComponent<Toggle>();
             Assert.IsNotNull(toggle, "CheckToggle: Game object " + path + " has no Toggle component.");
-            Assert.AreNotEqual(state, toggle.isOn, "CheckToggle: Toggle " + path +
-                                                   " is " + (toggle.isOn ? "On" : "Off") + " - but expected  " +
-                                                   " is " + (state ? "On" : "Off"));
+            Assert.AreEqual(
+                state,
+                toggle.isOn,
+                string.Format(
+                    "CheckToggle: Toggle {0} is {1} - but expected is {2}", 
+                    path, 
+                    (toggle.isOn ? "On" : "Off"), 
+                    (state ? "On" : "Off")));
         }
 
         #endregion
@@ -578,13 +591,11 @@ namespace PlayQ.UITestTools
         #region Animation
 
         /// <summary>
-        /// Seraches for `GameObject` by given path with `Animator` component. Waits during given `timeOut` until animation state with given name becames active.
+        /// Seraches for `GameObject` by given path with `Animator` component. During a given `timeOut` waits for an animation state with specific name to become active
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="stateName">`Animator` state name</param>
         /// <param name="timeout">Timeout</param>
-        /// <returns></returns>
-
         [ShowInEditor(typeof(AnimatorStateStartedClass), "Animator State Started", false)]
         public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout)
         {
@@ -677,11 +688,11 @@ namespace PlayQ.UITestTools
         #region Fps
 
         /// <summary>
-        /// Checks average fps since moment user last time called `Interact.ResetFPS()` method or since game started. If average fps less than `targetFPS` test will faled.
+        /// Checks average fps since the last time user called `Interact.ResetFPS()` method or since the game started. If average fps is less than `targetFPS` value, test fails
         /// </summary>
-        /// <param name="targetFPS">Minimum allowable value of average fps</param>
+        /// <param name="targetFPS">Minimum acceptable value of average fps</param>
         [ShowInEditor(typeof(CheckAverageFPSClass), "FPS/Check Average FPS", false)]
-        public static void CheckAverageFPS(float targetFPS)
+        public static void AverageFPS(float targetFPS)
         {
             var awerageFps = FPSCounter.AverageFPS;
             Assert.GreaterOrEqual(awerageFps, targetFPS);
@@ -696,11 +707,11 @@ namespace PlayQ.UITestTools
         }
 
         /// <summary>
-        /// Checks minimum fps since moment user last time called `Interact.ResetFPS()` method or since game started. If minimum fps less than `targetFPS` test will faled.
+        /// Checks minimum fps since the last time user called `Interact.ResetFPS()` method or since the game started. If minimum fps is less than `targetFPS` value, test fails
         /// </summary>
-        /// <param name="targetFPS">Minimum allowable value of minimum fps</param>
+        /// <param name="targetFPS">Minimum acceptable value of minimum fps</param>
         [ShowInEditor(typeof(CheckMinFPSClass), "FPS/Check Min FPS", false)]
-        public static void CheckMinFPS(float targetFPS)
+        public static void MinFPS(float targetFPS)
         {
             CheckMinFPSClass.CheckMinFPS(targetFPS);
         }
@@ -725,7 +736,7 @@ namespace PlayQ.UITestTools
         }
 
         #endregion
-        
+
         #region Image
 
         public static void SourceImage(GameObject go, string sourceName)
@@ -800,6 +811,11 @@ namespace PlayQ.UITestTools
             }
         }
 
+        /// <summary>
+        /// Seraches for `GameObject` by given path and checks the source image
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="sourceName">Source image name</param>
         [ShowInEditor(typeof(CheckSourceImage), "Check/Source Image")]
         public static void SourceImage(string path, string sourceName)
         {
