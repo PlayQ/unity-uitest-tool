@@ -513,7 +513,7 @@ namespace PlayQ.UITestTools
             var rectTransform = go.transform as RectTransform;
             if (rectTransform == null)
             {
-                Assert.Fail("Can't find rect transform on object \"{0}\"", go.name);
+                Assert.Fail("Can't find rect transform on object \"" + go.name + "\"");
             }
             yield return DragPixels(go, null, to, time);
         }
@@ -548,7 +548,7 @@ namespace PlayQ.UITestTools
 
             if (scrollElement == null)
             {
-                Assert.Fail("Can't find draggable object for \"{0}\"", go.name);
+                Assert.Fail("Can't find draggable object for \"" + go.name + "\"");
             }
 
             if (from != null)
@@ -560,7 +560,7 @@ namespace PlayQ.UITestTools
 
             if (!raycaster)
             {
-                Assert.Fail("Can't find GraphicRaycaster object for \"{0}\"", go.name);
+                Assert.Fail("Can't find GraphicRaycaster object for \"" + go.name + "\"");
             }
 
             var initialize = new PointerEventData(EventSystem.current)
@@ -576,9 +576,11 @@ namespace PlayQ.UITestTools
             ExecuteEvents.Execute(scrollElement, initialize, ExecuteEvents.beginDragHandler);
             
             var currentTime = 0f;
+
             while (currentTime <= time)
             {
                 yield return null;
+
                 var targetPos = Vector2.Lerp(fromPos, to, currentTime / time);
                 var drag = new PointerEventData(EventSystem.current)
                 {
@@ -589,6 +591,7 @@ namespace PlayQ.UITestTools
                         module = raycaster    
                     }
                 };
+
                 ExecuteEvents.Execute(scrollElement, drag, ExecuteEvents.dragHandler);
                 currentTime += Time.deltaTime;
             }

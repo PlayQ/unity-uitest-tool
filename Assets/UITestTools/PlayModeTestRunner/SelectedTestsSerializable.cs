@@ -104,7 +104,7 @@ public class SelectedTestsSerializable : ScriptableObject
 #if UNITY_EDITOR
     public static SelectedTestsSerializable CreateOrLoad()
     {
-        var asset = Resources.Load<SelectedTestsSerializable>("SelectedTest");
+        var asset = Resources.Load<SelectedTestsSerializable>("SelectedTests");
 
         if (!asset)
         {
@@ -120,6 +120,8 @@ public class SelectedTestsSerializable : ScriptableObject
                 AssetDatabase.CreateAsset(asset, path);
                 AssetDatabase.SaveAssets();
             }
+            else
+                throw new Exception("SelectedTestsSerializable: UNABLE TO FIND FOLDER NAMED \"PlayModeTestRunner\"");
         }
 
         return asset;

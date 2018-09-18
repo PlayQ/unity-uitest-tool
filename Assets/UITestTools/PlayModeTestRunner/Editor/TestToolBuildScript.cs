@@ -29,6 +29,7 @@ public class TestToolBuildScript
     [UsedImplicitly]
     private static void TestBuild()
     {
+        SetTimeScaleFromCommandLineArgument();
         PrepareTestBuild();
         
         string[] list = EditorBuildSettings.scenes.Where(x => x.enabled).Select(x => x.path).ToArray();
@@ -40,6 +41,17 @@ public class TestToolBuildScript
     //for executing from connamd line
     [UsedImplicitly]
     public static void RunPlayModeTests()
+    {
+        SetTimeScaleFromCommandLineArgument();
+
+        PlayerPrefs.SetString("PackageUpdaterLastChecked68207", DateTime.Now.ToString(CultureInfo.InvariantCulture));
+
+        PlayModeTestRunner.QuitAppAfterCompleteTests = true;
+        ResolveTestMode();
+        PlayModeTestRunner.Run();
+    }
+
+    private static void SetTimeScaleFromCommandLineArgument()
     {
         string timeScaleString = ConsoleArgumentHelper.GetArg("-timeScale");
 
@@ -53,12 +65,6 @@ public class TestToolBuildScript
             timeScale = 1;
         }
         PlayModeTestRunner.DefaultTimescale = timeScale;
-
-        PlayerPrefs.SetString("PackageUpdaterLastChecked68207", DateTime.Now.ToString(CultureInfo.InvariantCulture));
-
-        PlayModeTestRunner.QuitAppAfterCompleteTests = true;
-        ResolveTestMode();
-        PlayModeTestRunner.Run();
     }
 
     private static void AddTestSceneToBuild()

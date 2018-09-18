@@ -193,7 +193,7 @@ namespace PlayQ.UITestTools
         /// <summary>
         ///   <para>An exception that is thrown on a failure. Assertions.Assert._raiseExceptions needs to be set to true.</para>
         /// </summary>
-        private class AssertionException : Exception
+        public class AssertionException : Exception
         {
             private string m_UserMessage;
 
@@ -208,7 +208,7 @@ namespace PlayQ.UITestTools
                 get
                 {
                     string str = base.Message;
-                    if (this.m_UserMessage != null)
+                    if (!string.IsNullOrEmpty(this.m_UserMessage))
                         str = str + (object) '\n' + this.m_UserMessage;
                     return str;
                 }

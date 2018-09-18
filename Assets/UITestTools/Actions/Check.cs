@@ -576,9 +576,14 @@ namespace PlayQ.UITestTools
             var go = IsExist(path);
             Toggle toggle = go.GetComponent<Toggle>();
             Assert.IsNotNull(toggle, "CheckToggle: Game object " + path + " has no Toggle component.");
-            Assert.AreNotEqual(state, toggle.isOn, "CheckToggle: Toggle " + path +
-                                                   " is " + (toggle.isOn ? "On" : "Off") + " - but expected  " +
-                                                   " is " + (state ? "On" : "Off"));
+            Assert.AreEqual(
+                state,
+                toggle.isOn,
+                string.Format(
+                    "CheckToggle: Toggle {0} is {1} - but expected is {2}", 
+                    path, 
+                    (toggle.isOn ? "On" : "Off"), 
+                    (state ? "On" : "Off")));
         }
 
         #endregion

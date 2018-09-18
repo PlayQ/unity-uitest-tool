@@ -61,6 +61,18 @@ namespace PlayQ.UITestTools
                 handlePosition = CenterPointOfObject(go.transform as RectTransform);
                 return scrollRect.gameObject;
             }
+
+            var slider = go.GetComponent<Slider>();
+            if (slider == null)
+            {
+                slider = go.GetComponentInParent<Slider>();
+            }
+            if (slider != null)
+            {
+                handlePosition = CenterPointOfObject(go.transform as RectTransform);
+                return slider.gameObject;
+            }
+
             return null;
         }
         

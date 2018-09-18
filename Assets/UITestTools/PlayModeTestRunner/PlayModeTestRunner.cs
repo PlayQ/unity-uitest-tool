@@ -85,7 +85,7 @@ namespace PlayQ.UITestTools
         private static bool isRunning;
 
 
-        private static SelectedTestsSerializable serializedTests;
+        //private static SelectedTestsSerializable serializedTests;
         public static SelectedTestsSerializable SerializedTests
         {
             get
@@ -113,7 +113,7 @@ namespace PlayQ.UITestTools
             playModeLogger = new PlayModeLogger();
             screenGUIDrawer = new PlayModeTestRunnerGUI();
             logSaver = new LogSaver(Path.Combine(Application.persistentDataPath, LOG_FILE_NAME));
-            serializedTests = SelectedTestsSerializable.Load();
+            //serializedTests = SelectedTestsSerializable.Load();
             testInfoData = new TestInfoData();
 
             if (testsRootNode == null)
@@ -490,9 +490,8 @@ namespace PlayQ.UITestTools
                     continue;
                 }
 
-#if UNITY_EDITOR
                 Time.timeScale = PlayModeTestRunner.DefaultTimescale;
-#endif
+
                 Debug.Log("QA: Running testClass: " + classNode.Type);
                 currentTestState = TestState.InProgress;
 
