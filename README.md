@@ -159,7 +159,7 @@ Unity.exe
 `-buildNumber` - build_numer
 ```
 
-* `-project_path` - absolute path to project folder (Unity attribute);
+* `-projectPath` - absolute path to project folder (Unity attribute);
 * `-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window;
 * `-runOnlySmokeTests` - optional, runs test with `SmokeTest` attribute only;
 * `-timeScale` - timescale for tests;
@@ -179,21 +179,23 @@ Unity.exe
  -timeScale time_scale
 ```
 
+All arguments are the same.
+
 
 API methods
 --------
 
-`Test Tool` common features are split in 5 static partial classes: `Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`. Any of these classes contains list of methods which accordingly check state of given object, wait for resolving of specific condition and set state to given object.
+`Test Tool` common features are split to 5 static partial classes: `Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`. Any of these classes contains a list of methods which accordingly check the state of given object, wait for resolving of specific condition and set state to given object.
 
 For example:
 
 ```c#
-yield return Wait.ObjectEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/speech bubble/SpeechBubble/avatar_king", 20f);
-Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/overlay_square");
-Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/overlay_square_5");
-Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/speech bubble/SpeechBubble/speech bubble");
-Check.TextMeshProEquals("UITutorial/2_1(Clone)/CCBFile/2_1_content/CCLabelBMFontv2", "Match 4 to enchant the feather charms you need in the row.");
-Check.CheckEnabled("UITutorial/2_1(Clone)/CCBFile/2_1_content/pointer finger/SwipeAnim/pointer_finger");
+yield return Wait.ObjectEnabled("SpeechBubble/avatar_king", 20f);
+Check.CheckEnabled("content/overlay_square");
+Check.CheckEnabled("content/overlay_square_5");
+Check.CheckEnabled("content/speech bubble/SpeechBubble/speech bubble");
+Check.TextMeshProEquals("content/CCLabelBMFontv2", "Match 4 to enchant the feather charms you need in the row.");
+Check.CheckEnabled("content/pointer finger/SwipeAnim/pointer_finger");
 yield return Interact.SwipeCell(4, 7, Interact.SwipeCellClass.SwipeDirection.Down, true, 1f);
 ```
 
@@ -216,19 +218,25 @@ Extending Test Tool
 You can extend all of 5 classes with actions (`Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`) because thay are partial.
 
 
-Let's create a simple assertation method, which takes GameObject, checks whether it has your custom component `LevelButton` and check stars count on it. We will create iе in own partial `Check` class.
+Let's create a simple assertation method, which takes `GameObject`, checks whether it has your custom component `LevelButton` and check stars count on it. We will create it in own partial `Check` class.
 
 ``` c#
-public static void StarsCount(string path, int startCount) //path is a full path of GameObject in hierarchy on scene
+public static partial Check
 {
-    var go = IsExist(path); //if object not exist, exception will be thrown and test failed
-    var levelButton = go.GetComponent<LevelButton>();
-    //lest fail test, if component doesn't present on the object
-    if (levelButton == null)
+
+...
+
+    public static void StarsCount(string path, int startCount) //path is a full path of GameObject in hierarchy on scene
     {
-        Assert.Fail("StarsCount: " + path + " object is exist, but LevelButton component not found.");
+        var go = IsExist(path); //if object not exist, exception will be thrown and test failed
+        var levelButton = go.GetComponent<LevelButton>();
+        //lest fail test, if component doesn't present on the object
+        if (levelButton == null)
+        {
+            Assert.Fail("StarsCount: " + path + " object is exist, but LevelButton component not found.");
+        }
+        Assert.AreEqual(levelButton.StartCount, startCount, "Start Count is not equals.");
     }
-    Assert.AreEqual(levelButton.StartCount, startCount, "Start Count is not equals.");
 }
 ```
 Now we can use this method in out test method like this:
