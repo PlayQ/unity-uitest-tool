@@ -15,6 +15,11 @@ Content
 	* [Command Line Arguments](#command-line-arguments)
 * [API methods](#api-methods)
 * [Extending Test Tool](#extending-test-tool)
+	* [Example 1](#Example-1) 
+	* [ShowInEditor](#ShowInEditor)
+	* [How Recording works with Assertations](#How-Recording-works-with-Assertations)
+	* [Example 2](Example-2)
+	* [Another Camera](#Another-Camera)
 
 
 About
@@ -218,6 +223,8 @@ Extending Test Tool
 You can extend all of 5 classes with actions (`Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`) because thay are partial.
 
 
+### Example 1
+
 Let's create a simple assertation method, which takes `GameObject`, checks whether it has your custom component `LevelButton` and check stars count on it. We will create it in own partial `Check` class.
 
 ``` c#
@@ -239,7 +246,7 @@ public static partial Check
     }
 }
 ```
-Now we can use this method in out test method like this:
+Now we can use this method in our test method like this:
 
 ``` c#
 [UnityTest]
@@ -251,9 +258,9 @@ public IEnumerator SomeIntegrationTest()
 }
 ```
 
-Let's create class that show [Flow Recorder](#flow-recorder) when and how it should display it. It should be inherited from `ShowHelperBase` class and implement `CreateGenerator()` method. `CreateGenerator` desribe what entered paramets has method, what default parametrs should be used and how to generate code. 
+Let's create class that shows [Flow Recorder](#flow-recorder) when and how it should display it. It should be inherited from `ShowHelperBase` class and implement `CreateGenerator()` method. `CreateGenerator` desribe what entered paramets has method, what default parameters should be used and how to generate code. 
 
-Also you can override `bool IsAvailable(GameObject go)` method. It will set, is assertation available for current `GameObject`. As default it will return `true`, even if `GameObject` is `null`. You can override method `Camera GetCamera()` to use not main Camera to get game object by click on Flow Recorder not from main camera.
+You can override `bool IsAvailable(GameObject go)` method. This class will set, is assertation available for current `GameObject`. As default it will return `true`, even if `GameObject` is `null`. 
 
 ```c#
 private class CheckStarsCount : ShowHelperBase
@@ -278,7 +285,7 @@ private class CheckStarsCount : ShowHelperBase
 }
 ```
 
-Let's bind our method and class.
+Let's bind our method to class.
 
 ``` c#
 [ShowInEditor(typeof(CheckStarsCount), "Check Start Count on Button")]
@@ -295,23 +302,28 @@ public static void StarsCount(string path, int startCount) //path is a full path
 }
 ```
 
-Done! Now this action will be shown in `Flow Recorder` as `Check Start Count on Button` and will apeared only by clicking to `GameObject` with `LevelButton` component.
-
-`ShowInEditorAttribute` recieve 3 paramers in constructor:
-
-* `Type classType` - type of `ShowHelperBase` class with data for this test assertation.
-* `string description` - human friendly description of what this assertation for, this label is shown in recorder in dropdown list of assertations.
-* `bool isDefault` = false - optional, very often several assertation could be applied to selected `GameObject`.  If isDefault is true, recorder tries to show this assertation as a first one.
+Done! Now this action will be shown in `Flow Recorder` as `Check Start Count on Button` and will appeared only by clicking to `GameObject` with `LevelButton` component.
 
 
-Now when you tap on `GameObject` on a game screen, `Flow Recorder` will look through all assertation methods with an `ShowInEditor` attribute. `Flow Recorder` will find `EditorHelpers` and will pass instance of selected GameObject to `IsAvailable` method. If it returns true then assertation method will be shown in list of assertation methods in Flow Recorder UI. Then `Flow Recorder` will find one with `default` value equals true and set it as current for this assertation.
+### ShowInEditor
+
+`ShowInEditorAttribute` used to bind method and helper class. It receive 3 parameters in constructor:
+
+* `Type classType` - a type of `ShowHelperBase` class with data for this test assertation.
+* `string description` - human-friendly description of what this assertation for, this label is shown in recorder in dropdown list of assertations.
+* `bool isDefault` - optional (false), very often several assertations could be applied to selected `GameObject`.  If isDefault is true, recorder tries to show this assertation as a first one.
 
 
-Sometimes target GameObject could contain childs, which also could receive click. It can lead to confuse, for example you tap on text, but target GameObject is an image, because it's child of Text component and receives your click instead of Text component. That's why when Flow Recorder passes target GameObject to `IsAvailabel` method and if it returns false, Flow Recored takes parent of target GameObject and passes it to `IsAwailabel` method and so on, until parent is null.
+### How Recording works with Assertations
+
+When user tap on `GameObject` on a game screen, `Flow Recorder` will look through all assertation methods with a `ShowInEditor` attribute. `Flow Recorder` will find `EditorHelpers` and will pass an instance of selected GameObject to `IsAvailable` method. If it returns `true` then assertation method will be shown in the list of assertation methods in `Flow Recorder` UI. Then `Flow Recorder` will find one with `default` value equals `true` and set it as current for this assertation.
 
 
+Sometimes target `GameObject` could contain children, which also could receive a click. It can lead to confusing, for example, you tap on text, but target `GameObject` is an image because it's child of `Text` component and receives your click instead of `Text` component. That's why when `Flow Recorder` passes target `GameObject` to `IsAvailable` method and if it returns `false`, `Flow Recorded` takes parent of target `GameObject` and passes it to `IsAvailable` method and so on, until the parent is null.
 
-Let's define another assertation method which checks some specific game mechanics: lets assume we have a `ScreenManager` `MonoBehaviour` on scene with a string property of current active screen, and we want to check if lobby screen is active.
+### Example 2
+
+Let's define another assertation method which checks some specific game mechanics: let's assume we have a `ScreenManager` `MonoBehaviour` on the scene with a string property of the current active screen, and we want to check if lobby screen is active.
 
 ``` c#
 [ShowInEditor(typeof(CheckIsScreenActive), "Check Current Screen")]
@@ -347,8 +359,9 @@ public IEnumerator SomeIntegrationTest()
 }
 ```
 
+### Another Camera
 
-When user click on item(button, switch etc) `Flow Recorder` takes click coords and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coords to find `GameObject` under click. This works only with Unity ui objects. In case when you click on non UI object you have to define property in `Class Helper` that return specific camera to raycast. 
+When user click on item (button, switch etc) `Flow Recorder` takes click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to make raycast by these coords to find `GameObject` under click. This works only with Unity UI objects. In case when you click on non UI object you have to define property in Helper class that return specific camera to raycast. 
 
 ```c#
 static class MapLocationClick
