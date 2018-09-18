@@ -15,11 +15,11 @@ Content
 	* [Command Line Arguments](#command-line-arguments)
 * [API methods](#api-methods)
 * [Extending Test Tool](#extending-test-tool)
-	* [Example 1](#Example-1) 
-	* [ShowInEditor](#ShowInEditor)
-	* [How Recording works with Assertations](#How-Recording-works-with-Assertations)
-	* [Example 2](Example-2)
-	* [Another Camera](#Another-Camera)
+	* [Example 1](#example-1) 
+	* [ShowInEditor](#showineditor)
+	* [How Recording works with Assertations](#how-recording-works-with-assertations)
+	* [Example 2](example-2)
+	* [Another Camera](#another-camera)
 
 
 About
