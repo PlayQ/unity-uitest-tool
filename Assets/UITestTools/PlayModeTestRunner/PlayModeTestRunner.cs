@@ -570,9 +570,7 @@ namespace PlayQ.UITestTools
             {
                 var interfaceType = typeof(ITestRunnerCallbackReceiver);
 
-                return AppDomain.CurrentDomain.GetAssemblies()
-                    .SelectMany(s => s.GetTypes())
-                    .Where(p => p != interfaceType && interfaceType.IsAssignableFrom(p));
+                return Assembly.GetAssembly(typeof(ITestRunnerCallbackReceiver)).GetTypes().Where(p => p != interfaceType && interfaceType.IsAssignableFrom(p));
             }
         }
 
