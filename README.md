@@ -22,25 +22,6 @@ Content
 	* [Another Camera](#another-camera)
 
 
-UI Test Tool
-====================================
-Content
-----
-* [About](#about)
-	* [Installation](#installation)
-	* [Flow Recorder](#flow-recorder)
-	* [How Flow Recorder works](#how-flow-recorder-works)
-	* [Recording a new test](#recording-a-new-test)
-	* [Test Runner](#test-runner)
-		* [Run specific list of tests](#run-specific-list-of-tests)
-		* [Smoke testing](#smoke-testing)
-		* [Screen resolution depending tests](#screen-resolution-depending-tests)
-	* [Helper Window](#helper-window)
-	* [Command Line Arguments](#command-line-arguments)
-* [API methods](#api-methods)
-* [Extending Test Tool](#extending-test-tool)
-
-
 About
 ---------------------
 
@@ -65,7 +46,7 @@ To use `Test Recorder` navigate to `Window => Ui test tools => Flow recorder`, o
 * `Check` - toggles mode, in which clicks on UI buttons don't trigger them. The window will be colored green when check mode is enabled.
 * `Pause mode` - sets current timescale to 0 in play mode. Used in situations where user needs to emulate game pause yet still be able to record new actions.
 * `Clean` - deletes all previously recorded actions.
-* `+` button - manually adds new "empty" user action. Provides access to actions that don't require `GameObject` to be clicked
+* `+` button - manually adds new "empty" user action. Provides access to actions that don't require `GameObject` to be executed.
 * `Generate Code and Copy` - generate source code for test based on recorded user actions.
 
 Recorded users actions are visually displayed as a list. User can edit recorded actions by selecting necessary assertation type, editing arguments, drag-and-dropping actions inside the list to change execution order, adding or removing actions manually.
