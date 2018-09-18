@@ -65,14 +65,14 @@ Each item of the list contains next information:
 
 When you click on `GameObject` during `Unity` play mode, `Flow Recorder` takes click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find `GameObject` under click. Then `Flow Recorder` looks through a list of all existing `assertations` and checks which `assertation` could be applied to `GameObject`.
 
-For example, if you click on text - all `assertations` that compares text labels would be available. Common `assertations`, like `Is Enable` or `Is Exist` are available for any `GameObject`. By default, `Flow Recorder` supports only `Unity UI`. If you want support `GameObjects` that doesn't contain any UI components or use custom `assertations` you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
+For example, if you click on text - all `assertations` that compare text labels would be available. Common `assertations`, like `Is Enable` or `Is Exist` are available for any `GameObject`. By default, `Flow Recorder` supports only `Unity UI`. If you want support `GameObjects` that doesn't contain any UI components or use custom `assertations` you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
 
 
 ### Recording a new test
 
 Launch the game in editor, press `Start Record` button, perform any actions you need in the game. You can change assertation types or parameters and change order during test recording or after it. 
 
-When test recording is over press `Stop Record` or exit play mode. Press `Generate Code and Copy` - to obtain code for test. Then you can paste generated code to your own test class.
+When test recording is over press `Stop Record` or exit play mode. Press `Generate Code and Copy` - to obtain a code for the test. Then you can paste the generated code to your own test class.
 
 Also, you can create new assertation for the object by `Right Click` to it in the hierarchy and select `Create Assertation`.
 
@@ -85,7 +85,7 @@ To open `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
 
 <img src="documentation/images/play-mode-testrunner.png" width="600">
 
-`Test Runner` searches for all methods with attribute `[UnityTest]` and shows them like a folding list. Press `Run all` to run all tests.
+`Test Runner` searches for all methods with the attribute `[UnityTest]` and shows them like a folding list. Press `Run all` to run all tests.
 
 You can select the number of times each test will run. For it move `Repeat Tests N Times` slider.
 
@@ -98,7 +98,7 @@ One of the greatest feature of the `Test Runner` - run test on devices. See comm
 
 You can select tests that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. 
 
-When you run tests on the mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` do not exist - all tests will be executed.
+When you run tests on the mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` does not exist - all tests will be executed.
 
 
 ##### Smoke testing
@@ -119,9 +119,9 @@ public IEnumerator SomeTest()
 
 ##### Screen resolution depending tests
 
-Sometimes your tests may succeed or fail depending on different screen resolution. For example test checks if `GameObject` located under certain screen pixels. To ensure that test is run only with proper resolution you have to add `[EditorResolutionAttribute]` above test method declaration and set target resolution for Editor. It doesn't effect to run tests on devises.
+Sometimes, your tests may succeed or fail depending on different screen resolution. For example, test checks if `GameObject` located under certain screen pixels. To ensure that the test is run only with a proper resolution you have to add `[EditorResolutionAttribute]` above test method declaration and set target resolution for Editor. It doesn't affect to run tests on devices.
 
-Also you can set any count of `TargetResolutionAttribute` to test and if device resolution not matched with resolution in any of attributes, test will ignored. This attribute no affect to test running in Editor.
+Also, you can set any count of `TargetResolutionAttribute` to test and if device resolution not matched with resolution in all of attributes, the test will be ignored. If `EditorResolutionAttribute` is not set, `TargetResolutionAttribute` values will be used for Editor Resolution.
 
 For example:
 ```c#
@@ -136,7 +136,7 @@ public IEnumerator SomeTest()
 
 ### Helper Window
 
-`Test Helper` is an `Unity Editor Extension`, that shows list of possible assertations for selected `GameObject` in `Hierarchy` as completed code line. If you use `Test Helper` in play mode, you can also obtain list of playing sound clips.
+`Test Helper` is an `Unity Editor Extension`, that shows a list of possible assertations for selected `GameObject` in `Hierarchy` as completed code line. If you use `Test Helper` in play mode, you can also obtain the list of playing sound clips.
 
 <img src="documentation/images/test-helper.png" width="600">
 
