@@ -22,7 +22,7 @@
             <returns>Abstract async waiter</returns>
             <param name="message">Expected log message</param>
             <param name="isRegExp">Is expected log a regular expression</param>
-            <param name="timeout">Timeout (optional)</param>
+            <param name="timeout">Timeout (optional, default = 10)</param>
         </member>
         <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForUnityAnimation(System.String,System.String,System.Single)">
             <summary>
@@ -31,7 +31,7 @@
             <returns>Abstract async waiter</returns>
             <param name="path">Path to `GameObject` in hierarchy</param>
             <param name="animationName">Animation name</param>
-            <param name="timeout">Timeout (optional)</param>
+            <param name="timeout">Timeout (optional, default = 10)</param>
         </member>
         <member name="M:PlayQ.UITestTools.AsyncWait.StopWaitingForGameLog">
             <summary>
@@ -159,7 +159,7 @@
             Checks that `Gameobject` by given path is present on scene and its active in hierarchy flag equals to state variable
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
-            <param name="state">Enable state (optional)</param>
+            <param name="state">Enable state (optional, default = true)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Check.IsExist(System.String)">
             <summary>
@@ -194,8 +194,8 @@
             Checks that `GameObject` by given path is not present on scene or is not active
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Check.DoesNotExist``1(System.String)">
             <summary>
@@ -343,7 +343,7 @@
             </summary>
             <param name="from">Start position in pixels</param>
             <param name="to">Finish position in pixels</param>
-            <param name="time">Drag Time (optional)</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.DragPercents(UnityEngine.Vector2,UnityEngine.Vector2,System.Single)">
             <summary>
@@ -351,7 +351,7 @@
             </summary>
             <param name="from">Start position in percents</param>
             <param name="to">Finish position in percents</param>
-            <param name="time">Drag Time (optional)</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.DragPixels(UnityEngine.GameObject,UnityEngine.Vector2,System.Single)">
             <summary>
@@ -359,7 +359,7 @@
             </summary>
             <param name="go">`GameObject` to drag</param>
             <param name="to">Finish position in pixels</param>
-            <param name="time">Drag Time (optional)</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.DragPercents(UnityEngine.GameObject,UnityEngine.Vector2,System.Single)">
             <summary>
@@ -367,7 +367,7 @@
             </summary>
             <param name="go">`GameObject` to drag</param>
             <param name="to">Finish position in percents</param>
-            <param name="time">Drag Time (optional)</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.DragPixels(UnityEngine.GameObject,System.Nullable{UnityEngine.Vector2},UnityEngine.Vector2,System.Single)">
             <summary>
@@ -376,7 +376,7 @@
             <param name="go">`GameObject` to drag</param>
             <param name="from">Start position in percents</param>
             <param name="to">Finish position in percents</param>
-            <param name="time">Drag Time (optional)</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.DragPixels(System.String,UnityEngine.Vector2,System.Single)">
             <summary>
@@ -384,7 +384,7 @@
             </summary>
             <param name="path">Path to GameObject in hierarchy</param>
             <param name="to">Finish position in pixels</param>
-            <param name="time">Drag Time (optional)</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.DragPercents(System.String,UnityEngine.Vector2,System.Single)">
             <summary>
@@ -392,7 +392,7 @@
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
             <param name="to">Finish position in percents</param>
-            <param name="time">Drag Time (optional)</param>
+            <param name="time">Drag Time (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.ScrollToPosition(System.String,System.Single,System.Single,System.Single,System.Single,System.Boolean)">
             <summary>
@@ -401,9 +401,9 @@
             <param name="path">Path to `GameObject` in hierarchy</param>
             <param name="horizontalPosition">Horizontal position</param>
             <param name="verticalPosition">Vertical position</param>
-            <param name="animationDuration">Animation duration (optional)</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="animationDuration">Animation duration (optional, default = 1)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.DragPercents(System.String,System.Single,System.Single,System.Single,System.Single,System.Single)">
             <summary>
@@ -414,7 +414,7 @@
             <param name="fromPercentY">Min percent of drag at dimension Y</param>
             <param name="toPercentX">Max percent of drag at dimension X</param>
             <param name="toPercentY">Max percent of drag at dimension Y</param>
-            <param name="time">Time (optional)</param>
+            <param name="time">Time (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.SetText(UnityEngine.GameObject,System.String)">
             <summary>
@@ -454,17 +454,17 @@
             Awaits for 'GameObject' to become present on scene or fails after specified timeout
             </summary>
             <param name="path">Path to 'GameObject' in hierarchy</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectEnableAndInteractibleIfButton(System.String,System.Single,System.Boolean,System.Boolean)">
             <summary>
             Awaits for 'GameObject' to become enabled and interactible if it is a button
             </summary>
             <param name="path">Path to 'GameObject' in hierarchy</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="dontFail">Whether the test should fail upon exceeding timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="dontFail">Whether the test should fail upon exceeding timeout (optional, default = false)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectEnabledInstantiatedAndDelay(System.String,System.Single,System.Single,System.Boolean,System.Boolean)">
             <summary>
@@ -472,15 +472,15 @@
             </summary>
             <param name="path">Path to 'GameObject' in hierarchy</param>
             <param name="delay">Amount of time to delay</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="dontFail">If true, method will not generate exception after timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="dontFail">If true, method will not generate exception after timeout (optional, default = true)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.Frame(System.Int32)">
             <summary>
             Waits for given amount of frames, then return
             </summary>
-            <param name="count">Amount of frames to wait (optional)</param>
+            <param name="count">Amount of frames to wait (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.WaitFor(System.Func{PlayQ.UITestTools.WaitResults.WaitResult},System.Single,System.Boolean,System.Boolean)">
             <summary>
@@ -489,16 +489,16 @@
             <param name="condition">Predicate that return true, if its condition is successfuly fulfilled</param>
             <param name="timeout">Timeout</param>
             <param name="testInfo"> This label would be passed to logs if method fails</param>
-            <param name="dontFail">If true, method will not generate exception after timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="dontFail">If true, method will not generate exception after timeout (optional, default = false)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
             <exception cref="T:System.Exception"></exception>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectInstantiated``1(System.Single,System.Boolean)">
             <summary>
             Waits until 'GameObject' with component 'T' becomes present on scene or fails after specified timeout
             </summary>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
             <typeparam name="T">Type of component</typeparam>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectInstantiated``1(System.String,System.Single,System.Boolean)">
@@ -506,16 +506,16 @@
             Waits until 'GameObject' with component 'T' becomes present on scene or fails after specified timeout
             </summary>
             <param name="path">Path to 'GameObject' in hierarchy</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
             <typeparam name="T">Type of component</typeparam>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectDestroyed``1(System.Single,System.Boolean)">
             <summary>
             Waits until 'GameObject' with component 'T' disappears from scene or fails after specified timeout
             </summary>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
             <typeparam name="T">Type of component</typeparam>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectDestroyed(System.String,System.Single,System.Boolean)">
@@ -523,47 +523,47 @@
             Waits until 'GameObject' by given path disappears from scene or fails after specified timeout
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectDestroyed(UnityEngine.GameObject,System.Single,System.Boolean)">
             <summary>
             Waits until 'GameObject' by given path disappears from scene or fails after specified timeout
             </summary>
             <param name="gameObject">`GameObject` who should be destroyed</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ButtonAccessible(UnityEngine.GameObject,System.Single,System.Boolean)">
             <summary>
             Waits until given 'GameObject' obtains component 'UnityEngine.UI.Button' or fails after specified timeout
             </summary>
             <param name="button">'GameObject' who should be start accessible</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectEnabled(System.String,System.Single,System.Boolean)">
             <summary>
             Waits until 'GameObject' by given path becomes present on scene and active in hierarchy or fails after specified timeout
             </summary>
             <param name="path">Path to 'GameObject' in hierarchy</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectEnabled``1(System.Single,System.Boolean)">
             <summary>
             Waits until 'GameObject' with component 'T' becomes present on scene and active in hierarchy or fails after specified timeout
             </summary>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
             <typeparam name="T">Type of component</typeparam>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectDisabled``1(System.Single,System.Boolean)">
             <summary>
             Waits until 'GameObject' with component 'T' becomes present on scene and disabled in hierarchy or fails after specified timeout
             </summary>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
             <typeparam name="T">Type of component</typeparam>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectDisabled(System.String,System.Single,System.Boolean)">
@@ -571,31 +571,31 @@
             Waits until 'GameObject' by given path becomes present on scene and disabled in hierarchy or fails after specified timeout
             </summary>
             <param name="path">Path to 'GameObject' in hierarchy</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectDisabledOrNotExist(System.String,System.Single,System.Boolean)">
             <summary>
             Waits until 'GameObject' by given path disappears from scene or becomes disabled in hierarchy or fails after specified timeout
             </summary>
             <param name="path">Path to 'GameObject' in hierarchy</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.Seconds(System.Single,System.Boolean)">
             <summary>
             Waits for specified amount of seconds
             </summary>
             <param name="seconds">Count of seconds to wait</param>
-            <param name="ignoreTimescale">Should time scale be ignored or not (optional)</param>
+            <param name="ignoreTimescale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.SceneLeaded(System.String,System.Single,System.Boolean)">
             <summary>
             Waits until scene with given name is loaded or fails after specified timeout
             </summary>
             <param name="sceneName">Name of scene to load</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.AnimationCompleted(System.String,System.String,System.Single,System.Boolean)">
             <summary>
@@ -603,8 +603,8 @@
             </summary>
             <param name="path">Path to 'GameObject' in hierarchy</param>
             <param name="animationName">Animation name</param>
-            <param name="timeout">Timeout (optional)</param>
-            <param name="ignoreTimeScale">Should time scale be ignored or not (optional)</param>
+            <param name="timeout">Timeout (optional, default = 10)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
         <member name="M:PlayQ.UITestTools.TimeoutAttribute.#ctor(System.Int32)">
             <summary>
@@ -845,7 +845,7 @@
             </summary>
             <param name="x">X position in pixels</param>
             <param name="y">Y position in pixels</param>
-            <param name="ignoreNames">set of names of object, that are ignored (optional)</param>
+            <param name="ignoreNames">set of names of object, that are ignored (optional, default = null)</param>
             <returns>GameObjects under coords or null</returns>
         </member>
         <member name="M:PlayQ.UITestTools.UITestUtils.FindObjectByPercents(System.Single,System.Single)">

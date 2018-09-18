@@ -57,7 +57,7 @@ public static class XmlToMarkdown
 {
     static readonly string methodPattern = "M:PlayQ.UITestTools.";
     static readonly string classPattern = "T:PlayQ.UITestTools.";
-    static readonly string paramRepetitivePattern = "|Name | Description |\n|-----|------|\n";
+    static readonly string paramRepetitivePattern = "|Argument | Description |\n|-----|------|\n";
     static readonly string[] allowedClasses = { "Check", "AsyncCheck", "Wait", "AsyncWait", "Interact", "UITestUtils" };
 
     class TypeMarkdown
@@ -82,7 +82,7 @@ public static class XmlToMarkdown
                     {"example", "_C# code_\n\n```c#\n{0}\n```\n\n"},
                     {"seePage", "[[{1}|{0}]]"},
                     {"seeAnchor", "[{1}]({0})"},
-                    {"param", "|Name | Description |\n|-----|------|\n|{0} |{1}|\n" },
+                    {"param", paramRepetitivePattern + "|{0} |{1}|\n" },
                     {"exception", "[[{0}|{0}]]: {1}\n\n" },
                     {"returns", "Returns: {0}\n\n"},
                     {"none", ""}
@@ -272,6 +272,12 @@ public static class XmlToMarkdown
         {
             var el = (XElement)e;
             name = el.Name.LocalName;
+
+            if (name == "exception")
+            {
+                return string.Empty;
+            }
+
             if (name == "member")
             {
                 switch (el.Attribute("name").Value[0])
