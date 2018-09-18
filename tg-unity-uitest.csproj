@@ -111,6 +111,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Examples\Test1.cs" />
+    <Compile Include="Assets\Examples\Test2.cs" />
+    <Compile Include="Assets\Examples\Test3.cs" />
     <Compile Include="Assets\Examples\Tests For Scene 1\TestObject.cs" />
     <Compile Include="Assets\Examples\UITestCheck.cs" />
     <Compile Include="Assets\Examples\UITestSuccess.cs" />
