@@ -140,9 +140,9 @@ public IEnumerator SomeTest()
 
 <img src="documentation/images/test-helper.png" width="600">
 
-`Copy` - copyes generated code of assertation.
-`Find playing sounds` - searches for playing sound clips.
-`Select` - only for sound, focuses on `GameObject` in hierarchy which has `Audio Source` component and it's `Sound Clip` is playing.
+* `Copy` - copies generated code of assertation.
+* `Find playing sounds` - searches for playing sound clips.
+* `Select` - only for sound, focuses on `GameObject` in hierarchy which has `Audio Source` component and it's `Sound Clip` is playing.
 
 
 ### Command Line Arguments
