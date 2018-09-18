@@ -147,7 +147,7 @@ public IEnumerator SomeTest()
 
 ### Command Line Arguments
 
-To run test in Editor Mode via console use followin command:
+To run tests in Editor Mode via command line use following command:
 
 ```
 Unity.exe 
@@ -159,11 +159,11 @@ Unity.exe
 `-buildNumber` - build_numer
 ```
 
-`-project_path` - absolute path to project folder (Unity attribute);
-`-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window;
-`-runOnlySmokeTests` - optional, runs test with `SmokeTest` attribute only;
-`-timeScale` - timescale for tests;
-`-buildNumber` - used as postfix for file with test metrics.
+* `-project_path` - absolute path to project folder (Unity attribute);
+* `-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window;
+* `-runOnlySmokeTests` - optional, runs test with `SmokeTest` attribute only;
+* `-timeScale` - timescale for tests;
+* `-buildNumber` - used as postfix for file with test metrics.
 
 
 To make test build to run test on the device use `TestToolBuildScript.TestBuild` method instead of `TestToolBuildScript.RunPlayModeTests`:
