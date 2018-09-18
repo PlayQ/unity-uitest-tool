@@ -18,7 +18,7 @@ Content
 	* [Example 1](#example-1) 
 	* [ShowInEditor](#showineditor)
 	* [How Recording works with Assertations](#how-recording-works-with-assertations)
-	* [Example 2](example-2)
+	* [Example 2](#example-2)
 	* [Another Camera](#another-camera)
 
 
