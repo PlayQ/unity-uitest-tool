@@ -22,112 +22,65 @@ Content
 	* [Another Camera](#another-camera)
 
 
+
 About
 ---------------------
-
-This `Test Tool` simplifies testing of `Unity` games and makes possible to run tests on mobile devices. It's based on methods, attributes, and logs, similar to [NUnit](http://nunit.org).
-
-
+This `Test Tool` simplifies testing of `Unity` games and allows to run tests on mobile devices. It's based on methods, attributes, and logs, similar to those in [NUnit](http://nunit.org).
 ### Installation
-
-Just copy `UITestTools` folder and paste wherever you want in `Assets` folder of your project.
-
-
+Just copy `UITestTools` folder and paste it wherever you want inside `Assets` folder of your project.
 ### Flow Recorder
-
-`Flow Recorder` is an Unity Editor extension, which can record user actions and generate code of test from it.
-
+`Flow Recorder` is an Unity Editor extension that allows to record user actions and generate test's source code from them.
 To use `Test Recorder` navigate to `Window => Ui test tools => Flow recorder`, or press `Ctrl+T` for Windows and `Cmd+T` for Mac.
-
 <img src="documentation/images/recorder-interface.png" width="600">
-
-* `Start Record` button - enables recording mode, your clicks would be recorded as actions and added to existing action list. Then you can select necessary assertation type and edit params for each recorder actions.
-* `Stop Record` - disables recording mode. All recorded actions will be kept in safe.
-* `Check` - enables/disables mode, in which clicks on UI buttons don't trigger them. The window will be colored green when check mode is enabled.
-* `Pause mode` - set timescale to 0 when enabled, useful when it needs to emulate game pause but continue to write actions.
-* `Clean` - deletes all recorded actions.
-* `+` button - added new "empty" user action. You can select only assertations, which don't require `GameObject` to proceed to such action.
-* `Generate Code and Copy` - generate code for test from recorded user actions.
-
-Recorded users actions are visually displayed as a list. 
-You can reorder already recorded actions by drag and drop.
-
-Each item of the list contains next information:
-
+* `Start Record` button - enables recording mode. Once enabled, user's mouse input (LMB clicks) is recorded into test actions and appended to test's action list.
+* `Stop Record` - disables recording mode. All previously recorded actions are serialized automatically.
+* `Check` - toggles mode, in which clicks on UI buttons don't trigger them. The window will be colored green when check mode is enabled.
+* `Pause mode` - sets current timescale to 0 in play mode. Used in situations where user needs to emulate game pause yet still be able to record new actions.
+* `Clean` - deletes all previously recorded actions.
+* `+` button - manually adds new "empty" user action. Provides access to actions that don't require `GameObject` to be clicked
+* `Generate Code and Copy` - generate source code for test based on recorded user actions.
+Recorded users actions are visually displayed as a list. User can edit recorded actions by selecting necessary assertation type, editing arguments, drag-and-dropping actions inside the list to change execution order, adding or removing actions manually.
+Each action contains the following information:
 <img src="documentation/images/action-item.png" width="600">
-
-* `6` - index of assertation in the list.
-* `Assertation Type` - there is a drop-down menu with a list of assertation types. You can see only assertation types, available for current `GameObject`. Each assertation has its own list of required arguments.
-* `Description` - add a description as a commentary above generated `assertation method`. 
-* `Path` - path in the hierarchy to `GameObject` user interacts with. `Select` button will select current `GameObject` in the hierarchy.
-* `TimeOut`, `IgnoreTimeScale` - arguments list specific to selected assertation, values of these arguments could be edited by user. Arguments could be type of `enum`, `int`, `float`, `bool`, `string`.
-* `►` - this button applies assertation in runtime.
-* `Copy` - create a copy of this asertation and set it next to it. Also you can make by selection asertation and press `Ctrl+D` for Windows and `Cmd+D` for Mac.
-* `x` - button removes action from list.
-
-
+* `6` - action's index in the list.
+* `Assertation Type` - a drop-down menu with a list of assertation types, available for current `GameObject`. Each assertation has its own list of required arguments.
+* `Description` - a brief description to selected `assertation method`. Results in a commentary above assertation method call in the generated source code
+* `Path` - path in the scene hierarchy to the `GameObject` user interacted with. `Select` button allows to select the specified `GameObject`
+* `TimeOut`, `IgnoreTimeScale` - selected assertation's arguments list. Argument values can be edited by user. Available arguments types are `enum`, `int`, `float`, `bool`, `string`.
+* `►` - taplies assertation in runtime.
+* `Copy` - duplicates selected asertation and places the copy next to it. Hotkeys are `Ctrl+D` for Windows and `Cmd+D` for Mac.
+* `x` - removes selected action from list.
 ### How Flow Recorder works
-
-When you click on `GameObject` during `Unity` play mode, `Flow Recorder` takes click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find `GameObject` under click. Then `Flow Recorder` looks through a list of all existing `assertations` and checks which `assertation` could be applied to `GameObject`.
-
-For example, if you click on text - all `assertations` that compare text labels would be available. Common `assertations`, like `Is Enable` or `Is Exist` are available for any `GameObject`. By default, `Flow Recorder` supports only `Unity UI`. If you want support `GameObjects` that doesn't contain any UI components or use custom `assertations` you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
-
-
+When you perform a LMB click in the `Game` window during `Unity` play mode, `Flow Recorder` obtains click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find the `GameObject` user clicked. Then `Flow Recorder` looks through a list of all existing `assertations` and checks which `assertation` could be applied to the `GameObject`.
+For example, if user clicked on UI text - all `assertations` that compare text labels become available. Common `assertations`, like `Is Enable` or `Is Exist` are available for any `GameObject`. By default, `Flow Recorder` supports only `Unity UI` raycast targets. If a support for `GameObject`s that don't have any UI components attached or use of custom `assertations` is required you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
 ### Recording a new test
-
-Launch the game in editor, press `Start Record` button, perform any actions you need in the game. You can change assertation types or parameters and change order during test recording or after it. 
-
-When test recording is over press `Stop Record` or exit play mode. Press `Generate Code and Copy` - to obtain a code for the test. Then you can paste the generated code to your own test class.
-
-Also, you can create new assertation for the object by `Right Click` to it in the hierarchy and select `Create Assertation`.
-
+Launch the game from the editor, press `Start Record` button to start recording actions, perform any desired actions in the game window, then press 'Stop Record' button to stop recording. You can change assertation types or parameters and change action order during the test recording or any time after it. Press `Generate Code and Copy` to generate and obtain the source code for the test. Then you can paste the generated code to your own test class.
+Also, you can create new assertation for the object by `Right Click`ing it in the hierarchy and selecting `Create Assertation`.
 <img src="documentation/images/recorder_window.gif" width="600">
-
-
 ### Test Runner
-
 To open `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
-
 <img src="documentation/images/play-mode-testrunner.png" width="600">
-
-`Test Runner` searches for all methods with the attribute `[UnityTest]` and shows them like a folding list. Press `Run all` to run all tests.
-
-You can select the number of times each test will run. For it move `Repeat Tests N Times` slider.
-
-Also, you can change the `TimeScale` of tests by moving `Default Timescale` slider.
-
-One of the greatest feature of the `Test Runner` - run test on devices. See command line arguments for it in [Command line](#command-line-arguments) section.
-
-
+`Test Runner` searches the project for all methods with the attribute `[UnityTest]` and represents them as a tree structure with namespaces and classes as branches and methods as leaves. Press `Run all` to run all tests.
+You can select the number of times each test is run by dragging the `Repeat Tests N Times` slider.
+Also, you can change the `TimeScale` value applied to game environment before the test run by dragging the `Default Timescale` slider.
+One of the greatest features of the `Test Runner` tool is that it allows to run tests directly on target devices. See command line arguments for it in [Command line](#command-line-arguments) section.
 ##### Run specific list of tests
-
-You can select tests that you want to run and press `Run` button. Also, set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. 
-
-When you run tests on the mobile device `Play Mode Test Runner` loads `SelectedTests` and runs only selected tests. If `SelectedTests` does not exist - all tests will be executed.
-
-
+You can select specific tests that you want to run and press the `Run` button. The set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. 
+When you run tests on mobile device `Play Mode Test Runner` tool loads `SelectedTests` asset and performs only selected tests. If `SelectedTests` asset does not exist - all tests will be performed.
 ##### Smoke testing
-
-You can mark any test by `[SmokeTest]` attribute. When you click `Rum Smoke` only this test will run.
-
+You can mark any test with `[SmokeTest]` attribute. Clicking the `Rum Smoke` button allows to perform only tests marked with this attribute.
 For example:
-
 ``` c#
 [SmokeTest]
 [UnityTest]
 public IEnumerator SomeTest()
 {
-	// some code 
+    // some code 
 }
 ```
-
-
-##### Screen resolution depending tests
-
-Sometimes, your tests may succeed or fail depending on different screen resolution. For example, test checks if `GameObject` located under certain screen pixels. To ensure that the test is run only with a proper resolution you have to add `[EditorResolutionAttribute]` above test method declaration and set target resolution for Editor. It doesn't affect to run tests on devices.
-
-Also, you can set any count of `TargetResolutionAttribute` to test and if device resolution not matched with resolution in all of attributes, the test will be ignored. If `EditorResolutionAttribute` is not set, `TargetResolutionAttribute` values will be used for Editor Resolution.
-
+##### Screen resolution dependant tests
+Sometimes, tests may succeed or fail depending on the different screen resolution. For example, the test checks whether a specific `GameObject` is located at the certain screen pixel coordinates. To ensure that the test is run only at the proper resolution you have to add `[EditorResolutionAttribute]` attribute above test method declaration and specify target resolution for Editor. It doesn't affect tests that are performed on devices.
+Also, you can add any amount of `TargetResolutionAttribute` attributes to test. If device resolution matches not any of them, the test is ignored. If `EditorResolutionAttribute` is not set, `TargetResolutionAttribute` values are used for Editor Resolution.
 For example:
 ```c#
 [TargetResolution(1920, 1080)]
@@ -138,6 +91,7 @@ For example:
 public IEnumerator SomeTest()
 {....}
 ```
+
 
 ### Helper Window
 
