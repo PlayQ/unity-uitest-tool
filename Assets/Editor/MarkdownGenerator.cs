@@ -84,7 +84,7 @@ public static class XmlToMarkdown
                     {"seeAnchor", "[{1}]({0})"},
                     {"param", paramRepetitivePattern + "|{0} |{1}|\n" },
                     {"exception", "[[{0}|{0}]]: {1}\n\n" },
-                    {"returns", "Returns: {0}\n\n"},
+                    {"returns", "\nReturns: {0}\n\n"},
                     {"none", ""}
                 };
 

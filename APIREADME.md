@@ -93,6 +93,7 @@
  Starts the waiting for the log
  
 
+
 Returns: Abstract async waiter
 
 |Argument | Description |
@@ -109,6 +110,7 @@ Returns: Abstract async waiter
 
  Starts the waiting for unity animation to complete
  
+
 
 Returns: Abstract async waiter
 
@@ -417,6 +419,7 @@ Returns: Abstract async waiter
 |Argument | Description |
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
+
 Returns: `GameObject`
 
 
@@ -428,6 +431,7 @@ Returns: `GameObject`
 
  Searches for `GameObject` with component `T` on scene
  
+
 
 Returns: `GameObject`
 
@@ -444,6 +448,7 @@ Returns: `GameObject`
 |Argument | Description |
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
+
 Returns: `GameObject`
 
 
@@ -1217,6 +1222,7 @@ Returns: `GameObject`
 |Argument | Description |
 |-----|------|
 |transform |`RectTransform` component instance|
+
 Returns: Center point of given `RectTransform`
 
 
@@ -1232,6 +1238,7 @@ Returns: Center point of given `RectTransform`
 |Argument | Description |
 |-----|------|
 |text |String to encode|
+
 Returns: Encoded strings
 
 
@@ -1247,6 +1254,7 @@ Returns: Encoded strings
 |Argument | Description |
 |-----|------|
 |text |String to encode|
+
 Returns: Encoded strings
 
 
@@ -1262,6 +1270,7 @@ Returns: Encoded strings
 |Argument | Description |
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
+
 Returns: active and non-active `GameObjects` or null
 
 
@@ -1273,6 +1282,7 @@ Returns: active and non-active `GameObjects` or null
 
  Searches for `GameObject` that has component of `T` attached to it
  
+
 
 Returns: active and non-active `GameObjects` or null
 
@@ -1289,6 +1299,7 @@ Returns: active and non-active `GameObjects` or null
 |Argument | Description |
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
+
 Returns: active and non-active `GameObjects` or null
 
 
@@ -1304,6 +1315,7 @@ Returns: active and non-active `GameObjects` or null
 |Argument | Description |
 |-----|------|
 |go |Parent `GameObject`|
+
 Returns: `TComponent` instance, or null.
 
 
@@ -1329,6 +1341,7 @@ Returns: `TComponent` instance, or null.
 |Argument | Description |
 |-----|------|
 |path |Path to `GameObject` in hierarchy|
+
 Returns: Enabled `GameObject` or null.
 
 
@@ -1344,6 +1357,7 @@ Returns: Enabled `GameObject` or null.
 |Argument | Description |
 |-----|------|
 |go |Parent `GameObject`|
+
 Returns: `Component` or null.
 
 
@@ -1360,6 +1374,7 @@ Returns: `Component` or null.
 |-----|------|
 |x |X position in percents|
 |y |Y position in percents|
+
 Returns: GameObjects under coords or null
 
 
@@ -1377,6 +1392,7 @@ Returns: GameObjects under coords or null
 |x |X position in pixels|
 |y |Y position in pixels|
 |ignoreNames |set of names of object, that are ignored (optional, default = null)|
+
 Returns: GameObjects under coords or null
 
 
@@ -1392,6 +1408,7 @@ Returns: GameObjects under coords or null
 |Argument | Description |
 |-----|------|
 |gameObject |`GameObject`|
+
 Returns: Full path to `GameObject`
 
 
@@ -1418,6 +1435,7 @@ Returns: Full path to `GameObject`
  Gets the string comparator by specified text and regex option
  
 
+
 Returns: The string comparator
 
 |Argument | Description |
@@ -1437,6 +1455,7 @@ Returns: The string comparator
 |Argument | Description |
 |-----|------|
 |y |Y percents position in screen|
+
 Returns: Screen pixels
 
 
@@ -1472,12 +1491,14 @@ Returns: Screen pixels
  Transform screen percents to screen pixels
  
 
+
 Returns: Screen percents
 
 |Argument | Description |
 |-----|------|
 |x |X percents position in screen|
 |y |Y percents position in screen|
+
 Returns: Screen pixels
 
 
@@ -1493,6 +1514,7 @@ Returns: Screen pixels
 |Argument | Description |
 |-----|------|
 |percents |Screen percents|
+
 Returns: Screen pixels
 
 
@@ -1508,6 +1530,7 @@ Returns: Screen pixels
 |Argument | Description |
 |-----|------|
 |transform |`RectTransform` component instance|
+
 Returns: Array of coords of screen rectangle of given `RectTransform`
 
 
@@ -1523,6 +1546,7 @@ Returns: Array of coords of screen rectangle of given `RectTransform`
 |Argument | Description |
 |-----|------|
 |x |X percents position in screen|
+
 Returns: Screen pixels
 
 
