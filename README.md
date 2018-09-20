@@ -138,18 +138,18 @@ public IEnumerator SomeTest()
 
 ### Helper Window
 
-`Test Helper` is an `Unity Editor Extension`, that shows a list of possible assertations for selected `GameObject` in `Hierarchy` as completed code line. If you use `Test Helper` in play mode, you can also obtain the list of playing sound clips.
+`Test Helper` is an `Unity Editor Extension`, that shows a list of possible assertations for the selected `GameObject` in `Hierarchy` and corresponding code lines next to them. In play mode `Test Helper` allows user to obtain the list of sound clips that are currently playing.
 
 <img src="documentation/images/test-helper.png" width="600">
 
-* `Copy` - copies generated code of assertation.
-* `Find playing sounds` - searches for playing sound clips.
-* `Select` - only for sound, focuses on `GameObject` in hierarchy which has `Audio Source` component and it's `Sound Clip` is playing.
+* `Copy` - copies assertation's generated code.
+* `Find playing sounds` - searches for currently playing sound clips.
+* `Select` - used for sounds only, selects the `GameObject` in hierarchy which has `Audio Source` component and it's `Sound Clip` is playing a sound.
 
 
 ### Command Line Arguments
 
-To run tests in Editor Mode via command line use following command:
+To run tests in Editor Mode via command line use the following command:
 
 ```
 Unity.exe 
@@ -168,7 +168,7 @@ Unity.exe
 * `-buildNumber` - used as postfix for file with test metrics.
 
 
-To make test build to run test on the device use `TestToolBuildScript.TestBuild` method instead of `TestToolBuildScript.RunPlayModeTests`:
+To create test build to run tests on the target device use `TestToolBuildScript.TestBuild` method instead of `TestToolBuildScript.RunPlayModeTests`:
 
 ```
 Unity.exe 
@@ -181,13 +181,13 @@ Unity.exe
  -timeScale time_scale
 ```
 
-All arguments are the same.
+Arguments are equal in both methods.
 
 
 API methods
 --------
 
-`Test Tool` common features are split to 5 static partial classes: `Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`. Any of these classes contains a list of methods which accordingly check the state of given object, wait for resolving of specific condition and set state to given object.
+`Test Tool` common actions are split to 5 static partial classes: `Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`. Each of these classes contain a list of methods which perform a corresponding action like checking the state of the given object, waiting for specific condition or interacting with specific object.
 
 For example:
 
@@ -201,7 +201,7 @@ Check.CheckEnabled("content/pointer finger/SwipeAnim/pointer_finger");
 yield return Interact.SwipeCell(4, 7, Interact.SwipeCellClass.SwipeDirection.Down, true, 1f);
 ```
 
-`Async` assertions used for checking and waiting during which you want to do some interactions.
+`Async` actions allow user to delay their finish conditions check until the following actions are finished.
 
 For example:
 
@@ -217,12 +217,12 @@ yield return soundCheck;
 Extending Test Tool
 -----------
 
-You can extend all of 5 classes with actions (`Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`) because thay are partial.
+You can extend any of 5 common test actions classes (`Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`) with new sets of actions using partial class modifier.
 
 
 ### Example 1
 
-Let's create a simple assertation method, which takes `GameObject`, checks whether it has your custom component `LevelButton` and check stars count on it. We will create it in own partial `Check` class.
+The following example shows how to create a simple assertation method, which retrieves `GameObject` from hierarchy by path that is passed as an argument, checks whether it has user-defined custom component `LevelButton` attached and checks the stars count on it. The method is placed its in own partial `Check` class.
 
 ``` c#
 public static partial Check
@@ -243,7 +243,8 @@ public static partial Check
     }
 }
 ```
-Now we can use this method in our test method like this:
+
+The method is now available to be used in tests as an action:
 
 ``` c#
 [UnityTest]
@@ -255,9 +256,11 @@ public IEnumerator SomeIntegrationTest()
 }
 ```
 
-Let's create class that shows [Flow Recorder](#flow-recorder) when and how it should display it. It should be inherited from `ShowHelperBase` class and implement `CreateGenerator()` method. `CreateGenerator` desribe what entered paramets has method, what default parameters should be used and how to generate code. 
+Let's create a class that informs [Flow Recorder](#flow-recorder) when and how it should display the action created in the previous code snippet. The class is required to be inherited from `ShowHelperBase` class and implement `CreateGenerator()` method. `CreateGenerator` method is responsible for defining which editable arguments the action has, their default values and how to generate its source code. 
 
-You can override `bool IsAvailable(GameObject go)` method. This class will set, is assertation available for current `GameObject`. As default it will return `true`, even if `GameObject` is `null`. 
+`bool IsAvailable(GameObject go)` method is overridable. It typically indicates whether an assertation is available for the current `GameObject`. By default it returns `true`, even if `GameObject` is `null`. User can override method `Camera GetCamera()` to specify which camera should be used by Flow Recorder to raytrace the desired `GameObject`.
+
+User can override method `Camera GetCamera()` to specify which camera should be used by Flow Recorder to raytrace the desired `GameObject`. [See more below](#another-camera).
 
 ```c#
 private class CheckStarsCount : ShowHelperBase
@@ -299,28 +302,29 @@ public static void StarsCount(string path, int startCount) //path is a full path
 }
 ```
 
-Done! Now this action will be shown in `Flow Recorder` as `Check Start Count on Button` and will appeared only by clicking to `GameObject` with `LevelButton` component.
+The action can now be seen in `Flow Recorder` actions list as `Check Start Count on Button` upon clicking a `GameObject` with `LevelButton` component attached.
 
 
 ### ShowInEditor
 
-`ShowInEditorAttribute` used to bind method and helper class. It receive 3 parameters in constructor:
+`ShowInEditorAttribute` receive 3 arguments in constructor:
 
-* `Type classType` - a type of `ShowHelperBase` class with data for this test assertation.
-* `string description` - human-friendly description of what this assertation for, this label is shown in recorder in dropdown list of assertations.
-* `bool isDefault` - optional (false), very often several assertations could be applied to selected `GameObject`.  If isDefault is true, recorder tries to show this assertation as a first one.
+* `Type classType` - type of `ShowHelperBase` class to be applied to the action;
+* `string description` - assertation's brief description (shown in recorder's dropdown list of assertations);
+* `bool isDefault` false - optional argument that indicates whether this assertation should be used to selected `GameObject` by default. In case of multiple default assertations available recorder resolves it by selecting one of them,
 
 
 ### How Recording works with Assertations
 
-When user tap on `GameObject` on a game screen, `Flow Recorder` will look through all assertation methods with a `ShowInEditor` attribute. `Flow Recorder` will find `EditorHelpers` and will pass an instance of selected GameObject to `IsAvailable` method. If it returns `true` then assertation method will be shown in the list of assertation methods in `Flow Recorder` UI. Then `Flow Recorder` will find one with `default` value equals `true` and set it as current for this assertation.
+When user taps on a `GameObject` on the game screen, `Flow Recorder` looks through all assertation methods with a `ShowInEditor` attribute. `Flow Recorder` then finds suitable `EditorHelpers` and passes the instance of selected `GameObject` to their `IsAvailable` methods. If any of those methods return true then appropriate assertation method is selected to be shown in the list of assertation methods in `Flow Recorder` UI. Finally `Flow Recorder` looks for a method with `isDefault` value set to true and sets it as a selected assertation for the action.
 
 
-Sometimes target `GameObject` could contain children, which also could receive a click. It can lead to confusing, for example, you tap on text, but target `GameObject` is an image because it's child of `Text` component and receives your click instead of `Text` component. That's why when `Flow Recorder` passes target `GameObject` to `IsAvailable` method and if it returns `false`, `Flow Recorded` takes parent of target `GameObject` and passes it to `IsAvailable` method and so on, until the parent is null.
+Sometimes target `GameObjects` contain child `GameObjects` which can be raycast targets as well. This may lead to unpredicted behaviour in the `Flow Recorder`. For example, you tap on a text label, but the recorder choses the background image containing `GameObject` as a target instead. To address this issue `Flow Recorder` passes target `GameObject` to `IsAvailabel` method and if it returns `false`, `Flow Recored` passes its parent `GameObject` to `IsAvailabel` method recursively, until it returns `true` or parent is `null`.
+
 
 ### Example 2
 
-Let's define another assertation method which checks some specific game mechanics: let's assume we have a `ScreenManager` `MonoBehaviour` on the scene with a string property of the current active screen, and we want to check if lobby screen is active.
+Here's an example of another assertation method which checks some specific game mechanics: assume we have a `ScreenManager` `MonoBehaviour` present on a scene with a string property of current active screen, and we want to check if lobby screen is active.
 
 ``` c#
 [ShowInEditor(typeof(CheckIsScreenActive), "Check Current Screen")]
@@ -344,7 +348,7 @@ private class CheckIsScreenActive : ShowHelperBase
 }
 ```
 
-Example in test:
+Example of a test with this assertation:
 
 ``` c#
 [UnityTest]
@@ -358,7 +362,9 @@ public IEnumerator SomeIntegrationTest()
 
 ### Another Camera
 
-When user click on item (button, switch etc) `Flow Recorder` takes click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to make raycast by these coords to find `GameObject` under click. This works only with Unity UI objects. In case when you click on non UI object you have to define property in Helper class that return specific camera to raycast. 
+
+When user clicks on UI element (button, switch etc) `Flow Recorder` receives click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find the `GameObject` user clicked. This works only with GameObjects containing Unity UI elements. In case user needs to click on the GameObject with no UI element attached he needs to define property in `Class Helper` that returns specific camera to perform raycast from. 
+
 
 ```c#
 static class MapLocationClick
