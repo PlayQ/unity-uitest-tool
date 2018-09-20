@@ -363,7 +363,7 @@ public IEnumerator SomeIntegrationTest()
 ### Another Camera
 
 
-When user clicks on UI element (button, switch etc) `Flow Recorder` receives click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find the `GameObject` user clicked. This works only with GameObjects containing Unity UI elements. In case user needs to click on the GameObject with no UI element attached he needs to define property in `Class Helper` that returns specific camera to perform raycast from. 
+When user clicks on UI element (button, switch etc) `Flow Recorder` receives click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find the `GameObject` user clicked. This works only with `GameObjects` containing Unity UI elements. In case user needs to click on the `GameObject` with no UI element attached he needs to define property in `Class Helper` that returns specific camera to perform raycast from. 
 
 
 ```c#
