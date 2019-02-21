@@ -1,7 +1,7 @@
-UI Test Tool
-====================================
-Content
-----
+# UI Test Tool
+
+## Content
+
 * [About](#about)
 	* [Installation](#installation)
 	* [Flow Recorder](#flow-recorder)
@@ -10,7 +10,7 @@ Content
 	* [Test Runner](#test-runner)
 		* [Run specific list of tests](#run-specific-list-of-tests)
 		* [Smoke testing](#smoke-testing)
-		* [Screen resolution depending tests](#screen-resolution-depending-tests)
+		* [Screen resolution depending tests](#screen-resolution-dependant-tests)
 	* [Helper Window](#helper-window)
 	* [Command Line Arguments](#command-line-arguments)
 * [API methods](#api-methods)
@@ -22,8 +22,7 @@ Content
 	* [Another Camera](#another-camera)
 
 
-About
----------------------
+## About
 
 This `Test Tool` simplifies testing of `Unity` games and allows to run tests on mobile devices. It's based on methods, attributes, and logs, similar to those in [NUnit](http://nunit.org).
 
@@ -67,7 +66,7 @@ Each action contains the following information:
 
 ### How Flow Recorder works
 
-When you perform a LMB click in the `Game` window during `Unity` play mode, `Flow Recorder` obtains click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find the `GameObject` user clicked. Then `Flow Recorder` looks through a list of all existing `assertations` and checks which `assertation` could be applied to the `GameObject`.
+When you perform a LMB click in the `Game Window` during `Unity` play mode, `Flow Recorder` obtains click coordinates and uses `UnityEngine.EventSystems.EventSystem` class to raycast by these coordinates to find the `GameObject` user clicked. Then `Flow Recorder` looks through a list of all existing `assertations` and checks which `assertation` could be applied to the `GameObject`.
 
 For example, if user clicked on UI text - all `assertations` that compare text labels become available. Common `assertations`, like `Is Enable` or `Is Exist` are available for any `GameObject`. By default, `Flow Recorder` supports only `Unity UI` raycast targets. If a support for `GameObject`s that don't have any UI components attached or use of custom `assertations` is required you have to implement custom `assertation method`. Please read below how to [extend](#extending-test-tool) `UI Test Tool`.
 
