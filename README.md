@@ -11,7 +11,7 @@
 		* [Run specific list of tests](#run-specific-list-of-tests)
 		* [Smoke testing](#smoke-testing)
 		* [Screen resolution depending tests](#screen-resolution-dependant-tests)
-        * [TestRails support](#test-rails-support)
+        * [TestRails support](#testrails-support)
         * [Test context menu](#test-context-menu)
 	* [Helper Window](#helper-window)
 	* [Command Line Arguments](#command-line-arguments)
@@ -154,7 +154,7 @@ public IEnumerator SomeTest()
 {....}
 ```
 
-To use that link you have to right click on test name in TestRunner window and choose `Open TestRail` in [context menu](#test-rails-support).
+To use that link you have to right click on test name in TestRunner window and choose `Open TestRail` in [context menu](#testrails-support).
 
 
 #### Test context menu
