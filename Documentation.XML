@@ -15,7 +15,7 @@
             Contains methods which allow waiting until the game components and objects on the scene reach the certain state asynchronously
             </summary>
         </member>
-        <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForLog(System.String,System.Boolean,System.Single)">
+        <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForLog(System.String,System.Boolean,UnityEngine.LogType,System.Single)">
             <summary>
             Starts the waiting for the log
             </summary>
@@ -104,51 +104,51 @@
             <param name="path">Path to `GameObject` in hierarchy</param>
             <param name="expectedText">Expected text</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsEnable(System.String)">
+        <member name="M:PlayQ.UITestTools.Check.IsEnabled(System.String)">
             <summary>
             Checks that `Gameobject` by given path is present on scene and active in hierarchy
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsEnable``1(System.String)">
+        <member name="M:PlayQ.UITestTools.Check.IsEnabled``1(System.String)">
             <summary>
             Checks that `Gameobject` by given path is present on scene, contains component `T` and is active in hierarchy
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
             <typeparam name="T">`Type` of object</typeparam>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsEnable``1">
+        <member name="M:PlayQ.UITestTools.Check.IsEnabled``1">
             <summary>
             Searches for `Gameobject` with component `T` and checks that it is present on scene and active in hierarchy
             </summary>
             <typeparam name="T">`Type` of object</typeparam>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsEnable(UnityEngine.GameObject)">
+        <member name="M:PlayQ.UITestTools.Check.IsEnabled(UnityEngine.GameObject)">
             <summary>
             Checks that `GameObject` is active in hierarchy
             </summary>
             <param name="go">`GameObject`</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsDisable(System.String)">
+        <member name="M:PlayQ.UITestTools.Check.IsDisabled(System.String)">
             <summary>
             Checks that `GameObject` by given path is present on scene and is not active in hierarchy
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsDisable``1(System.String)">
+        <member name="M:PlayQ.UITestTools.Check.IsDisabled``1(System.String)">
             <summary>
             Checks that `GameObject` by given path is present on scene, contains component `T` and is not active in hierarchy
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
             <typeparam name="T">`Type` of object</typeparam>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsDisable``1">
+        <member name="M:PlayQ.UITestTools.Check.IsDisabled``1">
             <summary>
             Searches for `Gameobject` with component `T` and checks that it is present on scene and is not active in hierarchy
             </summary>
             <typeparam name="T">`Type` of object</typeparam>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsDisable(UnityEngine.GameObject)">
+        <member name="M:PlayQ.UITestTools.Check.IsDisabled(UnityEngine.GameObject)">
             <summary>
             Checks that `GameObject` is not active in hierarchy
             </summary>
@@ -161,14 +161,14 @@
             <param name="path">Path to `GameObject` in hierarchy</param>
             <param name="state">Enable state (optional, default = true)</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsExist(System.String)">
+        <member name="M:PlayQ.UITestTools.Check.IsExists(System.String)">
             <summary>
             Checks that `GameObject` by given path is present on scene
             </summary>
             <param name="path">Path to `GameObject` in hierarchy</param>
             <returns>`GameObject`</returns>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsExist``1(System.String)">
+        <member name="M:PlayQ.UITestTools.Check.IsExists``1(System.String)">
             <summary>
             Checks that `GameObject` by given path is present on scene and contains component `T`
             </summary>
@@ -176,7 +176,7 @@
             <typeparam name="T">`Type` of object</typeparam>
             <returns>`GameObject`</returns>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.IsExist``1">
+        <member name="M:PlayQ.UITestTools.Check.IsExists``1">
             <summary>
             Searches for `GameObject` with component `T` on scene
             </summary>
@@ -210,7 +210,19 @@
             </summary>
             <typeparam name="T">`Type` of object</typeparam>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.CheckToggle(UnityEngine.GameObject,System.Boolean)">
+        <member name="M:PlayQ.UITestTools.Check.Slider(System.String,System.Single,PlayQ.UITestTools.Check.ComparisonOption,System.Single,System.Single,System.Boolean)">
+            <summary>
+            Checks that `GameObject` by given path has `Slider` component and its has proper value
+            </summary>
+            <param name="path">Path to `GameObject` in hierarchy</param>
+            <param name="expectedValue"></param>
+            <param name="comparisonOption"></param>
+            <param name="timeout"></param>
+            <param name="ignoreTimeScale"></param>
+            <returns></returns>
+            <exception cref="T:System.ArgumentOutOfRangeException"></exception>
+        </member>
+        <member name="M:PlayQ.UITestTools.Check.Toggle(UnityEngine.GameObject,System.Boolean)">
             <summary>
             Checks that `GameObject` has `Toggle` component and its `isOn` value equals to expected
             </summary>
@@ -224,7 +236,7 @@
             <param name="path">Path to `GameObject` in hierarchy</param>
             <param name="state">Toggle state</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Check.AnimatorStateStarted(System.String,System.String,System.Single)">
+        <member name="M:PlayQ.UITestTools.Check.AnimatorStateStarted(System.String,System.String,System.Single,System.Boolean)">
             <summary>
             Seraches for `GameObject` by given path with `Animator` component. During a given `timeOut` waits for an animation state with specific name to become active
             </summary>
@@ -268,11 +280,6 @@
             FPS counter stores average fps, minimum and maximum FPS values since the last moment this method was called
             </summary>
         </member>
-        <member name="M:PlayQ.UITestTools.Interact.ClearFPSMetrics">
-            <summary>
-            Clears FPS data from the hard drive
-            </summary>
-        </member>
         <member name="M:PlayQ.UITestTools.Interact.SaveFPS(System.String)">
             <summary>
             Stores FPS data on the hard drive
@@ -285,11 +292,10 @@
             </summary>
             <param name="scale">New timescale</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Interact.Click(System.String)">
+        <member name="M:PlayQ.UITestTools.Interact.GetTimescale">
             <summary>
-            Emulates LMB click on `Unity UI` element by given path
+            Gets timescale
             </summary>
-            <param name="path">Path to GameObject in hierarchy</param>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.Click(UnityEngine.GameObject)">
             <summary>
@@ -297,7 +303,7 @@
             </summary>
             <param name="go">GameObject to click</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Interact.WaitDelayAndClick(System.String,System.Single,System.Single)">
+        <member name="M:PlayQ.UITestTools.Interact.WaitDelayAndClick(System.String,System.Single,System.Single,System.Boolean)">
             <summary>
             Waits until `GameObject` by given path is present on scene and active in hierarchy then emulates LMB click after the specified delay. Fails if exceeds the given timeout
             </summary>
@@ -305,24 +311,15 @@
             <param name="delay">Amount of time to delay</param>
             <param name="timeout">Timeout</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Interact.ObsoleteWaitClickAndDelay(System.String,System.Single,System.Single)">
+        <member name="M:PlayQ.UITestTools.Interact.WaitDelayAndClick(UnityEngine.GameObject,System.Single,System.Single,System.Boolean)">
             <summary>
-            Obsolete. Use WaitDelayAndClick instead
-            Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay. Fails if exceeds the given timeout
+            Waits until `GameObject` by given path is present on scene and active in hierarchy then emulates LMB click after the specified delay. Fails if exceeds the given timeout
             </summary>
-            <param name="path">Path to GameObject in hierarchy</param>
+            <param name="gameObject">GameObject to click</param>
             <param name="delay">Amount of time to delay</param>
             <param name="timeout">Timeout</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Interact.ObsoleteWaitClickAndDelayIfPossible(System.String,System.Single,System.Single)">
-            <summary>
-            Obsolete. Use WaitDelayAndClick instead
-            Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay
-            </summary>
-            <param name="path">Path to GameObject in hierarchy</param>
-            <param name="delay">Amount of time to delay</param>
-            <param name="timeout">Timeout</param>
-        </member>
+        <!-- Badly formed XML comment ignored for member "M:PlayQ.UITestTools.Interact.DelayAndClick(System.String,System.Single,System.Boolean)" -->
         <member name="M:PlayQ.UITestTools.Interact.ClickPixels(System.Int32,System.Int32)">
             <summary>
             Uses `UnityEngine.EventSystems.EventSystem` class to raycast UI by specified coords to find `GameObject` and perform LMB click on it
@@ -466,6 +463,15 @@
             <param name="dontFail">Whether the test should fail upon exceeding timeout (optional, default = false)</param>
             <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
+        <member name="M:PlayQ.UITestTools.Wait.ObjectEnableAndInteractibleIfButton(UnityEngine.GameObject,System.Single,System.Boolean,System.Boolean)">
+            <summary>
+            Awaits for 'GameObject' to become enabled and interactible if it is a button
+            </summary>
+            <param name="go">'GameObject' of button</param>
+            <param name="timeout">Timeout (optional, default = 2)</param>
+            <param name="dontFail">Whether the test should fail upon exceeding timeout (optional, default = false)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        </member>
         <member name="M:PlayQ.UITestTools.Wait.ObjectEnabledInstantiatedAndDelay(System.String,System.Single,System.Single,System.Boolean,System.Boolean)">
             <summary>
             Awaits for 'GameObject' to become present on scene and active in hierarchy. Then waits during given amount of time and returns after that. Method fails after exceeding the given timeout
@@ -483,6 +489,17 @@
             <param name="count">Amount of frames to wait (optional, default = 1)</param>
         </member>
         <member name="M:PlayQ.UITestTools.Wait.WaitFor(System.Func{PlayQ.UITestTools.WaitResults.WaitResult},System.Single,System.Boolean,System.Boolean)">
+            <summary>
+            Waits until given predicate returns true or fails after specified timeout
+            </summary>
+            <param name="condition">Predicate that return true, if its condition is successfuly fulfilled</param>
+            <param name="timeout">Timeout</param>
+            <param name="testInfo"> This label would be passed to logs if method fails</param>
+            <param name="dontFail">If true, method will not generate exception after timeout (optional, default = false)</param>
+            <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+            <exception cref="T:System.Exception"></exception>
+        </member>
+        <member name="M:PlayQ.UITestTools.Wait.WaitFor(System.Func{System.Boolean},System.Single,System.String,System.Boolean)">
             <summary>
             Waits until given predicate returns true or fails after specified timeout
             </summary>
@@ -574,7 +591,7 @@
             <param name="timeout">Timeout (optional, default = 2)</param>
             <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Wait.ObjectDisabledOrNotExist(System.String,System.Single,System.Boolean)">
+        <member name="M:PlayQ.UITestTools.Wait.ObjectIsDisabledOrDoesNotExist(System.String,System.Single,System.Boolean)">
             <summary>
             Waits until 'GameObject' by given path disappears from scene or becomes disabled in hierarchy or fails after specified timeout
             </summary>
@@ -975,20 +992,183 @@
             <param name="text">Text</param>
             <param name="useRegEx">Is the specified text a regular expression</param>
         </member>
-        <member name="T:Tests.Nodes.Node">
+        <member name="T:EditorUITools.EditorUIConstants">
             <summary>
-            Node in a tree
+            UI constant values
             </summary>
         </member>
-        <member name="F:Tests.Nodes.Node.parent">
+        <member name="F:EditorUITools.EditorUIConstants.LAYOUT_PADDING">
             <summary>
-            Parent node
+            Space between an element in Editor GUI Layout and layout's border
             </summary>
         </member>
-        <member name="F:Tests.Nodes.Node.children">
+        <member name="T:EditorUITools.TwoSectionWithSliderDrawer">
             <summary>
-            Child nodes
+            Draws two sections with a draggable slider between them
             </summary>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.DrawEmptyBox(UnityEngine.Rect,UnityEngine.Color)">
+            <summary>
+            Draws the empty box by a given rect and color
+            </summary>
+            <param name="rect">Box rect</param>
+            <param name="color">Box color</param>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.minBorder">
+            <summary>
+            The upper border of the two sections
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.maxBorder">
+            <summary>
+            The lower border of the two sections
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.lowerSection">
+            <summary>
+            Lower section drawer
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.upperSection">
+            <summary>
+            Upper section drawer
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.sliderDrawer">
+            <summary>
+            Draggable slider drawer
+            </summary>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Initialize drawer
+            </summary>
+            <param name="upperSectionMinSize">Upper section's minimum size</param>
+            <param name="upperSectionGUIStyle">Upper section's GUI style</param>
+            <param name="lowerSectionMinSize">Lower section's minimum size</param>
+            <param name="lowerSectionGUIStyle">Lower section's GUI style</param>
+            <param name="sliderPos">Slider's default position</param>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.Draw(UnityEngine.Rect,System.Single,System.Single,UnityEngine.GUIStyle,System.Action,UnityEngine.GUIStyle,System.Action)">
+            <summary>
+            Draw the sections and a draggable slider
+            </summary>
+            <returns>Should we call Repaint() or not</returns>
+            <param name="windowRect">Editor window rect</param>
+            <param name="topOffset">Amount of height to exclude from total height bottom</param>
+            <param name="bottomOffset">Amount of height to exclude from total height bottom</param>
+            <param name="upperSectionDrawAction">Upper section content draw delegate</param>
+            <param name="lowerSectionDrawAction">Lower section content draw delegate</param>
+        </member>
+        <member name="T:EditorUITools.TwoSectionWithSliderDrawer.SectionDrawer">
+            <summary>
+            Section drawer
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SectionDrawer.FixedBorderPos">
+            <summary>
+            The fixed border position
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SectionDrawer.MinSize">
+            <summary>
+            The minimum size of the section
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SectionDrawer.scrollPosition">
+            <summary>
+            The scroll position
+            </summary>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.SectionDrawer.Draw(UnityEngine.GUIStyle,System.Action,EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer,UnityEngine.Rect)">
+            <summary>
+            Draw the section
+            </summary>
+            <returns>The section's rect</returns>
+            <param name="drawer"></param>
+            <param name="sliderDrawer">Slider's drawer</param>
+        </member>
+        <member name="T:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer">
+            <summary>
+            Slider drawer
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.RESIZE_RECT_HEIGHT">
+            <summary>
+            Height of the resize control rect
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.RESIZE_LINE_THICKNESS">
+            <summary>
+            Center line's thickness
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.lineColor">
+            <summary>
+            Center line's color
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.SliderPos">
+            <summary>
+            Coordinate of slider center
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.mouseOffset">
+            <summary>
+            Offset between mouse position and slider center
+            </summary>
+        </member>
+        <member name="P:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.SliderUpperBorderPos">
+            <summary>
+            Slider's upper border coordinate
+            </summary>
+        </member>
+        <member name="P:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.SliderLowerBorderPos">
+            <summary>
+            Slider's lower border coordinate
+            </summary>
+        </member>
+        <member name="F:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.isDragged">
+            <summary>
+            Is slider currently being dragged
+            </summary>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.Handle(UnityEngine.Rect)">
+            <summary>
+            Handle mouse events
+            </summary>
+            <returns>Should we call Repaint() or not</returns>
+            <param name="windowRect">Editor window rect</param>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.Draw(UnityEngine.Rect)">
+            <summary>
+            Draws the slider line and changes cursor image
+            </summary>
+            <param name="windowRect">Window rect.</param>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.HandleMouseDownEvent">
+            <summary>
+            Handle the mouse down event. If we click on control rect of the slider, we consider the slider being dragged. Otherwise - not
+            </summary>
+            <returns>Should we call Repaint() or not</returns>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.HandleMouseDragEvent">
+            <summary>
+            Handle the mouse drag event. If the slider is being dragged, we set sliderPos to mouse position (minus offset). If the position has changed, we call Repaint()
+            </summary>
+            <returns>Should we call Repaint() or not</returns>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.HandleMouseUpEvent">
+            <summary>
+            Handle the mouse up event. Consider the slider as not being dragged
+            </summary>
+            <returns>Should we call Repaint() or not</returns>
+        </member>
+        <member name="M:EditorUITools.TwoSectionWithSliderDrawer.SliderDrawer.HandleMouseOutOfWindow">
+            <summary>
+            Handle the mouse out of window event
+            </summary>
+            <returns>Should we call Repaint() or not</returns>
         </member>
     </members>
 </doc>

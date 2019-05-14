@@ -9,30 +9,28 @@
   * [AnimatorStateStarted](#animatorstatestarted)
   * [AverageFPS](#averagefps)
   * [CheckEnabled](#checkenabled)
-  * [CheckToggle](#checktoggle)
   * [DoesNotExist](#doesnotexist)
   * [DoesNotExistOrDisabled](#doesnotexistordisabled)
   * [InputEquals](#inputequals)
   * [InputNotEquals](#inputnotequals)
-  * [IsDisable](#isdisable)
-  * [IsEnable](#isenable)
-  * [IsExist](#isexist)
+  * [IsDisabled](#isdisabled)
+  * [IsEnabled](#isenabled)
+  * [IsExists](#isexists)
   * [MinFPS](#minfps)
+  * [Slider](#slider)
   * [SourceImage](#sourceimage)
   * [TextEquals](#textequals)
   * [TextNotEquals](#textnotequals)
   * [Toggle](#toggle)
 * [Interact](#interact)
   * [AppendText](#appendtext)
-  * [ClearFPSMetrics](#clearfpsmetrics)
   * [Click](#click)
   * [ClickPercents](#clickpercents)
   * [ClickPixels](#clickpixels)
   * [DragPercents](#dragpercents)
   * [DragPixels](#dragpixels)
+  * [GetTimescale](#gettimescale)
   * [MakeScreenShot](#makescreenshot)
-  * [ObsoleteWaitClickAndDelay](#obsoletewaitclickanddelay)
-  * [ObsoleteWaitClickAndDelayIfPossible](#obsoletewaitclickanddelayifpossible)
   * [ResetFPS](#resetfps)
   * [SaveFPS](#savefps)
   * [ScrollToPosition](#scrolltoposition)
@@ -45,11 +43,11 @@
   * [Frame](#frame)
   * [ObjectDestroyed](#objectdestroyed)
   * [ObjectDisabled](#objectdisabled)
-  * [ObjectDisabledOrNotExist](#objectdisabledornotexist)
   * [ObjectEnableAndInteractibleIfButton](#objectenableandinteractibleifbutton)
   * [ObjectEnabled](#objectenabled)
   * [ObjectEnabledInstantiatedAndDelay](#objectenabledinstantiatedanddelay)
   * [ObjectInstantiated](#objectinstantiated)
+  * [ObjectIsDisabledOrDoesNotExist](#objectisdisabledordoesnotexist)
   * [SceneLeaded](#sceneleaded)
   * [Seconds](#seconds)
   * [WaitFor](#waitfor)
@@ -191,20 +189,6 @@ Returns: Abstract async waiter
 
 ---
 
-#### CheckToggle
-
-
- Checks that `GameObject` has `Toggle` component and its `isOn` value equals to expected
- 
-
-|Argument | Description |
-|-----|------|
-|go |`GameObject` with `Toggle` component|
-|expectedIsOn |Expected value of the toggle|
-
-
----
-
 #### DoesNotExist
 
 
@@ -312,7 +296,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsDisable
+#### IsDisabled
 
 
  Checks that `GameObject` by given path is present on scene and is not active in hierarchy
@@ -325,7 +309,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsDisable
+#### IsDisabled
 
 
  Checks that `GameObject` is not active in hierarchy
@@ -338,7 +322,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsDisable
+#### IsDisabled
 
 
  Searches for `Gameobject` with component `T` and checks that it is present on scene and is not active in hierarchy
@@ -348,7 +332,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsDisable
+#### IsDisabled
 
 
  Checks that `GameObject` by given path is present on scene, contains component `T` and is not active in hierarchy
@@ -361,7 +345,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsEnable
+#### IsEnabled
 
 
  Checks that `Gameobject` by given path is present on scene and active in hierarchy
@@ -374,7 +358,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsEnable
+#### IsEnabled
 
 
  Checks that `GameObject` is active in hierarchy
@@ -387,7 +371,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsEnable
+#### IsEnabled
 
 
  Searches for `Gameobject` with component `T` and checks that it is present on scene and active in hierarchy
@@ -397,7 +381,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsEnable
+#### IsEnabled
 
 
  Checks that `Gameobject` by given path is present on scene, contains component `T` and is active in hierarchy
@@ -410,7 +394,7 @@ Returns: Abstract async waiter
 
 ---
 
-#### IsExist
+#### IsExists
 
 
  Checks that `GameObject` by given path is present on scene
@@ -426,7 +410,7 @@ Returns: `GameObject`
 
 ---
 
-#### IsExist
+#### IsExists
 
 
  Searches for `GameObject` with component `T` on scene
@@ -439,7 +423,7 @@ Returns: `GameObject`
 
 ---
 
-#### IsExist
+#### IsExists
 
 
  Checks that `GameObject` by given path is present on scene and contains component `T`
@@ -464,6 +448,26 @@ Returns: `GameObject`
 |Argument | Description |
 |-----|------|
 |targetFPS |Minimum acceptable value of minimum fps|
+
+
+---
+
+#### Slider
+
+
+ Checks that `GameObject` by given path has `Slider` component and its has proper value
+ 
+
+|Argument | Description |
+|-----|------|
+|path |Path to `GameObject` in hierarchy|
+|expectedValue ||
+|comparisonOption ||
+|timeout ||
+|ignoreTimeScale ||
+
+Returns: 
+
 
 
 ---
@@ -552,6 +556,20 @@ Returns: `GameObject`
 
 ---
 
+#### Toggle
+
+
+ Checks that `GameObject` has `Toggle` component and its `isOn` value equals to expected
+ 
+
+|Argument | Description |
+|-----|------|
+|go |`GameObject` with `Toggle` component|
+|expectedIsOn |Expected value of the toggle|
+
+
+---
+
 ## Interact 
 
  Contains methods which allow interacting with game components and objects on the scene
@@ -582,29 +600,6 @@ Returns: `GameObject`
 |-----|------|
 |go |`GameObject` with `Text` component|
 |text |`Text` to set|
-
-
----
-
-#### ClearFPSMetrics
-
-
- Clears FPS data from the hard drive
- 
-
-
-
----
-
-#### Click
-
-
- Emulates LMB click on `Unity UI` element by given path
- 
-
-|Argument | Description |
-|-----|------|
-|path |Path to GameObject in hierarchy|
 
 
 ---
@@ -774,6 +769,16 @@ Returns: `GameObject`
 
 ---
 
+#### GetTimescale
+
+
+ Gets timescale
+ 
+
+
+
+---
+
 #### MakeScreenShot
 
 
@@ -783,38 +788,6 @@ Returns: `GameObject`
 |Argument | Description |
 |-----|------|
 |name |Name of screenshot|
-
-
----
-
-#### ObsoleteWaitClickAndDelay
-
-
- Obsolete. Use WaitDelayAndClick instead
- Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay. Fails if exceeds the given timeout
- 
-
-|Argument | Description |
-|-----|------|
-|path |Path to GameObject in hierarchy|
-|delay |Amount of time to delay|
-|timeout |Timeout|
-
-
----
-
-#### ObsoleteWaitClickAndDelayIfPossible
-
-
- Obsolete. Use WaitDelayAndClick instead
- Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay
- 
-
-|Argument | Description |
-|-----|------|
-|path |Path to GameObject in hierarchy|
-|delay |Amount of time to delay|
-|timeout |Timeout|
 
 
 ---
@@ -911,6 +884,21 @@ Returns: `GameObject`
 |Argument | Description |
 |-----|------|
 |path |Path to GameObject in hierarchy|
+|delay |Amount of time to delay|
+|timeout |Timeout|
+
+
+---
+
+#### WaitDelayAndClick
+
+
+ Waits until `GameObject` by given path is present on scene and active in hierarchy then emulates LMB click after the specified delay. Fails if exceeds the given timeout
+ 
+
+|Argument | Description |
+|-----|------|
+|gameObject |GameObject to click|
 |delay |Amount of time to delay|
 |timeout |Timeout|
 
@@ -1040,16 +1028,17 @@ Returns: `GameObject`
 
 ---
 
-#### ObjectDisabledOrNotExist
+#### ObjectEnableAndInteractibleIfButton
 
 
- Waits until 'GameObject' by given path disappears from scene or becomes disabled in hierarchy or fails after specified timeout
+ Awaits for 'GameObject' to become enabled and interactible if it is a button
  
 
 |Argument | Description |
 |-----|------|
 |path |Path to 'GameObject' in hierarchy|
 |timeout |Timeout (optional, default = 2)|
+|dontFail |Whether the test should fail upon exceeding timeout (optional, default = false)|
 |ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
 
 
@@ -1063,7 +1052,7 @@ Returns: `GameObject`
 
 |Argument | Description |
 |-----|------|
-|path |Path to 'GameObject' in hierarchy|
+|go |'GameObject' of button|
 |timeout |Timeout (optional, default = 2)|
 |dontFail |Whether the test should fail upon exceeding timeout (optional, default = false)|
 |ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
@@ -1161,6 +1150,21 @@ Returns: `GameObject`
 
 ---
 
+#### ObjectIsDisabledOrDoesNotExist
+
+
+ Waits until 'GameObject' by given path disappears from scene or becomes disabled in hierarchy or fails after specified timeout
+ 
+
+|Argument | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|timeout |Timeout (optional, default = 2)|
+|ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
+
+
+---
+
 #### SceneLeaded
 
 
@@ -1186,6 +1190,23 @@ Returns: `GameObject`
 |-----|------|
 |seconds |Count of seconds to wait|
 |ignoreTimescale |Should time scale be ignored or not (optional, default = false)|
+
+
+---
+
+#### WaitFor
+
+
+ Waits until given predicate returns true or fails after specified timeout
+ 
+
+|Argument | Description |
+|-----|------|
+|condition |Predicate that return true, if its condition is successfuly fulfilled|
+|timeout |Timeout|
+|testInfo | This label would be passed to logs if method fails|
+|dontFail |If true, method will not generate exception after timeout (optional, default = false)|
+|ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
 
 
 ---

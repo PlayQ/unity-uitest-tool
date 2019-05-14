@@ -11,6 +11,7 @@ Content
 		* [Run specific list of tests](#run-specific-list-of-tests)
 		* [Smoke testing](#smoke-testing)
 		* [Screen resolution depending tests](#screen-resolution-depending-tests)
+        * [Testrails support: comming soon](#test-rails-support)
 	* [Helper Window](#helper-window)
 	* [Command Line Arguments](#command-line-arguments)
 * [API methods](#api-methods)
@@ -135,6 +136,12 @@ For example:
 public IEnumerator SomeTest()
 {....}
 ```
+
+
+#### Test rails support
+Coming soon.
+
+
 
 ### Helper Window
 
