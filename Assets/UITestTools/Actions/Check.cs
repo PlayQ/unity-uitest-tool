@@ -188,7 +188,7 @@ namespace PlayQ.UITestTools
 
         #region EnableDisable
 
-        private class IsEnableGenerator : ShowHelperBase
+        private class IsEnabledGenerator : ShowHelperBase
         {
             public override AbstractGenerator CreateGenerator(GameObject go)
             {
@@ -205,14 +205,14 @@ namespace PlayQ.UITestTools
         /// Checks that `Gameobject` by given path is present on scene and active in hierarchy
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
-        [ShowInEditor(typeof(IsEnableGenerator), "Is Enable")]
-        public static void IsEnable(string path)
+        [ShowInEditor(typeof(IsEnabledGenerator), "Check/Is Enabled")]
+        public static void IsEnabled(string path)
         {
-            var go = IsExist(path);
+            var go = IsExists(path);
 
             if (!go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsEnable: with path " + path + " Game Object disabled");
+                Assert.Fail("IsEnabled: with path " + path + " Game Object disabled");
             }
         }
 
@@ -221,13 +221,13 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">`Type` of object</typeparam>
-        public static void IsEnable<T>(string path) where T : Component
+        public static void IsEnabled<T>(string path) where T : Component
         {
-            var go = IsExist<T>(path);
+            var go = IsExists<T>(path);
 
             if (!go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsEnable<" + typeof(T) + ">: with path " + path + " Game Object disabled");
+                Assert.Fail("IsEnabled<" + typeof(T) + ">: with path " + path + " Game Object disabled");
             }
         }
 
@@ -235,13 +235,13 @@ namespace PlayQ.UITestTools
         /// Searches for `Gameobject` with component `T` and checks that it is present on scene and active in hierarchy
         /// </summary>
         /// <typeparam name="T">`Type` of object</typeparam>
-        public static void IsEnable<T>() where T : Component
+        public static void IsEnabled<T>() where T : Component
         {
-            var go = IsExist<T>();
+            var go = IsExists<T>();
 
             if (!go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsEnable<" + typeof(T) + ">: Game Object disabled");
+                Assert.Fail("IsEnabled<" + typeof(T) + ">: Game Object disabled");
             }
         }
 
@@ -249,16 +249,16 @@ namespace PlayQ.UITestTools
         /// Checks that `GameObject` is active in hierarchy
         /// </summary>
         /// <param name="go">`GameObject`</param>
-        public static void IsEnable(GameObject go)
+        public static void IsEnabled(GameObject go)
         {
             if (!go.activeInHierarchy)
             {
-                Assert.Fail("IsEnable by object instance: with path " + UITestUtils.GetGameObjectFullPath(go) +
+                Assert.Fail("IsEnabled by object instance: with path " + UITestUtils.GetGameObjectFullPath(go) +
                             " Game Object disabled");
             }
         }
 
-        private class IsDisableGenerator : ShowHelperBase
+        private class IsDisabledGenerator : ShowHelperBase
         {
             public override AbstractGenerator CreateGenerator(GameObject go)
             {
@@ -275,14 +275,14 @@ namespace PlayQ.UITestTools
         /// Checks that `GameObject` by given path is present on scene and is not active in hierarchy
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
-        [ShowInEditor(typeof(IsDisableGenerator), "Is Disable")]
-        public static void IsDisable(string path)
+        [ShowInEditor(typeof(IsDisabledGenerator), "Check/Is Disabled")]
+        public static void IsDisabled(string path)
         {
-            var go = IsExist(path);
+            var go = IsExists(path);
 
             if (go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsDisable: with path " + path + " Game Object enabled");
+                Assert.Fail("IsDisabled: with path " + path + " Game Object enabled");
             }
         }
 
@@ -291,14 +291,14 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">`Type` of object</typeparam>
-        public static void IsDisable<T>(string path) where T : Component
+        public static void IsDisabled<T>(string path) where T : Component
         {
-            IsExist<T>(path);
+            IsExists<T>(path);
             var go = UITestUtils.FindAnyGameObject<T>(path);
 
             if (go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsDisable<" + typeof(T) + ">: with path " + path + " Game Object enabled");
+                Assert.Fail("IsDisabled<" + typeof(T) + ">: with path " + path + " Game Object enabled");
             }
         }
 
@@ -306,13 +306,13 @@ namespace PlayQ.UITestTools
         /// Searches for `Gameobject` with component `T` and checks that it is present on scene and is not active in hierarchy
         /// </summary>
         /// <typeparam name="T">`Type` of object</typeparam>
-        public static void IsDisable<T>() where T : Component
+        public static void IsDisabled<T>() where T : Component
         {
-            var go = IsExist<T>();
+            var go = IsExists<T>();
 
             if (go.gameObject.activeInHierarchy)
             {
-                Assert.Fail("IsDisable<" + typeof(T) + ">: Game Object enabled");
+                Assert.Fail("IsDisabled<" + typeof(T) + ">: Game Object enabled");
             }
         }
 
@@ -320,11 +320,11 @@ namespace PlayQ.UITestTools
         /// Checks that `GameObject` is not active in hierarchy
         /// </summary>
         /// <param name="go">`GameObject`</param>
-        public static void IsDisable(GameObject go)
+        public static void IsDisabled(GameObject go)
         {
             if (go.activeInHierarchy)
             {
-                Assert.Fail("IsDisable by object instance: Game Object " + UITestUtils.GetGameObjectFullPath(go) +
+                Assert.Fail("IsDisabled by object instance: Game Object " + UITestUtils.GetGameObjectFullPath(go) +
                             " enabled");
             }
         }
@@ -334,10 +334,10 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="state">Enable state (optional, default = true)</param>
-        [ShowInEditor(typeof(CheckEnabledState), "Check Enabled State")]
+        [ShowInEditor(typeof(CheckEnabledState), "Check/Check Enabled State")]
         public static void CheckEnabled(string path, bool state = true)
         {
-            var go = IsExist(path);
+            var go = IsExists(path);
             Assert.AreEqual(state, go.gameObject.activeInHierarchy, "CheckEnabled: object with path " + path + " is " +
                                                                     (go.gameObject.activeInHierarchy
                                                                         ? "enabled"
@@ -381,8 +381,8 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <returns>`GameObject`</returns>
-        [ShowInEditor(typeof(IsExistsGenerator), "Is Exist")]
-        public static GameObject IsExist(string path)
+        [ShowInEditor(typeof(IsExistsGenerator), "Check/Is Exist")]
+        public static GameObject IsExists(string path)
         {
             var go = UITestUtils.FindAnyGameObject(path);
 
@@ -399,13 +399,13 @@ namespace PlayQ.UITestTools
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">`Type` of object</typeparam>
         /// <returns>`GameObject`</returns>
-        public static GameObject IsExist<T>(string path) where T : Component
+        public static GameObject IsExists<T>(string path) where T : Component
         {
             var go = UITestUtils.FindAnyGameObject<T>(path);
 
             if (go == null)
             {
-                Assert.Fail("IsExist<" + typeof(T) + ">: Object with path " + path + " does not exist.");
+                Assert.Fail("IsExists<" + typeof(T) + ">: Object with path " + path + " does not exist.");
             }
 
             return go.gameObject;
@@ -416,13 +416,13 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <typeparam name="T">`Type` of object</typeparam>
         /// <returns>`GameObject`</returns>
-        public static GameObject IsExist<T>() where T : Component
+        public static GameObject IsExists<T>() where T : Component
         {
             var go = UITestUtils.FindAnyGameObject<T>();
 
             if (go == null)
             {
-                Assert.Fail("IsExist<" + typeof(T) + ">: Object does not exist.");
+                Assert.Fail("IsExists<" + typeof(T) + ">: Object does not exist.");
             }
 
             return go.gameObject;
@@ -445,7 +445,7 @@ namespace PlayQ.UITestTools
         /// Checks that `GameObject` by given path is not present on scene
         /// </summary>
         /// <param name="path">Path to `GameObject` in hierarchy</param>
-        [ShowInEditor(typeof(DoesNotExistsGenerator), "Does Not Exist")]
+        [ShowInEditor(typeof(DoesNotExistsGenerator), "Check/Does Not Exist")]
         public static void DoesNotExist(string path)
         {
             var go = UITestUtils.FindAnyGameObject(path);
@@ -462,7 +462,7 @@ namespace PlayQ.UITestTools
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <param name="timeout">Timeout (optional, default = 2)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
-        [ShowInEditor(typeof(DoesNotExistOrDisabledClass), "Does Not Exist Or Disabled")]
+        [ShowInEditor(typeof(DoesNotExistOrDisabledClass), "Check/Does Not Exist Or Disabled")]
         public static IEnumerator DoesNotExistOrDisabled(string path, float timeout = 2, bool ignoreTimeScale = false)
         {
             var go = UITestUtils.FindAnyGameObject(path);
@@ -521,6 +521,128 @@ namespace PlayQ.UITestTools
 
         #endregion
 
+        #region Slider
+
+        private class CheckSliderState : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return VoidMethod.Path(go).Float(UITestUtils.FindComponentInParents<Slider>(go).value)
+                    .Enum(ComparisonOption.Equal);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                if (!go)
+                {
+                    return false;
+                }
+
+                var slider = go.GetComponent<Slider>();
+                return slider && slider.gameObject.activeInHierarchy;
+            }
+        }
+
+        public enum ComparisonOption
+        {
+            Equal = 0,
+            NotEqual = 1,
+            GreaterThan = 2,
+            GreaterThanOrEqualTo = 3,
+            LessThan = 4,
+            LessThanOrEqualTo = 5,
+        }
+
+        /// <summary>
+        /// Checks that `GameObject` by given path has `Slider` component and its has proper value
+        /// </summary>
+        /// <param name="path">Path to `GameObject` in hierarchy</param>
+        /// <param name="expectedValue"></param>
+        /// <param name="comparisonOption"></param>
+        /// <param name="timeout"></param>
+        /// <param name="ignoreTimeScale"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentOutOfRangeException"></exception>
+        [ShowInEditor(typeof(CheckSliderState), "Check Slider State")]
+        public static IEnumerator Slider(string path, float expectedValue, ComparisonOption comparisonOption, float delta = float.Epsilon,
+            float timeout = 10, bool ignoreTimeScale = false)
+        {
+            yield return Wait.WaitFor(() =>
+            {
+                var go = IsExists(path);
+                var slider = go.GetComponent<Slider>();
+                if (slider == null)
+                {
+                    return new WaitFailed("CheckToggle: Game object " + path + " has no Slider component.");
+                }
+
+                var value = slider.value;
+                switch (comparisonOption)
+                {
+                    case ComparisonOption.Equal:
+                        if (! (Math.Abs(value - expectedValue) < delta))
+                        {
+                            return new WaitFailed(string.Format(
+                                "CheckSlider: Slider {0} have value \"{1}\" - but expected \"{2}\"",
+                                path, value, expectedValue));
+                        }
+
+                        break;
+                    case ComparisonOption.NotEqual:
+                        if (Math.Abs(value - expectedValue) < delta)
+                        {
+                            return new WaitFailed(string.Format(
+                                "CheckSlider: Slider {0} have value \"{1}\" - but expected not \"{2}\"",
+                                path, value, expectedValue));
+                        }
+
+                        break;
+                    case ComparisonOption.GreaterThan:
+                        if (value - expectedValue <= delta)
+                        {
+                            return new WaitFailed(string.Format(
+                                "CheckSlider: Slider {0} have value \"{1}\" - but expected greater than \"{2}\"",
+                                path, value, expectedValue));
+                        }
+
+                        break;
+                    case ComparisonOption.GreaterThanOrEqualTo:
+                        if (value < expectedValue)
+                        {
+                            return new WaitFailed(string.Format(
+                                "CheckSlider: Slider {0} have value \"{1}\" - but expected greater than or equal to \"{2}\"",
+                                path, value, expectedValue));
+                        }
+
+                        break;
+                    case ComparisonOption.LessThan:
+                        if (value - expectedValue >= -delta)
+                        {
+                            return new WaitFailed(string.Format(
+                                "CheckSlider: Slider {0} have value \"{1}\" - but expected less than \"{2}\"",
+                                path, value, expectedValue));
+                        }
+
+                        break;
+                    case ComparisonOption.LessThanOrEqualTo:
+                        if (value > expectedValue)
+                        {
+                            return new WaitFailed(string.Format(
+                                "CheckSlider: Slider {0} have value \"{1}\" - but expected less than or equal to \"{2}\"",
+                                path, value, expectedValue));
+                        }
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("comparisonOption", comparisonOption, null);
+                }
+
+                return new WaitSuccess();
+            }, timeout, false, ignoreTimeScale);
+        }
+
+        #endregion
+
         #region Toggle
 
         /// <summary>
@@ -528,7 +650,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="go">`GameObject` with `Toggle` component</param>
         /// <param name="expectedIsOn">Expected value of the toggle</param>
-        public static void CheckToggle(GameObject go, bool expectedIsOn)
+        public static void Toggle(GameObject go, bool expectedIsOn)
         {
             var toggle = UITestUtils.FindGameObjectWithComponentInParents<Toggle>(go);
 
@@ -573,7 +695,7 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(CheckToggleState), "Check Toggle State")]
         public static void Toggle(string path, bool state)
         {
-            var go = IsExist(path);
+            var go = IsExists(path);
             Toggle toggle = go.GetComponent<Toggle>();
             Assert.IsNotNull(toggle, "CheckToggle: Game object " + path + " has no Toggle component.");
             Assert.AreEqual(
@@ -587,7 +709,7 @@ namespace PlayQ.UITestTools
         }
 
         #endregion
-
+        
         #region Animation
 
         /// <summary>
@@ -597,9 +719,9 @@ namespace PlayQ.UITestTools
         /// <param name="stateName">`Animator` state name</param>
         /// <param name="timeout">Timeout</param>
         [ShowInEditor(typeof(AnimatorStateStartedClass), "Animator State Started", false)]
-        public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout)
+        public static IEnumerator AnimatorStateStarted(string path, string stateName, float timeout = 10, bool ignoreTimeScale = false)
         {
-            return AnimatorStateStartedClass.AnimatorStateStarted(path, stateName, timeout);
+            return AnimatorStateStartedClass.AnimatorStateStarted(path, stateName, timeout, ignoreTimeScale);
         }
 
         private class AnimatorStateStartedClass : ShowHelperBase
@@ -694,7 +816,7 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(CheckAverageFPSClass), "FPS/Check Average FPS", false)]
         public static void AverageFPS(float targetFPS)
         {
-            var awerageFps = FPSCounter.AverageFPS;
+            var awerageFps = TestMetrics.FPSCounter.AverageFPS;
             Assert.GreaterOrEqual(awerageFps, targetFPS);
         }
 
@@ -720,7 +842,7 @@ namespace PlayQ.UITestTools
         {
             public static void CheckMinFPS(float targetFPS)
             {
-                var minFps = FPSCounter.MixFPS;
+                var minFps = TestMetrics.FPSCounter.MixFPS;
                 Assert.GreaterOrEqual(minFps, targetFPS);
             }
 
@@ -819,7 +941,7 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(CheckSourceImage), "Check/Source Image")]
         public static void SourceImage(string path, string sourceName)
         {
-            var go = IsExist(path);
+            var go = IsExists(path);
             SourceImage(go, sourceName);
         }
 

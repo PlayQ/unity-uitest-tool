@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
-using JetBrains.Annotations;
-using Newtonsoft.Json.Linq;
+﻿using System.Collections;
 using PlayQ.UITestTools.WaitResults;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -17,22 +11,6 @@ namespace PlayQ.UITestTools
     /// </summary>
     public static partial class Interact
     {
-        private static string GenerateScreenshotDirectoryPath()
-        {
-            var pathBuilder = new StringBuilder();
-
-            if (!Application.isMobilePlatform)
-            {
-                pathBuilder
-                    .Append(Application.persistentDataPath)
-                    .Append(Path.DirectorySeparatorChar);
-            }
-
-            pathBuilder.Append("Screenshots");
-            var result = pathBuilder.ToString();
-            return result;
-        }
-        
         /// <summary>
         /// Makes a screenshot. Saves it to persistant data folder
         /// </summary>
@@ -40,19 +18,10 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(MakeScreenshot), "Screenshot/Make Screenshot", false)]
         public static IEnumerator MakeScreenShot(string name)
         {
-            var screenshotPath = GenerateScreenshotDirectoryPath();
-            if (!Directory.Exists(screenshotPath))
-            {
-                Directory.CreateDirectory(screenshotPath);
-            }
-
-            name = TestScreenshotTools.GenerateScreenshotName(name);
-            var fullPath = screenshotPath + Path.DirectorySeparatorChar + name;
-            
+            var screenshotPath = TestScreenshotTools.GetFullPath(name);
             PlayModeTestRunner.IsTestUIEnabled = false;
             yield return null;
-            Application.CaptureScreenshot(fullPath);
-            yield return Wait.Frame(5);
+            Application.CaptureScreenshot(screenshotPath);
             PlayModeTestRunner.IsTestUIEnabled = true;
         }
 
@@ -71,7 +40,7 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(ResetFPSClass), "FPS/Reset FPS", false)]
         public static void ResetFPS()
         {
-            FPSCounter.Reset();
+            TestMetrics.FPSCounter.Reset();
         }
 
         private class ResetFPSClass : ShowHelperBase
@@ -88,110 +57,17 @@ namespace PlayQ.UITestTools
         }
         
         /// <summary>
-        /// Clears FPS data from the hard drive
-        /// </summary>
-        public static void ClearFPSMetrics()
-        {
-            if (File.Exists(SaveFPSClass.FPSMettricsFileFullPath))
-            {
-                File.Delete(SaveFPSClass.FPSMettricsFileFullPath);
-            }
-        }
-        
-        /// <summary>
         /// Stores FPS data on the hard drive
         /// </summary>
         /// <param name="tag">Measure discription</param>
         [ShowInEditor(typeof(SaveFPSClass), "FPS/Save FPS", false)]
         public static void SaveFPS(string tag)
         {
-            string textData = null;
-            if (File.Exists(SaveFPSClass.FPSMettricsFileFullPath))
-            {
-                try
-                {
-                    textData = File.ReadAllText(SaveFPSClass.FPSMettricsFileFullPath);
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning("file with fps metrics exists but can't be read " + ex.Message);
-                }
-            }
-
-            var  metrics = new SaveFPSClass.FPSMetrics();
-            if (!string.IsNullOrEmpty(textData))
-            {
-                metrics = JObject.Parse(textData).ToObject<SaveFPSClass.FPSMetrics>();
-                if (metrics == null)
-                {
-                    metrics = new SaveFPSClass.FPSMetrics();
-                }
-            }
-            metrics.Build = Application.version;
-            var buildVersion = ConsoleArgumentHelper.GetArg("-buildNumber");
-            if (!string.IsNullOrEmpty(buildVersion))
-            {
-                metrics.Build = metrics.Build + ":" + buildVersion;
-            }
-
-            if (metrics.Fps == null)
-            {
-                metrics.Fps = new Dictionary<string, SaveFPSClass.FPSData>();
-            }
-
-            if (metrics.Fps.ContainsKey(tag))
-            {
-                Debug.LogWarning("Tag " + tag + " is already exists in FPS metrics file!");
-                tag = tag + "_" +Time.realtimeSinceStartup;
-            }
-            metrics.Fps.Add(tag, new SaveFPSClass.FPSData
-            {
-                Min = FPSCounter.MixFPS,
-                Avg = FPSCounter.AverageFPS,
-                Max = FPSCounter.MaxFPS
-            });
-
-            textData = JObject.FromObject(metrics).ToString();
-
-            if (!Directory.Exists(SaveFPSClass.FPSMettricsFolder))
-            {
-                Directory.CreateDirectory(SaveFPSClass.FPSMettricsFolder);
-            }
-            
-            File.WriteAllText(SaveFPSClass.FPSMettricsFileFullPath, textData);
+            TestMetrics.FPSCounter.SaveFPS(tag);
         }
         
         public class SaveFPSClass : ShowHelperBase
         {
-            private const string METRICS_FILE_NAME = "fps.json"; 
-            public static string FPSMettricsFolder
-            {
-                get
-                {
-                    return Application.persistentDataPath +
-                           Path.DirectorySeparatorChar + "Metrics";
-                }
-            }
-            public static string FPSMettricsFileFullPath
-            {
-                get
-                {
-                    return FPSMettricsFolder + Path.DirectorySeparatorChar + METRICS_FILE_NAME;
-                }
-            }
-
-            public class FPSData
-            {
-                public float Min;
-                public float Avg;
-                public float Max;
-            }
-            public class FPSMetrics
-            {
-                public string Build;
-                public Dictionary<string, FPSData> Fps;
-            }
-
             public override AbstractGenerator CreateGenerator(GameObject go)
             {
                 return VoidMethod.String("default_tag");
@@ -206,6 +82,14 @@ namespace PlayQ.UITestTools
         public static void SetTimescale(float scale)
         {
             Time.timeScale = scale;
+        }
+        
+        /// <summary>
+        /// Gets timescale
+        /// </summary>
+        public static float GetTimescale()
+        {
+            return Time.timeScale;
         }
 
         private class SetTimescaleClass : ShowHelperBase
@@ -224,12 +108,7 @@ namespace PlayQ.UITestTools
 
         
 #region Click
-        /// <summary>
-        /// Emulates LMB click on `Unity UI` element by given path
-        /// </summary>
-        /// <param name="path">Path to GameObject in hierarchy</param>
-        [ShowInEditor(typeof(ButtonClick), "Button Click")]
-        public static void Click(string path)
+        private static void Click(string path)
         {
             GameObject go = UITestUtils.FindEnabledGameObjectByPath(path);
             if (go == null)
@@ -239,29 +118,11 @@ namespace PlayQ.UITestTools
             Click(go);
         }
         
-        private class ButtonClick : ShowHelperBase
-        {
-            public override AbstractGenerator CreateGenerator(GameObject go)
-            {
-                return VoidMethod.Path(go);
-            }
-
-            public override bool IsAvailable(GameObject go)
-            {
-                if (!go)
-                {
-                    return false;
-                }
-                var clicable = go.GetComponent<IPointerClickHandler>();
-                return clicable != null && go.activeInHierarchy;
-            }
-        }
-        
         /// <summary>
         /// Emulates LMB click on `Unity UI GameObject`
         /// </summary>
         /// <param name="go">GameObject to click</param>
-        public static void Click(GameObject go)
+        private static void Click(GameObject go)
         {
             var clicables = go.GetComponents<IPointerClickHandler>();
 
@@ -290,99 +151,78 @@ namespace PlayQ.UITestTools
         /// <param name="path">Path to GameObject in hierarchy</param>
         /// <param name="delay">Amount of time to delay</param>
         /// <param name="timeout">Timeout</param>
-        [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Wait, Delay and Click", true)]
-        public static IEnumerator WaitDelayAndClick(string path, float delay, float timeout)
+        [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Click, Tap/Wait, Delay and Click", true)]
+        public static IEnumerator WaitDelayAndClick(string path, float delay = 1, float timeout = 5, bool ignoreTimeScale = false)
         {
-            yield return Wait.ObjectEnableAndInteractibleIfButton(path, timeout);
+            yield return Wait.ObjectEnableAndInteractibleIfButton(path, timeout, false, ignoreTimeScale);
+            yield return DelayAndClick(path, delay, ignoreTimeScale);
+        }
+
+        /// <summary>
+        /// Waits until `GameObject` by given path is present on scene and active in hierarchy then emulates LMB click after the specified delay. Fails if exceeds the given timeout
+        /// </summary>
+        /// <param name="gameObject">GameObject to click</param>
+        /// <param name="delay">Amount of time to delay</param>
+        /// <param name="timeout">Timeout</param>
+        [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Click, Tap/Wait, Delay and Click", true)]
+        public static IEnumerator WaitDelayAndClick(GameObject gameObject, float delay, float timeout, bool ignoreTimeScale = false)
+        {
+            yield return Wait.ObjectEnableAndInteractibleIfButton(gameObject, timeout, false, ignoreTimeScale);
             if (delay > 0)
             {
                 yield return new WaitForSeconds(delay);
             }
-            Click(path);
+            Click(gameObject);
         }
 
         /// <summary>
-        /// Obsolete. Use WaitDelayAndClick instead
-        /// Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay. Fails if exceeds the given timeout
+        /// Emulates LMB click after the specified delay.
         /// </summary>
         /// <param name="path">Path to GameObject in hierarchy</param>
         /// <param name="delay">Amount of time to delay</param>
-        /// <param name="timeout">Timeout</param>
-        //todo make it by desing
-        [Obsolete]
-        [ShowInEditor(typeof(ObsoleteButtonWaitClickAndDelay), "Obsolete Wait, Click And Delay")]
-        public static IEnumerator ObsoleteWaitClickAndDelay(string path, float delay, float timeout)
+        /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</para>
+        [ShowInEditor(typeof(ButtonDelayAndClick), "Click, Tap/Delay and Click", true)]
+        public static IEnumerator DelayAndClick(string path, float delay = 1, bool ignoreTimeScale = false)
         {
-            yield return new WaitForSeconds(1);
-            yield return Wait.ObjectEnableAndInteractibleIfButton(path, timeout);
-            
-            Click(path);
-
             if (delay > 0)
             {
-                yield return new WaitForSeconds(delay);
-            }
-        }
-
-        /// <summary>
-        /// Obsolete. Use WaitDelayAndClick instead
-        /// Waits for one second, then waits until `GameObject` by given path is present on scene and active in hierarchy, then emulates LMB click and finally waits for a specified delay
-        /// </summary>
-        /// <param name="path">Path to GameObject in hierarchy</param>
-        /// <param name="delay">Amount of time to delay</param>
-        /// <param name="timeout">Timeout</param>
-        //todo remove it
-        [Obsolete]
-        [ShowInEditor(typeof(ObsoleteButtonWaitClickAndDelay), "Obsolete Wait, Click And Delay if Possible")]
-        public static IEnumerator ObsoleteWaitClickAndDelayIfPossible(string path, float delay, float timeout)
-        {
-            yield return new WaitForSeconds(1);
-            yield return Wait.ObjectEnableAndInteractibleIfButton(path, timeout, true);
-            ObsoleteButtonWaitClickAndDelay.ClickIfPossible(path);
-            yield return new WaitForSeconds(delay);
-        }
-        
-        [Obsolete]
-        private class ObsoleteButtonWaitClickAndDelay : ShowHelperBase
-        {
-            public override AbstractGenerator CreateGenerator(GameObject go)
-            {
-                return IEnumeratorMethod.Path(go).Float(2).Float(30);
-            }
-
-            public override bool IsAvailable(GameObject go)
-            {
-                if (go != null)
+                if (ignoreTimeScale)
                 {
-                    var clicable = go.GetComponent<IPointerClickHandler>();
-                    return clicable != null && go.activeInHierarchy;
+                    yield return new WaitForSecondsRealtime(delay);
                 }
-                return false;
-            }
-            
-            public static void ClickIfPossible(string path)
-            {
-                GameObject go = UITestUtils.FindEnabledGameObjectByPath(path);
-                var isOverlayed = UITestUtils.FindUIObjectWhichOverlayGivenObject(go) != null;
-                if (isOverlayed)
+                else
                 {
-                    return;
-                }
-                if (go != null && go.activeInHierarchy)
-                {
-                    Click(go);
+                    yield return new WaitForSeconds(delay);
                 }
             }
+            Click(path);
         }
-        
-     
         
         //todo make private
         public class ButtonWaitDelayAndClick : ShowHelperBase
         {
             public override AbstractGenerator CreateGenerator(GameObject go)
             {
-                return IEnumeratorMethod.Path(go).Float(1).Float(20);
+                return IEnumeratorMethod.Path(go).Float(1).Float(20).Bool(false);
+            }
+
+            public override bool IsAvailable(GameObject go)
+            {
+                if (!go)
+                {
+                    return false;
+                }
+                var clicable = go.GetComponent<IPointerClickHandler>();
+                return clicable != null && go.activeInHierarchy;
+            }
+        }
+        
+        //todo make private
+        public class ButtonDelayAndClick : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return IEnumeratorMethod.Path(go).Float(1);
             }
 
             public override bool IsAvailable(GameObject go)
@@ -402,7 +242,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="x">X position in screen pixels</param>
         /// <param name="y">Y position in screen pixels</param>
-        [ShowInEditor(typeof(ButtonClickPixels), "Click Pixels", false)]
+        [ShowInEditor(typeof(ButtonClickPixels), "Click, Tap/Click Pixels", false)]
         public static void ClickPixels(int x, int y)
         {
             GameObject go = UITestUtils.FindObjectByPixels(x, y);
@@ -439,7 +279,7 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <param name="x">X position in screen percents</param>
         /// <param name="y">Y position in screen percents</param>
-        [ShowInEditor(typeof(ButtonClickPercent), "Click Percents", false)]
+        [ShowInEditor(typeof(ButtonClickPercent), "Click, Tap/Click Percents", false)]
         public static void ClickPercents(float x, float y)
         {
             GameObject go = UITestUtils.FindObjectByPercents(x, y);
@@ -646,7 +486,7 @@ namespace PlayQ.UITestTools
         /// <param name="animationDuration">Animation duration (optional, default = 1)</param>
         /// <param name="timeout">Timeout (optional, default = 2)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
-        [ShowInEditor(typeof(ScrollToPositionClass), "Scroll To Position")]
+        [ShowInEditor(typeof(ScrollToPositionClass), "Click, Tap/Scroll To Position")]
         public static IEnumerator ScrollToPosition(string path,
             float horizontalPosition,
             float verticalPosition, 
@@ -709,7 +549,7 @@ namespace PlayQ.UITestTools
         /// <param name="toPercentX">Max percent of drag at dimension X</param>
         /// <param name="toPercentY">Max percent of drag at dimension Y</param>
         /// <param name="time">Time (optional, default = 1)</param>
-        [ShowInEditor(typeof(DragPercentsClass), "Drag percents")]
+        [ShowInEditor(typeof(DragPercentsClass), "Click, Tap/Drag percents")]
         public static IEnumerator DragPercents(string path,
             float fromPercentX, float fromPercentY,
             float toPercentX, float toPercentY, float time = 1)
@@ -816,7 +656,7 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(AppendTextClass), "Set text")]
         public static void AppendText(string path, string text)
         {
-            GameObject go = Check.IsExist(path);
+            GameObject go = Check.IsExists(path);
             AppendText(go, text);
         }
         

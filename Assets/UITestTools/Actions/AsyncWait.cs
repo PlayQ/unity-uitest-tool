@@ -17,10 +17,10 @@ namespace PlayQ.UITestTools
         /// <param name="isRegExp">Is expected log a regular expression</param>
         /// <param name="timeout">Timeout (optional, default = 10)</param>
         [ShowInEditor(typeof(StartWaitingForLogClass), "Async Wait/Start Waiting For Log", false)]
-        public static AbstractAsyncWaiter StartWaitingForLog(string message, bool isRegExp,
+        public static AbstractAsyncWaiter StartWaitingForLog(string message, bool isRegExp, LogType logType = LogType.Log,
             float timeout = 10)
         {
-            return new LogWaiter(message, isRegExp, timeout);
+            return new LogWaiter(message, isRegExp, logType, timeout);
         }
 
         /// <summary>
@@ -170,9 +170,11 @@ namespace PlayQ.UITestTools
             private string message;
             private bool isComplete;
             private IStringComparator stringComparator;
+            private LogType logType;
 
-            public LogWaiter(string message, bool isRegExp, float timeout)
+            public LogWaiter(string message, bool isRegExp, LogType logType, float timeout)
             {
+                this.logType = logType;
                 Application.logMessageReceived += ApplicationOnLogMessageReceived;
                 OnCompleteCallback += OnComplete;
                 stringComparator = UITestUtils.GetStringComparator(message, isRegExp);
@@ -189,7 +191,7 @@ namespace PlayQ.UITestTools
             private void ApplicationOnLogMessageReceived(string condition, 
                 string stackTrace, LogType logType)
             {
-                if (logType == LogType.Error)
+                if (logType != this.logType)
                 {
                     return;
                 }

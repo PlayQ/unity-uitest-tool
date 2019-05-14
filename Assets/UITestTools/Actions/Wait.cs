@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using PlayQ.UITestTools.WaitResults;
 using UnityEngine;
@@ -21,7 +22,7 @@ namespace PlayQ.UITestTools
         /// <param name="timeout">Timeout (optional, default = 2)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         [ShowInEditor(typeof(WaitForObjectInstantiated), "Wait/For Object Instantiated")]
-        public static IEnumerator ObjectInstantiated(string path, float timeout = 2f, bool ignoreTimeScale = false)
+        public static IEnumerator ObjectInstantiated(string path, float timeout = 5, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
             {
@@ -62,32 +63,89 @@ namespace PlayQ.UITestTools
                 var go = UITestUtils.FindEnabledGameObjectByPath(path); //finds only enabled gameobjects
                 if (go && go.activeInHierarchy)
                 {
-                    var objectWhichOverlays = UITestUtils
-                        .FindUIObjectWhichOverlayGivenObject(go);
-                    if (objectWhichOverlays)
+                    string overlay = IsOverlayed(go);
+                    if (overlay != null)
                     {
                         return new WaitFailed("gameobject object " + path + " isOverlayed by " +
-                                              UITestUtils.GetGameObjectFullPath(objectWhichOverlays));
+                                              overlay);
                     }
-                    var selectables = go.GetComponents<Selectable>();
-                    if (selectables != null && selectables.Length > 0)
-                    {
-                        var allInteractable = selectables.All(selectable => selectable.interactable);
-                        if (allInteractable)
-                        {
-                            return new WaitSuccess();
-                        }
-                        else
-                        {
-                            return new WaitFailed("gameobject "+path+" button is not interactable");
-                        }
-                    }
-                    else
+
+                    if (IsClickable(go))
                     {
                         return new WaitSuccess();
                     }
+                    return new WaitFailed("gameobject "+path+" button is not interactable");
                 }
                 return new WaitFailed("gameobject "+path+" is not " + (go == null ? "present on scene":"active in hierarchy"));
+            }, timeout, dontFail, ignoreTimeScale: ignoreTimeScale);
+        }
+
+        private static string IsOverlayed(GameObject go)
+        {
+            var objectWhichOverlays = UITestUtils
+                .FindUIObjectWhichOverlayGivenObject(go);
+            if (objectWhichOverlays)
+            {
+                return UITestUtils.GetGameObjectFullPath(objectWhichOverlays);
+            }
+            else
+            {
+                return null;
+            }
+                
+        }
+        private static bool IsClickable(GameObject go)
+        {
+            var selectables = go.GetComponents<Selectable>();
+            if (selectables != null && selectables.Length > 0)
+            {
+                var allInteractable = selectables.All(selectable => selectable.interactable);
+                if (allInteractable)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+        
+        /// <summary>
+        /// Awaits for 'GameObject' to become enabled and interactible if it is a button
+        /// </summary>
+        /// <param name="go">'GameObject' of button</param>
+        /// <param name="timeout">Timeout (optional, default = 2)</param>
+        /// <param name="dontFail">Whether the test should fail upon exceeding timeout (optional, default = false)</param>
+        /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        public static IEnumerator ObjectEnableAndInteractibleIfButton(GameObject go, float timeout = 2f,
+            bool dontFail = false, bool ignoreTimeScale = false)
+        {
+            string path = UITestUtils.GetGameObjectFullPath(go);
+            yield return WaitFor(() =>
+            {
+                if (go.activeInHierarchy)
+                {
+                    string overlay = IsOverlayed(go);
+                    if (overlay != null)
+                    {
+                        return new WaitFailed("gameobject object " + path + " isOverlayed by " +
+                                              overlay);
+                    }
+
+                    if (IsClickable(go))
+                    {
+                        return new WaitSuccess();
+                    }
+                    return new WaitFailed("gameobject "+path+" button is not interactable");
+                }
+
+                return new WaitFailed("gameobject " + path + " is not " +
+                                      (go == null ? "present on scene" : "active in hierarchy"));
             }, timeout, dontFail, ignoreTimeScale: ignoreTimeScale);
         }
 
@@ -113,7 +171,7 @@ namespace PlayQ.UITestTools
         /// <param name="dontFail">If true, method will not generate exception after timeout (optional, default = true)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         [ShowInEditor(typeof(WaitObjectEnabledWithDelay), "Wait/For Object Enabled With Delay")]
-        public static IEnumerator ObjectEnabledInstantiatedAndDelay(string path, float delay, float timeout = 2f, bool dontFail = true, bool ignoreTimeScale = false)
+        public static IEnumerator ObjectEnabledInstantiatedAndDelay(string path, float delay = 1, float timeout = 5, bool dontFail = true, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
             {
@@ -189,10 +247,9 @@ namespace PlayQ.UITestTools
         public static IEnumerator WaitFor(Func<WaitResult> condition, float timeout, bool dontFail = false, bool ignoreTimeScale = false)
         {
             float time = 0;
-            WaitResult waitResult = null;
-            while (waitResult == null || waitResult is WaitFailed)
+            while (true)
             {
-                waitResult = condition();
+                WaitResult waitResult = condition();
                 time += ignoreTimeScale
                     ? Time.unscaledDeltaTime
                     : Time.deltaTime;
@@ -207,6 +264,42 @@ namespace PlayQ.UITestTools
                     {
                         throw new Exception("Operation timed out: " + waitResult);
                     }
+                }
+
+                if (waitResult is WaitSuccess)
+                {
+                    yield break;
+                }
+                yield return null;
+            }
+        }
+
+
+        /// <summary>
+        /// Waits until given predicate returns true or fails after specified timeout
+        /// </summary>
+        /// <param name="condition">Predicate that return true, if its condition is successfuly fulfilled</param>
+        /// <param name="timeout">Timeout</param>
+        /// <param name="testInfo"> This label would be passed to logs if method fails</param>
+        /// <param name="dontFail">If true, method will not generate exception after timeout (optional, default = false)</param>
+        /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
+        /// <exception cref="Exception"></exception>
+        public static IEnumerator WaitFor(Func<bool> condition, float timeout, string message = "No message", bool ignoreTimeScale = false)
+        {
+            float time = 0;
+            while (true)
+            {
+                if (condition())
+                {
+                    yield break;
+                }
+                time += ignoreTimeScale
+                    ? Time.unscaledDeltaTime
+                    : Time.deltaTime;
+
+                if (time > timeout)
+                {
+                    throw new Exception("Operation WaitFor timed out: " + message);
                 }
                 yield return null;
             }
@@ -348,7 +441,7 @@ namespace PlayQ.UITestTools
         /// <param name="timeout">Timeout (optional, default = 2)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         [ShowInEditor(typeof(WaitForObjectEnableOrDestroyed), "Wait/For Object Enabled")]
-        public static IEnumerator ObjectEnabled(string path, float timeout = 2f, bool ignoreTimeScale = false)
+        public static IEnumerator ObjectEnabled(string path, float timeout = 5, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
             {
@@ -409,7 +502,7 @@ namespace PlayQ.UITestTools
         /// <param name="timeout">Timeout (optional, default = 2)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         [ShowInEditor(typeof(WaitForObjectEnableOrDestroyed), "Wait/For Object Disabled")]
-        public static IEnumerator ObjectDisabled(string path, float timeout = 2f, bool ignoreTimeScale = false)
+        public static IEnumerator ObjectDisabled(string path, float timeout = 5, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
             {
@@ -430,7 +523,7 @@ namespace PlayQ.UITestTools
         /// <param name="timeout">Timeout (optional, default = 2)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         [ShowInEditor(typeof(WaitForObjectEnableOrDestroyed), "Wait/For Object Disabled Or Not Exist")]
-        public static IEnumerator ObjectDisabledOrNotExist(string path, float timeout = 2f, bool ignoreTimeScale = false)
+        public static IEnumerator ObjectIsDisabledOrDoesNotExist(string path, float timeout = 5, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
                 {
@@ -535,6 +628,18 @@ namespace PlayQ.UITestTools
                     return new WaitFailed("WaitingForUnityAnimationCompleted: Animator not found");
                 }
             }, restTime, ignoreTimeScale: ignoreTimeScale);
+        }
+        public static IEnumerator WaitForObjectScaleChanged(GameObject element, float timeout = 10f)
+        {
+            yield return WaitFor(() =>
+            {
+                if (element.transform.localScale != Vector3.one)
+                {
+                    return new WaitSuccess();
+                }
+                
+                return new WaitFailed("WaitsForElementScaleChanged: " + element.GetType());
+            }, timeout);
         }
 
         private class WaitingForAnimationCompleteClass : ShowHelperBase

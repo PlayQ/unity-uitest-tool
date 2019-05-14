@@ -9,14 +9,14 @@ namespace Tests
     {
         private const float DEFAULT_TIME_OUT = 30000f;
 
-        public static MethodTestSettings Build(MethodInfo methodInfo)
+        public static MethodTestSettings Build(MethodInfo methodInfo, string ignoreReason)
         {
             float timeOut = DEFAULT_TIME_OUT;
-            bool isIgnored = false;
+            bool isIgnored = ignoreReason != null;
             bool isSmoke = false;
-            string ignoreReason = string.Empty;
             List<CustomResolution> targetResolutions = new List<CustomResolution>();
             CustomResolution editorTargetResolution = null;
+            string testRailURL = null;
 
             var attributes = methodInfo.GetCustomAttributes(false);
 
@@ -65,9 +65,16 @@ namespace Tests
                     editorTargetResolution = new CustomResolution(editorTargetResolutionAttribute.Width, editorTargetResolutionAttribute.Height);
                     continue;
                 }
+                
+                if (attribute is TestRailAttribute)
+                {
+                    var testRail = (TestRailAttribute) attribute;
+                    testRailURL = testRail.TestRailURL;
+                    continue;
+                }
             }
 
-            return new MethodTestSettings(methodInfo, timeOut, isIgnored, ignoreReason, isSmoke, targetResolutions, editorTargetResolution);
+            return new MethodTestSettings(methodInfo, timeOut, isIgnored, ignoreReason, isSmoke, testRailURL, targetResolutions, editorTargetResolution);
         }
     }
 }

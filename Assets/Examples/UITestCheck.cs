@@ -67,16 +67,16 @@ namespace PlayQ.UITestTools.Tests
             testObject.gameObject.SetActive(false);
 
             //ensure object disabled by component
-            Check.IsDisable<TestObject>();
+            Check.IsDisabled<TestObject>();
 
             //ensure object disabled by path in hierarchy
-            Check.IsDisable("container");
+            Check.IsDisabled("container");
 
             //ensure object disabled by path in hierarchy and component type
-            Check.IsDisable<TestObject>("container");
+            Check.IsDisabled<TestObject>("container");
 
             //ensure object disbaled by object instance
-            Check.IsDisable(testObject.gameObject);
+            Check.IsDisabled(testObject.gameObject);
         }
 
         [UnityTest]
@@ -89,7 +89,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsDisable<TestObject>();
+                Check.IsDisabled<TestObject>();
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -102,7 +102,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsDisable("container");
+                Check.IsDisabled("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -115,7 +115,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsDisable<TestObject>("container");
+                Check.IsDisabled<TestObject>("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -128,7 +128,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsDisable(testObject.gameObject);
+                Check.IsDisabled(testObject.gameObject);
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -152,16 +152,16 @@ namespace PlayQ.UITestTools.Tests
             testObject.gameObject.SetActive(true);
 
             //ensure object enabled by component
-            Check.IsEnable<TestObject>();
+            Check.IsEnabled<TestObject>();
 
             //ensure object enabled by path in hierarchy
-            Check.IsEnable("container");
+            Check.IsEnabled("container");
 
             //ensure object enabled by path in hierarchy and component type
-            Check.IsEnable<TestObject>("container");
+            Check.IsEnabled<TestObject>("container");
 
             //ensure object enabled by object instance
-            Check.IsEnable(testObject.gameObject);
+            Check.IsEnabled(testObject.gameObject);
         }
 
         [UnityTest]
@@ -175,7 +175,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsEnable<TestObject>();
+                Check.IsEnabled<TestObject>();
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -188,7 +188,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsEnable("container");
+                Check.IsEnabled("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -201,7 +201,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsEnable<TestObject>("container");
+                Check.IsEnabled<TestObject>("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -214,7 +214,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsEnable(testObject.gameObject);
+                Check.IsEnabled(testObject.gameObject);
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -231,9 +231,9 @@ namespace PlayQ.UITestTools.Tests
         {
             yield return null;
            
-            Check.IsExist("container");
-            Check.IsExist<TestObject>();
-            Check.IsExist<TestObject>("container");
+            Check.IsExists("container");
+            Check.IsExists<TestObject>();
+            Check.IsExists<TestObject>("container");
         }
 
         [UnityTest]
@@ -246,7 +246,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsExist("container");
+                Check.IsExists("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -259,7 +259,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsExist<TestObject>();
+                Check.IsExists<TestObject>();
                 Assert.Fail();
             }
             catch (AssertionException ex)
@@ -272,7 +272,7 @@ namespace PlayQ.UITestTools.Tests
 
             try
             {
-                Check.IsExist<TestObject>("container");
+                Check.IsExists<TestObject>("container");
                 Assert.Fail();
             }
             catch (AssertionException ex)

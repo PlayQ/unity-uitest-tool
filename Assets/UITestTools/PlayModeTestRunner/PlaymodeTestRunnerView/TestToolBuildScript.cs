@@ -1,13 +1,11 @@
 ﻿#if UNITY_EDITOR
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using JetBrains.Annotations;
 using PlayQ.UITestTools;
 using UnityEditor;
-using UnityEditor.Build;
 using UnityEditor.Callbacks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -21,7 +19,6 @@ public class TestToolBuildScript
     {
         AddTestSceneToBuild();
         ResolveTestMode();
-        PlayModeTestRunner.AdjustSelectedTestsForBuild();
         AddScreenshotsAndEventsToBuild();
     }
 
@@ -38,17 +35,50 @@ public class TestToolBuildScript
             BuildOptions.None);
     }
 
-    //for executing from connamd line
+    //for executing from command line
     [UsedImplicitly]
     public static void RunPlayModeTests()
     {
         SetTimeScaleFromCommandLineArgument();
+        SetTestsNamespacesFromCommandLineArgument();
 
         PlayerPrefs.SetString("PackageUpdaterLastChecked68207", DateTime.Now.ToString(CultureInfo.InvariantCulture));
-
+        
         PlayModeTestRunner.QuitAppAfterCompleteTests = true;
         ResolveTestMode();
         PlayModeTestRunner.Run();
+    }
+
+    private static void SetTestsNamespacesFromCommandLineArgument()
+    {
+        string namespaceString = ConsoleArgumentHelper.GetArg("-testNamespaces");
+
+        int timeScale = 0;
+        if (!string.IsNullOrEmpty(namespaceString))
+        {
+            namespaceString = namespaceString.Replace(" ", String.Empty);
+            string[] strings = namespaceString.Split(';');
+
+            if (strings.Length > 0)
+            {
+                PlayModeTestRunner.Namespaces = strings.Where(s => !string.IsNullOrEmpty(s)).ToArray();
+                if (PlayModeTestRunner.Namespaces.Length > 0)
+                {
+                    Debug.LogFormat("TestTools: namespace string {0}  Test Namespaces count: {1}",
+                        namespaceString,
+                        PlayModeTestRunner.Namespaces.Length);
+                    
+                    foreach (var name in PlayModeTestRunner.Namespaces)
+                    {
+                        Debug.Log("namespace: " + name);
+                    }
+                    return;
+                }
+            }
+        }
+        
+        Debug.Log("TestTools: No Test Namespaces:");
+        PlayModeTestRunner.Namespaces = null;
     }
 
     private static void SetTimeScaleFromCommandLineArgument()
@@ -205,7 +235,6 @@ public class TestToolBuildScript
     public static void MenuPreBuild()
     {
         AddTestSceneToBuild();
-        PlayModeTestRunner.AdjustSelectedTestsForBuild();
         AddScreenshotsAndEventsToBuild();
     }
 }

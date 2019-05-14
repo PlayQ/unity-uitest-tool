@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using UnityEngine;
 
@@ -13,9 +12,9 @@ namespace PlayQ.UITestTools
             {
                 MethodInfo testMethodInfo = null;
 
-                if (PlayModeTestRunner.CurrentMethodInfo != null)
+                if (PlayModeTestRunner.CurrentPlayingMethodNode.Node != null)
                 {
-                    testMethodInfo = PlayModeTestRunner.CurrentMethodInfo;
+                    testMethodInfo = PlayModeTestRunner.CurrentPlayingMethodNode.Node.TestSettings.MethodInfo;
                 }
 
                 if (testMethodInfo == null)
@@ -52,8 +51,8 @@ namespace PlayQ.UITestTools
             {
                 if (PlayModeTestRunner.IsRunning)
                 {
-                    return PlayModeTestRunner.CurrentMethodInfo != null
-                        ? PlayModeTestRunner.CurrentMethodInfo.DeclaringType.FullName
+                    return PlayModeTestRunner.CurrentPlayingMethodNode.Node != null
+                        ? PlayModeTestRunner.CurrentPlayingMethodNode.Node.ParentClass.FullName
                         : null;
                 }
                 return null;
@@ -66,8 +65,8 @@ namespace PlayQ.UITestTools
             {
                 if (PlayModeTestRunner.IsRunning)
                 {
-                    return PlayModeTestRunner.CurrentMethodInfo != null
-                        ? PlayModeTestRunner.CurrentMethodInfo.Name
+                    return PlayModeTestRunner.CurrentPlayingMethodNode.Node != null
+                        ? PlayModeTestRunner.CurrentPlayingMethodNode.Node.FullName
                         : null;
                 }
                 return null;

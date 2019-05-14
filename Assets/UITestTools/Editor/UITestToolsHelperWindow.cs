@@ -46,19 +46,6 @@ namespace PlayQ.UITestTools
             }
         }
         
-        [MenuItem("Window/UI Test Tools/Open FPS metrics")]
-        static void OpenFPSMetrics()
-        {
-            if (Directory.Exists(Interact.SaveFPSClass.FPSMettricsFolder))
-            {
-                EditorUtility.RevealInFinder(Interact.SaveFPSClass.FPSMettricsFolder);                
-            }
-            else
-            {
-                EditorUtility.DisplayDialog("Error", "FPS metrics folder doesn't exist yet.", "Ok");
-            }
-        }
-
         private void OnEnable()
         {
             footer = new UITestToolWindowFooter();
@@ -79,7 +66,7 @@ namespace PlayQ.UITestTools
             }
             if (Selection.gameObjects.Length > 1)
             {
-                EditorGUILayout.LabelField("Muliple game objects selection not supported.", EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Multiple game objects selection not supported.", EditorStyles.boldLabel);
             }
             GameObject go = Selection.gameObjects.Length == 1 ? Selection.gameObjects[0] : null;
             

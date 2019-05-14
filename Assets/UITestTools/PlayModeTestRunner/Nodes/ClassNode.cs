@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Newtonsoft.Json;
 
 namespace Tests.Nodes
 {
-    public class ClassNode : Node, IAllMethodsEnumerable, IAllClassesEnumerable
+    public class ClassNode : Node
     {
-        public readonly Type Type;
+        public Type Type { get; private set; }
 
         private List<MethodInfo> setUpMethods;
+        
+        [JsonIgnore]
         public IEnumerable<MethodInfo> SetUpMethods { get { return setUpMethods; } set { setUpMethods = (List<MethodInfo>)value; } }
 
         private List<MethodInfo> oneTimeSetUpMethods;
+        [JsonIgnore]
         public IEnumerable<MethodInfo> OneTimeSetUpMethods
         { 
             get 
@@ -29,10 +33,19 @@ namespace Tests.Nodes
             } 
         }
 
+        [JsonIgnore]
+        public readonly string FilePath;
+
         private List<MethodInfo> tearDownMethods;
+        [JsonIgnore]
         public IEnumerable<MethodInfo> TearDownMethods { get { return tearDownMethods; } set { tearDownMethods = (List<MethodInfo>)value; } }
 
         private List<MethodInfo> oneTimeTearDownMethods;
+        
+        [JsonProperty]
+        private string fullName;
+
+        [JsonIgnore]
         public IEnumerable<MethodInfo> OneTimeTearDownMethods 
         {
             get 
@@ -54,54 +67,115 @@ namespace Tests.Nodes
         {
             Type baseType = info.DeclaringType.BaseType;
 
-            if (baseType == typeof(System.Object))
+            if (baseType == typeof(Object))
                 return 0;
 
             return baseType.FullName.Split('.').Length;
         }
 
-        public ClassNode(Type type, Node parentNode = null) : base (type.Name, parentNode)
+
+        public void UpdateType(Type type)
         {
-            this.Type = type;
+            Type = type;
+            fullName = Type.FullName;   
+        }
+        
+       
+        public ClassNode(Type type, Node parentNode, string filePath = null) 
+            : base (type.Name, parentNode)
+        {
+            FilePath = filePath;
+            Type = type;
+            fullName = Type.FullName;
+        }
+        
+        [JsonConstructor]
+        public ClassNode() 
+        {
+        }
+        
+        public ClassNode(string name, Node parentNode) 
+            : base (name, parentNode)
+        {
+            if (parentNode != null)
+            {
+                fullName = parent.FullName + "." + name;    
+            }
+            else
+            {
+                fullName = name;
+            }
+            
         }
 
-        public IEnumerable<ClassNode> AllClasses
+        [JsonIgnore]
+        public override string FullName
+        {
+            get { return fullName; }
+        }
+
+        [JsonIgnore]
+        public override TestState State
         {
             get
             {
-                foreach (Node node in children)
+                if (stateIsDirty)
                 {
-                    ClassNode classNode = node as ClassNode;
+                    stateIsDirty = false;
+                    bool isAnyIgnored = false;
+                    bool isAnyUndefined = false;
+                    bool isAnyFail = false;
+                    
+                    foreach (var child in children)
+                    {
+                        if (child.State == TestState.Failed)
+                        {
+                            isAnyFail = true;
+                            break;
+                        }
+                        if (child.State == TestState.Undefined)
+                        {
+                            isAnyUndefined = true;
+                        }
+                        if (child.State == TestState.Ignored)
+                        {
+                            isAnyIgnored = true;
+                        }
+                    }
 
-                    if (classNode != null)
-                        yield return classNode;
-
-                    IAllClassesEnumerable enumerableNode = node as IAllClassesEnumerable;
-
-                    if (enumerableNode != null)
-                        foreach (ClassNode childClassNode in enumerableNode.AllClasses)
-                            yield return childClassNode;
+                    if (isAnyFail)
+                    {
+                        cachedState = TestState.Failed;
+                    }
+                    else if (isAnyUndefined)
+                    {
+                        cachedState = TestState.Undefined;
+                    }
+                    else if(isAnyIgnored)
+                    {
+                        cachedState = TestState.Ignored;
+                    }
+                    else
+                    {
+                        cachedState = TestState.Passed;
+                    }
+                    
+                    return cachedState;
+                }
+                else
+                {
+                    return cachedState;
                 }
             }
         }
-
-        public IEnumerable<MethodNode> AllMethods
+        
+        protected override void SetDataFromNode(Node other)
         {
-            get
+            base.SetDataFromNode(other);
+            if (other is ClassNode)
             {
-                foreach (Node node in children)
-                {
-                    MethodNode methodNode = node as MethodNode;
-
-                    if (methodNode != null)
-                        yield return methodNode;
-
-                    IAllMethodsEnumerable enumerableNode = node as IAllMethodsEnumerable;
-
-                    if (enumerableNode != null)
-                        foreach (MethodNode childMethodNode in enumerableNode.AllMethods)
-                            yield return childMethodNode;
-                }
+                var otherClassNode = (ClassNode) other;
+                cachedState = otherClassNode.cachedState;
             }
         }
     }
