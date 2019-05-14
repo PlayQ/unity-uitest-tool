@@ -1,10 +1,9 @@
-﻿using System;
+﻿#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
-//    [Serializable]
     public class UITestToolWindowFooter
     {
         public const int HEIGHT = 22;
@@ -68,3 +67,4 @@ namespace PlayQ.UITestTools
 
     }
 }
+#endif

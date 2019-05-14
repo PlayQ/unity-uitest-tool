@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
 
 namespace PlayQ.UITestTools
 {
@@ -13,12 +12,8 @@ namespace PlayQ.UITestTools
         public void SaveTestInfo(TestInfoData data)
         {
             var json = JObject.FromObject(data).ToString();
-            var folderPath = Application.persistentDataPath + Path.DirectorySeparatorChar + "Metrics";
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-            File.WriteAllText(folderPath + Path.DirectorySeparatorChar + "tests.json", json);
+            TestMetrics.CheckAndCreateFolder();
+            File.WriteAllText(TestMetrics.PathTo("tests.json"), json);
         }
 
         public LogSaver(string path)

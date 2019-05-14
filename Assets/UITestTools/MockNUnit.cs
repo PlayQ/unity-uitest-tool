@@ -70,7 +70,7 @@ namespace PlayQ.UITestTools
     {
     }
 
-    [AttributeUsage(AttributeTargets.Method)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class IgnoreAttribute : Attribute
     {
         public readonly string Reason;
@@ -570,15 +570,44 @@ namespace PlayQ.UITestTools
         {
             if (current < expected)
             {
-                throw new Exception("GreaterOrEqual fail, expected: " + expected +  ", current: " + current);
+                throw new Exception("GreaterOrEqual fail, expected: " + expected + ", current: " + current);
             }
         }
-        
+
+        public static void LessOrEquals(float current, float expected, string message)
+        {
+            if (current > expected)
+            {
+                throw new Exception("LessOrEquals fail, expected: " + expected + ", current: " + current +
+                                    ", message: " + message);
+            }
+        }
+
+        public static void Less(float current, float expected, string message)
+        {
+            if (current >= expected)
+            {
+                throw new Exception("Less fail, expected: " + expected + ", current: " + current +
+                                    ", message: " + message);
+            }
+        }
+
+
+        public static void Greater(float current, float expected, string message)
+        {
+            if (current <= expected)
+            {
+                throw new Exception("Greater fail, expected: " + expected + ", current: " + current +
+                                    ", message: " + message);
+            }
+        }
+
         public static void GreaterOrEqual(float current, float expected, string message)
         {
             if (current < expected)
             {
-                throw new Exception("GreaterOrEqual fail, expected: " + expected +  ", current: " + current + ", message: " + message);
+                throw new Exception("GreaterOrEqual fail, expected: " + expected + ", current: " + current +
+                                    ", message: " + message);
             }
         }
     }

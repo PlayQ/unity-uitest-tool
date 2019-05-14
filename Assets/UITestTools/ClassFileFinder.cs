@@ -10,52 +10,7 @@ public static class ClassFileFinder
     private static Dictionary<string, string> csFiles = new Dictionary<string, string>();
     private static HashSet<string> duplicatedFileNames = new HashSet<string>();
 
-//    public class ClassStructure
-//    {
-//        public string ClassName;
-//        public List<string> Methods;
-//    }
-    
-//    public static ClassFileDetails FindClassFile(System.Type t)
-//    {
-//        return FindClassFile(t.Name);
-//    }
-
-//    public class Node
-//    {
-//        public List<Node> Inners = new List<Node>();
-//        public NodeType Type = NodeType.None;
-//
-//        public enum NodeType
-//        {
-//            Namespace,
-//            Class,
-//            Method,
-//            None
-//        }
-//        
-//        
-//        public string 
-//    }
-//
-//    private static void ProcessCsFiles()
-//    {
-//        for (int i = 0; i < csFiles.Count; i++)
-//        {
-//            string codeFile = File.ReadAllText(csFiles[i]);
-//            
-//            Node root = new Node();
-//            foreach (var VARIABLE in codeFile)
-//            {
-//                if (VARIABLE == '{')
-//                {
-//                    root.Inners.Add(new Node());
-//                }
-//            }
-//        }
-//    }
-
-    private static readonly string testsFolder = Application.dataPath + "/Tests/TestSuites";
+    private static readonly string testsFolder = Application.dataPath + "/Tests";
 
     public static string FindStackTrace(string className, string methodName, int yieldInstructionIndex)
     {
@@ -116,10 +71,6 @@ public static class ClassFileFinder
 
         return "\n.\n.\nFailed at: " +methodName + " (" + classPath + ":" + (strIndex + 1) + ")\n"+
                "\"" + strings[strIndex] + "\".";
-//        return "\n \n\tClass: " + className +
-//               "\n\tMethod: " + methodName + 
-//               "\n\tLine number: " + (strIndex + 1) + 
-//               "\n\"" + strings[strIndex] + "\".";
     }
 
     private static bool IsCommented(string text, int index)
@@ -157,6 +108,10 @@ public static class ClassFileFinder
 
     private static void FindAllCsFiles(string startDir)
     {
+        if (!Directory.Exists(startDir))
+        {
+            return;
+        }
         foreach (string file in Directory.GetFiles(startDir))
         {
             if (file.EndsWith(".cs", StringComparison.Ordinal))

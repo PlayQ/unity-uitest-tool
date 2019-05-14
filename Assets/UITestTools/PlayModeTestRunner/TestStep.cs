@@ -5,45 +5,60 @@ namespace PlayQ.UITestTools
 {
     public static class TestStep
     {
+        public static event Action OnTestStepUpdated;
         public static void Step(string step)
         {
-            currentStep = new CurrentStep(step, (float) current/count);
-            current++;
-            if (current > count)
+            currentStep = step;
+            CurrentIndex++;
+            Debug.Log("Step " + CurrentIndex + " (" + step + ") started.");
+            if (OnTestStepUpdated != null)
             {
-                throw new ArgumentException("Current step (" + current + ") more than count (" + count + ")");                
+                OnTestStepUpdated();
             }
-            Debug.Log("Step " + current + " (" + step + ") started.");
         }
 
-        public static void SetStepsCount(uint count)
+        public static void Reset()
         {
-            if (count == 0)
-            {
-                throw new ArgumentException("Count should be grater then Zero.");
-            }
             currentStep = null;
-            current = 0;
-            TestStep.count = count;
+            CurrentIndex = 0;
+            if (OnTestStepUpdated != null)
+            {
+                OnTestStepUpdated();
+            }
         }
 
-        private static uint current = 0;
-        private static uint count = 0;
+        public static int CurrentIndex { get; private set; }
 
-        private static CurrentStep currentStep;
-        
-        public static CurrentStep GetCurrentStep()
+        private static string currentStep;
+
+        public static CurrentStep GetCurrentStep(int stepsCount)
         {
-            return currentStep;
+            if (currentStep == null)
+            {
+                return null;
+            }
+
+            if (stepsCount <= 0)
+            {
+                stepsCount = 1;
+            }
+            return new CurrentStep(currentStep, CurrentIndex, Math.Min((float) CurrentIndex / stepsCount, 1));
         }
-        
+
         public class CurrentStep
         {
             public readonly string Text;
             public readonly float Progress;
+            public readonly int Index;
 
-            public CurrentStep(string text, float percent)
+            public override string ToString()
             {
+                return "Step " + Index + " - " + Text;
+            }
+
+            public CurrentStep(string text, int index, float percent)
+            {
+                Index = index;
                 Text = text;
                 Progress = percent;
             }

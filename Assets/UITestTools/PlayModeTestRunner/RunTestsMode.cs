@@ -1,4 +1,8 @@
-﻿namespace PlayQ.UITestTools
+﻿using Newtonsoft.Json;
+using Tests.Nodes;
+using UnityEditor;
+
+namespace PlayQ.UITestTools
 {
     public static class RunTestsMode
     {
@@ -10,9 +14,6 @@
             Selected
         }
 
-       
-        
-
         public static void SelectOnlySmokeTests()
         {
             Mode = RunTestsModeEnum.Smoke;
@@ -20,7 +21,10 @@
 
         public static RunTestsModeEnum Mode
         {
-            get { return PlayModeTestRunner.SerializedTests.TestRunMode; }
+            get
+            {
+                return PlayModeTestRunner.SerializedTests.TestRunMode;
+            }
             private set
             {
                 PlayModeTestRunner.SerializedTests.TestRunMode = value;
@@ -68,12 +72,20 @@
                 PlayModeTestRunner.SerializedTests.RunSpecificTestType = value;
             }
         }
+
+        public static string NodeToRunFullName
+        {
+            get
+            {
+                return PlayModeTestRunner.SerializedTests.SelectedNodeFullName;
+            }
+        }
         
-        
-        public static void RunTestByDoubleClick(PlayModeTestRunner.SpecificTestType type, string testFullName)
+        public static void RunTestByDoubleClick(PlayModeTestRunner.SpecificTestType type,
+            Node node)
         {
             RunSpecificTestType = type;
-            SpecificTestOrClassName = testFullName;
+            PlayModeTestRunner.SerializedTests.SelectedNodeFullName = node.FullName;
             Mode = RunTestsModeEnum.DoubleClick;
         }
 

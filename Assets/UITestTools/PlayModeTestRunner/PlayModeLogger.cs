@@ -28,7 +28,6 @@ namespace PlayQ.UITestTools
             Debug.LogFormat("\"{0}\" ignored. Reason: {1}", methodName, reason);
             Debug.LogFormat("##teamcity[testIgnored timestamp='{0}' name='{1}' message='{2}']",
                 DateTime.UtcNow.ToString(TC_DATE_FORMAT), methodName, reason);
-            Debug.Log(DELIMETER);
 
             UnhookFromDebugLogs();
         }
@@ -79,7 +78,7 @@ namespace PlayQ.UITestTools
             }
         }
 
-        public void SuccessLog(string methodName)
+        public void EndLog(string methodName)
         {
             Debug.LogFormat("##teamcity[testFinished timestamp='{0}' name='{1}']",
                 DateTime.UtcNow.ToString(TC_DATE_FORMAT), methodName);
@@ -95,42 +94,7 @@ namespace PlayQ.UITestTools
                 DateTime.UtcNow.ToString(TC_DATE_FORMAT),
                 methodName);
             Debug.LogFormat("\"{0}\" fail", methodName);
-            Debug.Log(DELIMETER);
-
-            UnhookFromDebugLogs();
-        }
-
-        public void LogTestStart()
-        {
-            StartLog(PlayModeTestRunner.CurrentMethodInfo.DeclaringType.Name + "." +
-                     PlayModeTestRunner.CurrentMethodInfo.Name);
-        }
-
-        public void LogTestEnd()
-        {
-            var methodName = PlayModeTestRunner.CurrentMethodInfo.DeclaringType.Name + "." +
-                             PlayModeTestRunner.CurrentMethodInfo.Name;
-            var currentState = PlayModeTestRunner.CurrentTestState;
-
-            switch (currentState)
-            {
-                case PlayModeTestRunner.TestState.Failed:
-                    FailLog(methodName);
-                    break;
-                case PlayModeTestRunner.TestState.Success:
-                    SuccessLog(methodName);
-                    break;
-                case PlayModeTestRunner.TestState.Ignored:
-                    IgnoreLog(methodName, "");
-                    break;
-                default:
-                    Debug.LogFormat("##teamcity["+ currentState +" timestamp='{0}' name='{1}']",
-                        DateTime.UtcNow.ToString(TC_DATE_FORMAT),
-                        methodName);
-                    Debug.LogFormat("\"{0}\" fail", methodName);
-                    Debug.Log(DELIMETER);
-                    break;
-            }
+            EndLog(methodName);
         }
     }
 }

@@ -47,18 +47,8 @@ namespace PlayQ.UITestTools
                 if (inner != null && inner.IsNotCompleted)
                 {
                     YieldInstruction result;
-                    try
-                    {
-                        result = inner.MoveNext();
-                    }
-                    catch (Exception e)
-                    {
-                        if (e is CoroutineException)
-                        {
-                            throw e;
-                        }
-                        throw new CoroutineException(e);
-                    }
+                    result = SafeMoveNext(inner);
+
                     if (result != null)
                     {
                         return result;
@@ -80,6 +70,22 @@ namespace PlayQ.UITestTools
                 return null;
             }
 
+            private YieldInstruction SafeMoveNext(CoroutinerExecutorBase coroutinerExecutorBase)
+            {
+                try
+                {
+                    return coroutinerExecutorBase.MoveNext();
+                }
+                catch (Exception e)
+                {
+                    if (e is CoroutineException)
+                    {
+                        throw e;
+                    }
+                    throw new CoroutineException(e);
+                }
+            }
+            
             private bool CheckCurrent(ref YieldInstruction refYieldInstruction)
             {
                 if (coroutine.Current != null)
@@ -112,7 +118,7 @@ namespace PlayQ.UITestTools
                             {
                                 Debug.LogError(coroutine.Current.GetType());
                             }
-                            refYieldInstruction = inner.MoveNext();
+                            refYieldInstruction = SafeMoveNext(inner);
                             return true;
                         }
                     }
