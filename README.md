@@ -154,7 +154,7 @@ public IEnumerator SomeTest()
 {....}
 ```
 
-To use that link you have to right click on test name in TestRunner window and choose `Open TestRail` in context menu.
+To use that link you have to right click on test name in TestRunner window and choose `Open TestRail` in [context menu](#test-rails-support).
 
 
 #### Test context menu
