@@ -11,7 +11,8 @@
 		* [Run specific list of tests](#run-specific-list-of-tests)
 		* [Smoke testing](#smoke-testing)
 		* [Screen resolution depending tests](#screen-resolution-dependant-tests)
-        * [Testrails support: comming soon](#test-rails-support)
+        * [TestRails support](#test-rails-support)
+        * [Test context menu](#test-context-menu)
 	* [Helper Window](#helper-window)
 	* [Command Line Arguments](#command-line-arguments)
 * [API methods](#api-methods)
@@ -137,9 +138,34 @@ public IEnumerator SomeTest()
 ```
 
 
-#### Test rails support
-Coming soon.
+#### TestRails support
+You add link to test description in TestRails with attribute `TestRailAttribute`. `TestRailAttribute` constructor takes 2 arguments:
+`string subdomen` and `int testId`.
+For example if link to your test looks like this:
 
+`https://TESTRAILS_PROJECT_NAME.testrail.net/index.php?/cases/view/12345`
+
+where `12345` is some test id. Then you have to declare test method like that:
+
+```c#
+[TestRail("TESTRAILS_PROJECT_NAME", 12345)]
+[UnityTest]
+public IEnumerator SomeTest()
+{....}
+```
+
+To use that link you have to right click on test name in TestRunner window and choose `Open TestRail` in context menu.
+
+
+#### Test context menu
+You can open test context menu by right click on it's name in TestRunner window.
+
+<img src="documentation/images/test-runner_context_menu.png" width="600">
+
+* `Open TestRails` - opens Testrail webpage with description of selected test. This option is shown only if you've added `TestRail` attribute to test method.
+* `Open Source` - opens .cs file with name equals to method's class name. If file contains test method name it will open source on corresponding line. This option is shown only if such file exists. 
+* `Copy Name` - copies full name of test method with namespace.
+* `Run` - simply runs specific test method.
 
 
 ### Helper Window
