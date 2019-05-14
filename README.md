@@ -160,7 +160,7 @@ To use that link you have to right click on test name in TestRunner window and c
 #### Test context menu
 You can open test context menu by right click on it's name in TestRunner window.
 
-<img src="documentation/images/test-runner_context_menu.png" width="600">
+<img src="documentation/images/test-runner_context_menu.png" width="300">
 
 * `Open TestRails` - opens Testrail webpage with description of selected test. This option is shown only if you've added `TestRail` attribute to test method.
 * `Open Source` - opens .cs file with name equals to method's class name. If file contains test method name it will open source on corresponding line. This option is shown only if such file exists. 
