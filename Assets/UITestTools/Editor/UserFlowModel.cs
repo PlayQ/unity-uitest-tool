@@ -99,8 +99,6 @@ namespace PlayQ.UITestTools
                     }
                 }
             }
-
-            Debug.Log("[UserFlowModel] OnFETCH");
         }
 
 
@@ -307,12 +305,10 @@ namespace PlayQ.UITestTools
 
         public void OnBeforeSerialize()
         {
-            Debug.Log("[UserFlowModel] OnBeforeSerialize");
         }
 
         public void OnAfterDeserialize()
         {
-            Debug.Log("[UserFlowModel] OnAfterDeserialize");
             FetchAssertationMethods();
         }
 
@@ -524,7 +520,6 @@ namespace PlayQ.UITestTools
                     Formatting = Formatting.Indented,
                     NullValueHandling = NullValueHandling.Ignore
                 }).ToString();
-            Debug.Log(codeGeneratorsSerialized);
         }
         
         

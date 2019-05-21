@@ -487,7 +487,6 @@ namespace PlayQ.UITestTools
 
                 reorderableList.onReorderCallback = (ReorderableList list) =>
                 {
-                    Debug.Log("----------------- REORDER");
                     CalculateListItemsHeight();
                 };
 
