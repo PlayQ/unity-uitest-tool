@@ -103,7 +103,7 @@ One of the greatest features of the `Test Runner` tool is that it allows to run 
 
 You can select specific tests that you want to run and press the `Run` button. The set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. 
 
-We have a possibility to use a filter to search for tests. Just write the name or id of the test in the line.
+We have a possibility to use a `Filter` to search for tests. Just write the name or id of the test in the line.
 
 You can run a single test by double clicking on test's name.
 
