@@ -64,6 +64,7 @@ Each action contains the following information:
 * `►` - taplies assertation in runtime.
 * `Copy` - duplicates selected asertation and places the copy next to it. Hotkeys are `Ctrl+D` for Windows and `Cmd+D` for Mac.
 * `x` - removes selected action from list.
+* `select` - displays the location of the object
 
 
 ### How Flow Recorder works
@@ -84,7 +85,7 @@ Also, you can create new assertation for the object by `Right Click`ing it in th
 
 ### Test Runner
 
-To open `Test Runner Window` navigate to `Window => Play Mode Test Runner`.
+To open `Test Runner Window` navigate to `Window => Runtime Test Runner`.
 
 <img src="documentation/images/play-mode-testrunner.png" width="600">
 
