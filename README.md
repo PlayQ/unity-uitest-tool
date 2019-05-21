@@ -103,6 +103,10 @@ One of the greatest features of the `Test Runner` tool is that it allows to run 
 
 You can select specific tests that you want to run and press the `Run` button. The set of selected tests is saved to `UITestTools/PlayModeTestRunner/Resources/SelectedTests.asset` scriptable object. 
 
+We have a possibility to use a filter to search for tests. Just write the name or id of the test in the line.
+
+You can run a single test by double clicking on test's name.
+
 When you run tests on mobile device `Play Mode Test Runner` tool loads `SelectedTests` asset and performs only selected tests. If `SelectedTests` asset does not exist - all tests will be performed.
 
 
@@ -345,7 +349,7 @@ The action can now be seen in `Flow Recorder` actions list as `Check Start Count
 
 * `Type classType` - type of `ShowHelperBase` class to be applied to the action;
 * `string description` - assertation's brief description (shown in recorder's dropdown list of assertations);
-* `bool isDefault` false - optional argument that indicates whether this assertation should be used to selected `GameObject` by default. In case of multiple default assertations available recorder resolves it by selecting one of them,
+* `bool isDefault` false - optional argument that indicates whether this assertation should be used to selected `GameObject` by default. In case of multiple default assertations available recorder resolves it by selecting one of them.
 
 
 ### How Recording works with Assertations
