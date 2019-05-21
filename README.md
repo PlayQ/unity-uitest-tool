@@ -28,6 +28,7 @@
 
 This `Test Tool` simplifies testing of `Unity` games and allows to run tests on mobile devices. It's based on methods, attributes, and logs, similar to those in [NUnit](http://nunit.org).
 
+License: [Apache License 2.0](LICENSE)
 
 ### Installation
 
