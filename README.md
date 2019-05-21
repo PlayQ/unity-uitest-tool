@@ -171,7 +171,7 @@ You can open test context menu by right click on it's name in TestRunner window.
 
 ### Helper Window
 
-`Test Helper` is an `Unity Editor Extension`, that shows a list of possible assertations for the selected `GameObject` in `Hierarchy` and corresponding code lines next to them. In play mode `Test Helper` allows user to obtain the list of sound clips that are currently playing.
+`Test Helper` navigate to `Window` => `Helper` that shows a list of possible assertations for the selected `GameObject` in `Hierarchy` and corresponding code lines next to them. In play mode `Test Helper` allows user to obtain the list of sound clips that are currently playing.
 
 <img src="documentation/images/test-helper.png" width="600">
 
