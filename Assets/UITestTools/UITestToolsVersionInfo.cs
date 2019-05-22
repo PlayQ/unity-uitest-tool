@@ -1,11 +1,14 @@
-﻿public static class UITestToolsVersionInfo
+﻿namespace PlayQ.UITestTools
 {
-    public const int MAJOR = 0;
-    public const int MINOR = 3;
-    public const int PATCH = 0;
-
-    public static string StringVersion
+    public static class UITestToolsVersionInfo
     {
-        get { return "v." + MAJOR + "." + MINOR + "." + PATCH; }
+        public const int MAJOR = 1;
+        public const int MINOR = 0;
+        public const int PATCH = 0;
+
+        public static string StringVersion
+        {
+            get { return "v." + MAJOR + "." + MINOR + "." + PATCH; }
+        }
     }
 }

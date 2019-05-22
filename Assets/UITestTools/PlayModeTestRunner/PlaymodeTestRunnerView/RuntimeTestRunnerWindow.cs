@@ -407,7 +407,11 @@ namespace PlayQ.UITestTools
             }
 
             if (GUILayout.Button("Deselect all", GUILayout.Width(buttonSize)))
-            {   
+            {
+                if (rootNode.IsSemiSelected)
+                {
+                    rootNode.SetSelected(true);
+                }
                 rootNode.SetSelected(false);
             }
             
