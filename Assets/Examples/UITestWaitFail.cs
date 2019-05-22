@@ -70,7 +70,7 @@ namespace PlayQ.UITestTools.Tests
             Object.DestroyImmediate(testObject);
 
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitForObject path: container"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             yield return Wait.ObjectInstantiated("container");
@@ -85,7 +85,7 @@ namespace PlayQ.UITestTools.Tests
             Object.DestroyImmediate(testObject);
 
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitForObject<PlayQ.UITestTools.Tests.TestObject>"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             yield return Wait.ObjectInstantiated<TestObject>();
@@ -99,7 +99,7 @@ namespace PlayQ.UITestTools.Tests
             Object.DestroyImmediate(testObject);
             
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitForObject<PlayQ.UITestTools.Tests.TestObject>"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
 
             yield return Wait.ObjectInstantiated<TestObject>("container");
@@ -110,7 +110,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectDestractionByComponent()
         {
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitForDestroy<PlayQ.UITestTools.Tests.TestObject>"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             yield return Wait.ObjectDestroyed<TestObject>(1);
@@ -123,7 +123,7 @@ namespace PlayQ.UITestTools.Tests
             var objectInstance = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
 
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitForDestroy UnityEngine.GameObject"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             yield return Wait.ObjectDestroyed(objectInstance);
@@ -134,7 +134,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectDestractionByName()
         {
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitForDestroy path: container"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             yield return Wait.ObjectDestroyed("container");
@@ -145,7 +145,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectDisabledByName()
         {
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitObjectDisabled path: Object_enabled_at_start"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             yield return Wait.ObjectDisabled("Object_enabled_at_start");
@@ -158,7 +158,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectDisabledByComponent()
         {
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitObjectDisabled<PlayQ.UITestTools.Tests.TestObject>"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             yield return Wait.ObjectDisabled<TestObject>();
@@ -170,7 +170,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectEnabledByComponent()
         {
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitObjectEnabled<PlayQ.UITestTools.Tests.TestObject>"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
@@ -184,7 +184,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForObjectEnabledByName()
         {
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: WaitObjectEnabled path: container"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             var testObject = UITestUtils.FindAnyGameObject<TestObject>().gameObject;
@@ -199,7 +199,7 @@ namespace PlayQ.UITestTools.Tests
         public IEnumerator WaitForButtonAccesible()
         {
             var exceptionMessage = "Exception: Operation timed out: Wait failed, reason: ButtonAccessible UnityEngine.GameObject"; 
-            PermittedErrors.AddPermittedException(exceptionMessage);
+            PermittedErrors.AddPermittedError(exceptionMessage);
             var waiter = AsyncWait.StartWaitingForLog(exceptionMessage,false, LogType.Exception);
             
             var button = UITestUtils.FindAnyGameObject("container");

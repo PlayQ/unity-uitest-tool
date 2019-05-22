@@ -5,97 +5,58 @@ namespace PlayQ.UITestTools
 {
     public static class PermittedErrors
     {
-        private static readonly List<string> permanent = new List<string>()
+        struct ErrorInfo
         {
-            "RemoveEmptyFolders.cs", //AssetDatabase.DeleteAsset sometimes can log error (Unity bug)
-            //"[TG] PersistenceManager:: Fail parsing string",
-            //"[FB] Failed to link:\nPlayQ.TG.Core.Exceptions.UnhandledHttpException: Offline mode",
-            "Exception when filling SpriteSharpDatabase with JSON data",
-            "ArgumentException: An element with the same key already exists in the dictionary.",
-            
-            //"Can't get translation for term: COMMON_LEVEL_ID",
-            //"_locDefaultText is null or empty. can't update region level button ui with correct localization",
-            
-            //"[RegionManager] Could not show region for ID: 1"
-            "flow", "FLOW", "Flow",
-            "_activeBubble not set"
-
-        };
-
-        struct ConditionToStacktrace
-        {
-            public string Condition;
+            public string Message;
+            public bool IsExactMessage;
             public string Stacktrace;
+            public bool IsExactStacktrace;
         }
-        private static readonly List<ConditionToStacktrace> permanentExceptions = new List<ConditionToStacktrace>
-        {
-            new ConditionToStacktrace 
-            {
-                Condition = "The object of type 'GameObject' has been destroyed but you are still trying to access it.",
-                Stacktrace = "BackgroundDarkener.SetBlockerAlpha (UnityEngine.GameObject obj, Single a) (at Assets/CharmKing/Scripts/UI/BackgroundDarkener.cs:502)"
-            },
-        };
         
-        private static readonly List<ConditionToStacktrace> variableException = new List<ConditionToStacktrace>();
+        private static readonly List<ErrorInfo> erroInfos = new List<ErrorInfo>();
 
-        private static readonly List<string> variable = new List<string>();
-
-        public static void AddPermittedException(string condition, string stacktrace = "")
+        public static void AddPermittedError(string message, string stacktrace = "", 
+            bool isExactMessage = false, bool isExactStacktrace = false)
         {
-            variableException.Add(new ConditionToStacktrace()
+            erroInfos.Add(new ErrorInfo
             {
-                Condition = condition,
-                Stacktrace = stacktrace
+                Message = message,
+                Stacktrace = stacktrace,
+                IsExactMessage = isExactMessage,
+                IsExactStacktrace = isExactStacktrace
             });
-        }
-        
-        public static void AddPermittedError(string errorText)
-        {
-            variable.Add(errorText);
         }
 
         public static void Clear()
         {
-            variable.Clear();
-            variableException.Clear();
+            erroInfos.Clear();
         }
 
-        public static bool IsPermittedException(string condition, string stacktrace)
+        public static bool IsPermittedError(string message, string stacktrace)
         {
-            foreach (var conditionToStack in permanentExceptions)
+            foreach (var errorInfo in erroInfos)
             {
-                if (condition.Equals(conditionToStack.Condition, StringComparison.Ordinal) &&
-                    stacktrace.Contains(conditionToStack.Stacktrace))
+                var messageCheck = false;
+                if (errorInfo.IsExactMessage)
                 {
-                    return true;
+                    messageCheck = message.Equals(errorInfo.Message, StringComparison.Ordinal);
                 }
-            }
-            
-            foreach (var conditionToStack in variableException)
-            { 
-                if (condition.Equals(conditionToStack.Condition, StringComparison.Ordinal) &&
-                    stacktrace.Contains(conditionToStack.Stacktrace))
+                else
                 {
-                    return true;
+                    messageCheck = message.IndexOf(errorInfo.Message, StringComparison.Ordinal) != -1;
                 }
-            }
-            
+                
+                var stacktraceCheck = false;
+                if (errorInfo.IsExactStacktrace)
+                {
+                    stacktraceCheck = stacktrace.Equals(errorInfo.Stacktrace, StringComparison.Ordinal);
+                }
+                else
+                {
+                    stacktraceCheck = stacktrace.IndexOf(errorInfo.Stacktrace, StringComparison.Ordinal) != -1;
+                }
 
-            return false;
-        }
-        
-        public static bool IsPermitted(string condition)
-        {
-            foreach (var error in permanent)
-            {
-                if (condition.Contains(error))
-                {
-                    return true;
-                }
-            }
-            foreach (var error in variable)
-            {
-                if (condition.Contains(error))
+                if (messageCheck && stacktraceCheck)
                 {
                     return true;
                 }

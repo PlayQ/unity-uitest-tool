@@ -282,17 +282,9 @@ namespace PlayQ.UITestTools
                 return;
             }
             logSaver.Write(condition, stackTrace);
-            if ((logType == LogType.Exception || logType == LogType.Error))
+            if (logType == LogType.Exception || logType == LogType.Error)
             {
-                if (logType == LogType.Error &&
-                    (stackTrace == "UnityEditor.AsyncHTTPClient:Done(State, Int32)\n"
-                     || PermittedErrors.IsPermitted(condition)))
-                {
-                    return;
-                }
-
-                if (logType == LogType.Exception &&
-                    PermittedErrors.IsPermittedException(condition, stackTrace))
+                if (PermittedErrors.IsPermittedError(condition, stackTrace))
                 {
                     return;
                 }
@@ -383,7 +375,7 @@ namespace PlayQ.UITestTools
                     for (int i = 0; i < Namespaces.Length; i++)
                     {
                         var contains = methodNode.FullName.IndexOf(Namespaces[i],
-                                           StringComparison.OrdinalIgnoreCase) == -1;
+                                           StringComparison.OrdinalIgnoreCase) != -1;
                         result |= contains;
                     }
 

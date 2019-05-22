@@ -22,6 +22,7 @@
 	* [How Recording works with Assertations](#how-recording-works-with-assertations)
 	* [Example 2](#example-2)
 	* [Another Camera](#another-camera)
+	* [Error Handling](#error-handling)
 
 
 ## About
@@ -202,8 +203,9 @@ Unity.exe
 * `-projectPath` - absolute path to project folder (Unity attribute);
 * `-runOnlySelectedTests` - optional, runs only tests selected in `Play Mode Test Runner` window;
 * `-runOnlySmokeTests` - optional, runs test with `SmokeTest` attribute only;
-* `-timeScale` - timescale for tests;
-* `-buildNumber` - used as postfix for file with test metrics.
+* `-timeScale` - optional, timescale for tests;
+* `-buildNumber` - optional, used as postfix for file with test metrics.
+* `-testNamespaces` - optional, list of namespaces separated with comma, only tests which full name contains any of namespaces are run.
 
 
 To create test build to run tests on the target device use `TestToolBuildScript.TestBuild` method instead of `TestToolBuildScript.RunPlayModeTests`:
@@ -417,3 +419,24 @@ static class MapLocationClick
     }
 }
 ```
+
+
+### Error Handling
+
+In some cases you want to ignore error or exception logs. Unity method `LogAssert.Except()` wouldn't work because test runner has its own way to handle logs. You have to use class `PermittedErrors`.
+You can set errors to ignore in Setup() method or wherever in you test method with methods:
+```c#
+PermittedErrors.AddPermittedException(string message, string stacktrace = "", bool isExactMessage = false, bool isExactStacktrace = false)
+PermittedErrors.AddPermittedError(string message, bool isExactMessage = false, bool isExactStacktrace = false)
+```
+`AddPermittedError()` method is used to ignore log errors and `AddPermittedException()` is used to ignore log exceptions.
+   
+* `message` - error message
+* `stacktrace` - exception stacktrace. Only for exceptions
+* `isExactMessage` - if true then error log message should be exact the same as message which is set to permitted errors.
+Otherwise log message should contains permitted message. Case sensitive.
+* `isExactStacktrace` - if true then exception log stacktrace should be exact the same as stacktrace which is set to permitted errors.
+Otherwise exception stacktrace should contains permitted stacktrace. Case sensitive.
+
+You can clear ignored errors or exception by calling method `PermittedErrors.Clear()`. 
+ 
