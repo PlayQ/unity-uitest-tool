@@ -65,7 +65,7 @@ Each action contains the following information:
 * `►` - taplies assertation in runtime.
 * `Copy` - duplicates selected asertation and places the copy next to it. Hotkeys are `Ctrl+D` for Windows and `Cmd+D` for Mac.
 * `x` - removes selected action from list.
-* `select` - displays the location of the objects in hierarchy order
+* `select` - displays the location of the objects in hierarchy order.
 
 
 ### How Flow Recorder works
