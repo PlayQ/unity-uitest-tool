@@ -77,9 +77,9 @@ For example, if user clicked on UI text - all `assertations` that compare text l
 
 ### Recording a new test
 
-Launch the game from the editor, press `Start Record` button to start recording actions, perform any desired actions in the game window, then press 'Stop Record' button to stop recording. You can change assertation types or parameters and change action order during the test recording or any time after it. Press `Generate Code and Copy` to generate and obtain the source code for the test. Then you can paste the generated code to your own test class.
+Launch the game from the editor, press `Start Record` button to start recording actions, perform any desired actions in the game window, then press `Stop Record` button to stop recording. You can change assertation types or parameters and change action order during the test recording or any time after it. Press `Generate Code and Copy` to generate and obtain the source code for the test. Then you can paste the generated code to your own test class.
 
-Also, you can create new assertation for the object by `Right Click`ing it in the hierarchy and selecting `Create Assertation`.
+Also, you can create a new assertation with the object by making a `Right Click` on the object in the hierarchy view and then selecting `Create Assertation`, or you can select `Copy Path` if you want to copy the path to the object.
 
 <img src="documentation/images/recorder_window.gif" width="600">
 
