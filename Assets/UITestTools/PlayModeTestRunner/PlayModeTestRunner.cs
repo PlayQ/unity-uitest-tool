@@ -89,7 +89,10 @@ namespace PlayQ.UITestTools
                             
                             if (oldData != null)
                             {
-                                testsRootNode.MergeWithRoot(oldData);
+                                if (testsRootNode != null)
+                                {
+                                    testsRootNode.MergeWithRoot(oldData);    
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -128,6 +131,22 @@ namespace PlayQ.UITestTools
         private PlayModeTestRunnerGUI screenGUIDrawer;
         private static bool isRunning;
 
+        #if UNITY_EDITOR
+        private class Postprocessor : AssetPostprocessor
+        {
+            static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, 
+                                               string[] movedAssets, string[] movedFromAssetPaths)
+            {
+                foreach (string str in deletedAssets)
+                {
+                    if (str.EndsWith("SelectedTests.asset"))
+                    {
+                        serializedTests = null;
+                    }
+                }
+            }
+        }
+        #endif
 
         private static SelectedTestsSerializable serializedTests;
         public static SelectedTestsSerializable SerializedTests
@@ -135,7 +154,12 @@ namespace PlayQ.UITestTools
             get
             {
 #if UNITY_EDITOR
-                return SelectedTestsSerializable.CreateOrLoad();
+                if (!serializedTests)
+                {
+                    serializedTests = SelectedTestsSerializable.CreateOrLoad();
+                }
+
+                return serializedTests;
 #else
                 if (!serializedTests)
                 {
@@ -181,6 +205,44 @@ namespace PlayQ.UITestTools
             get
             {
                 return SerializedTests.DefaultTimescale;
+            }
+        }
+        
+        public static string EditorTestResourcesFolder
+        {
+            set
+            {
+                SerializedTests.EditorTestResourcesFolder = value; 
+            }
+            get
+            {
+                return SerializedTests.EditorTestResourcesFolder;
+            }
+        }
+        
+        public static bool ForceMakeReferenceScreenshot
+        {
+            set
+            {
+                SerializedTests.ForceMakeReferenceScreenshot = value;
+            }
+            get
+            {
+                return SerializedTests.ForceMakeReferenceScreenshot;
+            }
+        }
+        
+        
+        
+        public static string BuildTestResourcesFolder
+        {
+            set
+            {
+                SerializedTests.BuildTestResourcesFolder = value;
+            }
+            get
+            {
+                return SerializedTests.BuildTestResourcesFolder;
             }
         }
 

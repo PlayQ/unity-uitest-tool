@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using PlayQ.UITestTools.WaitResults;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,7 +19,7 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(MakeScreenshot), "Screenshot/Make Screenshot", false)]
         public static IEnumerator MakeScreenShot(string name)
         {
-            var screenshotPath = TestScreenshotTools.GetFullPath(name);
+            var screenshotPath = TestScreenshotTools.GetScreenshotFullPath(name);
             PlayModeTestRunner.IsTestUIEnabled = false;
             yield return null;
             Application.CaptureScreenshot(screenshotPath);
@@ -32,6 +33,49 @@ namespace PlayQ.UITestTools
                 return new MethodName().String("default_screenshot_name");
             }
         }
+        
+        
+        private class MakeScreenshotReference : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return IEnumeratorMethod.String("default_screenshot_name");
+            }
+        }
+        
+        /// <summary>
+        /// Makes a reference screenshot. Saves it to editor resources folder
+        /// </summary>
+        /// <param name="name">Name of screenshot</param>
+        [ShowInEditor(typeof(MakeScreenshotReference), "Screenshot/Make Screenshot Reference(editor only)", false)]
+        public static IEnumerator MakeScreenShotReference(string name)
+        {
+#if UNITY_EDITOR
+            var fullPath = TestScreenshotTools.GetReferenceScreenshotFullPath(name);
+
+            PlayModeTestRunner.IsTestUIEnabled = false;
+            yield return null;
+            Application.CaptureScreenshot(fullPath);
+            yield return Wait.Frame(5);
+            PlayModeTestRunner.IsTestUIEnabled = true;
+
+            int index = fullPath.IndexOf("Assets", StringComparison.Ordinal);
+            var assetPath = fullPath.Substring(index);
+            UnityEditor.AssetDatabase.Refresh();
+            var textureImporter = (UnityEditor.TextureImporter) UnityEditor.AssetImporter.GetAtPath(assetPath);
+            textureImporter.isReadable = true;
+            textureImporter.mipmapEnabled = false;
+            textureImporter.textureType = UnityEditor.TextureImporterType.Default;
+            textureImporter.textureCompression = UnityEditor.TextureImporterCompression.Uncompressed;
+            UnityEditor.AssetDatabase.ImportAsset(assetPath, UnityEditor.ImportAssetOptions.ForceUpdate);
+
+#else
+			yield return null;
+			Debug.LogWarning("You can use Make referece screenshot only in editor.");
+#endif
+        }
+        
+        
 
         /// <summary>
         /// Resets FPS counter

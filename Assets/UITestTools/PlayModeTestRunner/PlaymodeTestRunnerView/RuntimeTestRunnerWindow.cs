@@ -89,8 +89,6 @@ namespace PlayQ.UITestTools
         private TwoSectionWithSliderDrawer twoSectionDrawer;
         [SerializeField]
         private UITestToolWindowFooter footer;
-        
-        public bool ForceMakeReferenceScreenshot;
       
         [MenuItem("Window/UI Test Tools/Runtime Test Runner")]
         private static void ShowWindow()
@@ -107,6 +105,10 @@ namespace PlayQ.UITestTools
             if (rootNode == null)
             {
                 rootNode = PlayModeTestRunner.TestsRootNode;
+                if (rootNode == null)
+                {
+                    return;
+                }
                 currentPlayingTest = PlayModeTestRunner.CurrentPlayingMethodNode;
                 
                 rootNode.StateUpdated += CalculateAllTestsResults;
@@ -127,11 +129,6 @@ namespace PlayQ.UITestTools
 
         private void OnEnable()
         {
-            if (EditorPrefs.HasKey("ForceMakeReferenceScreenshot"))
-            {
-                ForceMakeReferenceScreenshot = EditorPrefs.GetBool("ForceMakeReferenceScreenshot");
-            }
-            
             footer = new UITestToolWindowFooter();
             if (twoSectionDrawer == null)
             {
@@ -145,12 +142,14 @@ namespace PlayQ.UITestTools
 
             PlayModeTestRunner.OnMethodStateUpdated += Repaint;
             TestStep.OnTestStepUpdated += Repaint;
+            EditorApplication.update += OnEditorUpdate;
         }
 
         private void OnDisable()
         {
             PlayModeTestRunner.OnMethodStateUpdated -= Repaint;
             TestStep.OnTestStepUpdated -= Repaint;
+            EditorApplication.update -= OnEditorUpdate;
         }
 
 
@@ -165,13 +164,21 @@ namespace PlayQ.UITestTools
                 selectedNode.UpdateSelectedNode(null);
             }
 
-            GUI.enabled = !Application.isPlaying;
+            
             DrawHeader((int) position.width);
-            GUI.enabled = true;
-            DrawStatistics();
-            DrawFilter();
-            DrawClasses();
-            DrawFooter();
+            
+            if (rootNode == null)
+            {
+                GUILayout.Label("No serialized tests found after compilation");
+                GUILayout.Label("You can adjust tests updating in Advanced Options");
+            }
+            else
+            {
+                DrawStatistics();
+                DrawFilter();        
+                DrawClasses();
+                DrawFooter();
+            }
         }
 
         private void DrawFilter()
@@ -338,6 +345,14 @@ namespace PlayQ.UITestTools
         private int allIgnoredTests;
         private int allFailedTests;
         private int totalTests;
+        
+        [SerializeField]
+        private bool ShowAdvancedOptions;
+        public DefaultAsset EditorTestResourcesFolder;
+        public DefaultAsset BuildTestResourcesFolder;
+        public bool UpdateTestsOnEveryCompilation;
+        private int editorUpdateEnabledForFrames; 
+        
 
         private void CalculateAllTestsResults()
         { 
@@ -391,6 +406,8 @@ namespace PlayQ.UITestTools
 
         private void DrawHeader(int width)
         {
+            GUI.enabled = !Application.isPlaying && rootNode != null;
+            
             const int buttonOffset = 3;
 
             width -= 10;
@@ -413,6 +430,7 @@ namespace PlayQ.UITestTools
                     rootNode.SetSelected(true);
                 }
                 rootNode.SetSelected(false);
+            
             }
             
             if (GUILayout.Button("Run all", GUILayout.Width(buttonSize)))
@@ -488,24 +506,167 @@ namespace PlayQ.UITestTools
             }
             
             GUI.enabled = !Application.isPlaying;
-            
-            var text = "Make reference screenshot instead of comparing:";
 
-            var content = new GUIContent(text);
+            var oldValue = ShowAdvancedOptions;
+            ShowAdvancedOptions = EditorGUILayout.Foldout(ShowAdvancedOptions, "Advanced Options");
+            if (ShowAdvancedOptions)
+            {
+                GUILayout.BeginVertical(EditorStyles.helpBox);
+                AdvancedSettings();
+                GUILayout.EndVertical();
+            }
 
-            var oldValue = EditorGUIUtility.labelWidth;
+            if (oldValue != ShowAdvancedOptions)
+            {
+                editorUpdateEnabledForFrames = 10;
+            }
 
-            EditorGUIUtility.labelWidth = GetContentLenght(content);
-
-            GUI.SetNextControlName("Reference");
-
-            ForceMakeReferenceScreenshot = EditorGUILayout.Toggle(text, ForceMakeReferenceScreenshot);
-
-            EditorPrefs.SetBool("ForceMakeReferenceScreenshot", ForceMakeReferenceScreenshot);
-
-            EditorGUIUtility.labelWidth = oldValue;
-            
             EditorGUILayout.LabelField("Playmode tests: ", EditorStyles.boldLabel);
+            GUI.enabled = true;
+        }
+
+        private void OnEditorUpdate()
+        {
+            if (editorUpdateEnabledForFrames > 0)
+            {
+                editorUpdateEnabledForFrames--;
+                Repaint();
+            }
+        }
+        
+        
+        void AdvancedSettings()
+        {
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Make reference screenshot instead of comparing:");
+            var oldValue = EditorGUILayout.Toggle("", PlayModeTestRunner.ForceMakeReferenceScreenshot);
+            if (oldValue != PlayModeTestRunner.ForceMakeReferenceScreenshot)
+            {
+                PlayModeTestRunner.ForceMakeReferenceScreenshot = oldValue;
+                isDirty = true;
+                EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+                
+            }
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+
+            var oldInstance = EditorTestResourcesFolder ? 
+                EditorTestResourcesFolder.GetInstanceID() : -1;
+            EditorTestResourcesFolder = (DefaultAsset)EditorGUILayout.ObjectField(
+                "Editor Test Resources", 
+                EditorTestResourcesFolder, 
+                typeof(DefaultAsset), 
+                false);
+            var path = ValidateEditorResourceFolder();
+            if (!string.IsNullOrEmpty(path) && 
+                (oldInstance != EditorTestResourcesFolder.GetInstanceID() ||
+                 string.IsNullOrEmpty(PlayModeTestRunner.EditorTestResourcesFolder)))
+            {
+                PlayModeTestRunner.EditorTestResourcesFolder = path;
+                isDirty = true;
+                EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+            }
+            
+            oldInstance = BuildTestResourcesFolder ? 
+                BuildTestResourcesFolder.GetInstanceID() : -1;
+            BuildTestResourcesFolder = (DefaultAsset)EditorGUILayout.ObjectField(
+                "Buil Test Resources", 
+                BuildTestResourcesFolder, 
+                typeof(DefaultAsset), 
+                false);
+            path = ValidateBuildResourceFolder();
+            if (!string.IsNullOrEmpty(path) && 
+                (oldInstance != BuildTestResourcesFolder.GetInstanceID() ||
+                 string.IsNullOrEmpty(PlayModeTestRunner.BuildTestResourcesFolder)))
+            {
+                PlayModeTestRunner.BuildTestResourcesFolder = path;
+                isDirty = true;
+                EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+            }
+
+//            EditorGUILayout.BeginHorizontal();
+//            GUILayout.Label("Update tests on every compilation: ");
+//            UpdateTestsOnEveryCompilation = GUILayout.Toggle(UpdateTestsOnEveryCompilation, "");
+//            GUILayout.FlexibleSpace();
+//            EditorGUILayout.EndHorizontal();
+//            EditorGUILayout.BeginHorizontal();
+//            GUI.enabled = !UpdateTestsOnEveryCompilation;
+//            if (GUILayout.Button("Force Update Tests"))
+//            {
+//                NodeFactory.Build();
+//            }
+//            GUILayout.Label("Can take several minutes...");
+//            GUI.enabled = UpdateTestsOnEveryCompilation;
+//            EditorGUILayout.EndHorizontal();
+        }
+
+        private string ValidateEditorResourceFolder()
+        {
+            if (EditorTestResourcesFolder != null)
+            {
+                var folderIncorrect = false;
+                var assetPath = AssetDatabase.GetAssetPath(EditorTestResourcesFolder);
+                assetPath = assetPath.Replace('\\', '/');
+                if (EditorTestResourcesFolder.name != "Resources")
+                {
+                    Debug.LogError("Editor test resources folder " + assetPath +
+                                   " is incorrect, it must be Resources folder");
+                    folderIncorrect = true;
+                }
+
+                if (!assetPath.Contains("/Editor/"))
+                {
+                    Debug.LogError("Editor test resources folder " + assetPath +
+                                   " is incorrect, Resource folder must be located somewhere inside Editor folder to prevent " +
+                                   "adding test resources to build.");
+                    folderIncorrect = true;
+                }
+
+                if (folderIncorrect)
+                {
+                    EditorTestResourcesFolder = null;
+                }
+                else
+                {
+                    return assetPath;
+                }
+            }
+
+            return null;
+        }
+        
+        private string ValidateBuildResourceFolder()
+        {
+            if (BuildTestResourcesFolder != null)
+            {
+                var folderIncorrect = false;
+                var assetPath = AssetDatabase.GetAssetPath(BuildTestResourcesFolder);
+                assetPath = assetPath.Replace('\\', '/');
+                if (BuildTestResourcesFolder.name != "Resources")
+                {
+                    Debug.LogError("Build test resources folder " + assetPath +
+                                   " is incorrect, it must be Resources folder");
+                    folderIncorrect = true;
+                }
+
+                if (assetPath.Contains("/Editor/") || 
+                    assetPath.Contains("/Editor"))
+                {
+                    Debug.LogError("Buld test resources folder " + assetPath +
+                                   " is incorrect, Resource folder must NOT be located inside Editor folder");
+                    folderIncorrect = true;
+                }
+
+                if (folderIncorrect)
+                {
+                    BuildTestResourcesFolder = null;
+                }
+                else
+                {
+                    return assetPath;
+                }
+            }
+            return null;
         }
 
         private void ClearAllSmokeMethods()

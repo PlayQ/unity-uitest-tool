@@ -629,6 +629,7 @@ namespace PlayQ.UITestTools
                 }
             }, restTime, ignoreTimeScale: ignoreTimeScale);
         }
+        
         public static IEnumerator WaitForObjectScaleChanged(GameObject element, float timeout = 10f)
         {
             yield return WaitFor(() =>

@@ -8,6 +8,8 @@ namespace PlayQ.UITestTools
 {
 	public static class TestScreenshotTools
 	{
+		public const string REFERENCE_SCREENSHOT_FOLDER = "ReferenceScreenshots";
+		
 		private static string GenerateScreenshotName(string name)
 		{
 			var adjustedName = new StringBuilder()
@@ -18,11 +20,42 @@ namespace PlayQ.UITestTools
 
 			return adjustedName;
 		}
+		
+		private static string GenerateReferenceScreenshotName(string name)
+		{
+			var adjustedName = new StringBuilder()
+				.Append(name)
+				.Append(".png").ToString();
 
-        public static string GetFullPath(string name)
-        {
-            return GenerateScreenshotPathWithSubfolder(GenerateMainScreenshotDirectoryPath()) + Path.DirectorySeparatorChar + GenerateScreenshotName(name);
+			return adjustedName;
+		}
+
+        public static string GetScreenshotFullPath(string name)
+        {  
+	        var path = GenerateMainScreenshotDirectoryPath();
+	        var screenshotName = GenerateScreenshotName(name);
+
+	        if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(name))
+	        {
+		        return null;
+	        }
+	        
+	        return GenerateScreenshotPathWithSubfolder(path) + '/' + screenshotName;
         }
+        
+#if UNITY_EDITOR
+        public static string GetReferenceScreenshotFullPath(string name)
+        {
+		    var path = GenerateReferenceScreenshotFolderPath();
+		    var screenshotName = GenerateReferenceScreenshotName(name);
+
+	        if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(name))
+	        {
+		        return null;
+	        }
+	        return GenerateScreenshotPathWithSubfolder(path) + '/' + screenshotName;
+        }
+#endif
 
 		private static string GenerateScreenshotPathWithSubfolder(string path)
 		{
@@ -77,30 +110,21 @@ namespace PlayQ.UITestTools
             }
             return result;
         }
-        
-        public static string GenerateReferenceScreenshotPath()
-        {
-            var pathBuilder = new StringBuilder();
-            pathBuilder
-                .Append(Application.dataPath +
-                        Path.DirectorySeparatorChar + "Tests" +
-                        Path.DirectorySeparatorChar + "Editor" +
-                        Path.DirectorySeparatorChar + "Resources")
-                .Append(Path.DirectorySeparatorChar)
-                .Append("ReferenceScreenshots");
 
-            var subfolderPath = GenerateScreenshotPathWithSubfolder(pathBuilder.ToString());
-            return subfolderPath;
+        public static string GenerateReferenceScreenshotFolderPath()
+        {
+	        var editorResources = PlayModeTestRunner.EditorTestResourcesFolder;
+	        if (string.IsNullOrEmpty(editorResources))
+	        {
+		        Debug.LogError("EditorTestResourcesFolder is not set. You have to set it before creating " +
+		                       "reference screenshots. You cat set folder in TestRunner window => Advanced Options");
+		        return null;
+	        }
+
+	        var referencePath = editorResources + "/" + REFERENCE_SCREENSHOT_FOLDER;
+	        return referencePath;
         }
         
-        public static string GenerateReferenceScreenshotName(string name)
-        {
-            var adjustedName = new StringBuilder()
-                .Append(name)
-                .Append(".png").ToString();
-
-            return adjustedName;
-        }
         
         public static void ClearScreenshotsEmptyFolders()
         {

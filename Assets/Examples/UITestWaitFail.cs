@@ -1,7 +1,6 @@
 ﻿﻿using System.Collections;
  using UnityEngine;
  using UnityEngine.SceneManagement;
- using UnityEngine.TestTools;
  using Object = UnityEngine.Object;
 
 namespace PlayQ.UITestTools.Tests

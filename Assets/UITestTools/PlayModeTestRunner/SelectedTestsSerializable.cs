@@ -17,6 +17,9 @@ public class SelectedTestsSerializable : ScriptableObject
     public string SerializedTestsData;
     public string SelectedNodeFullName;
     public string[] Namespaces;
+    public string EditorTestResourcesFolder;
+    public string BuildTestResourcesFolder;
+    public bool ForceMakeReferenceScreenshot;
 
 #if UNITY_EDITOR
     public static SelectedTestsSerializable CreateOrLoad()

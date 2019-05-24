@@ -61,7 +61,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Editor\MarkdownGenerator.cs" />
     <Compile Include="Assets\UITestTools\Editor\EditorParameterDrawers.cs" />
     <Compile Include="Assets\UITestTools\Editor\ParameterDrawersFactorycs.cs" />
     <Compile Include="Assets\UITestTools\Editor\UITestFlowRecorderController.cs" />
