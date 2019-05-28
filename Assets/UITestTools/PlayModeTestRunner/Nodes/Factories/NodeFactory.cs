@@ -30,8 +30,35 @@ namespace Tests.Nodes
                 fileNameToFullPath[name] =  fullName;
             }
             
+            var assemblies = RuntimeTestRunnerWindow.GetAllSuitableAssemblies();
             
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            List<string> testBaseClassesStrings = PlayModeTestRunner.BaseTypes;
+            List<Type> testBaseClasses = new List<Type>(); 
+            if (testBaseClassesStrings != null)
+            {
+                foreach (var testBaseClassString in testBaseClassesStrings)
+                {
+                    Type testBaseClass = null;
+                    foreach (var assembly in assemblies)
+                    {
+                        testBaseClass = assembly.GetType(testBaseClassString);
+                        if (testBaseClass != null)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (testBaseClass == null)
+                    {
+                        Debug.LogError("Can't find type " + testBaseClassString + " in any assemblies");
+                    }
+                    else
+                    {
+                        testBaseClasses.Add(testBaseClass);
+                    }
+                }
+            }
+
             foreach (var assembly in assemblies)
             {
                 var types = assembly.GetTypes();
@@ -41,9 +68,28 @@ namespace Tests.Nodes
                     {
                         continue;
                     }
+
                     if (!type.IsClass || type.IsAbstract)
                     {
                         continue;
+                    }
+
+                    if (testBaseClasses.Count > 0)
+                    {
+                        bool isAssignable = false;
+                        foreach (var testBaseClass in testBaseClasses)
+                        {
+                            if (testBaseClass.IsAssignableFrom(type))
+                            {
+                                isAssignable = true;
+                                break;
+                            }
+                        }
+
+                        if (!isAssignable)
+                        {
+                            continue;
+                        }
                     }
 
                     BuildClassNode(type, rootNode);

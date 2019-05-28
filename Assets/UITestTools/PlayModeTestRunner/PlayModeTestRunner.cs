@@ -149,6 +149,7 @@ namespace PlayQ.UITestTools
         #endif
 
         private static SelectedTestsSerializable serializedTests;
+
         public static SelectedTestsSerializable SerializedTests
         {
             get
@@ -193,6 +194,14 @@ namespace PlayQ.UITestTools
                 SerializedTests.QuitAferComplete = value;
             }
             get { return SerializedTests.QuitAferComplete; }
+        }
+
+        public static List<string> BaseTypes
+        {
+            get
+            {
+                return SerializedTests.BaseTypes;
+            }
         }
 
         public static float DefaultTimescale

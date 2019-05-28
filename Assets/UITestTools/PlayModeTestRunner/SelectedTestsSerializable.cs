@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using PlayQ.UITestTools;
 using UnityEngine;
 using System.IO;
@@ -20,6 +21,8 @@ public class SelectedTestsSerializable : ScriptableObject
     public string EditorTestResourcesFolder;
     public string BuildTestResourcesFolder;
     public bool ForceMakeReferenceScreenshot;
+    public List<string> BaseTypes = new List<string>();
+
 
 #if UNITY_EDITOR
     public static SelectedTestsSerializable CreateOrLoad()

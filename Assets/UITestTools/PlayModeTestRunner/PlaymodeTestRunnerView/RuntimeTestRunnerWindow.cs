@@ -1,10 +1,12 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using EditorUITools;
 using Tests.Nodes;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace PlayQ.UITestTools
@@ -100,6 +102,36 @@ namespace PlayQ.UITestTools
         private ClassNode rootNode; 
         public List<MethodNode> AllMethodNodes { get; private set; }
 
+        private ReorderableList typesReordableList;
+
+        private void SetSerializedTestsDirty()
+        {
+            isDirty = true;
+            EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+        }
+
+        //todo move from here!
+        public static List<Assembly> GetAllSuitableAssemblies()
+        {
+            //we can cache it and reset after compilation
+            return AppDomain.CurrentDomain.GetAssemblies().Where(x => 
+                !x.FullName.StartsWith("UnityScript") &&
+                !x.FullName.StartsWith("Boo.Lang") &&
+                !x.FullName.StartsWith("System") &&
+                !x.FullName.StartsWith("Unity.") &&
+                !x.FullName.StartsWith("ICSharp.") &&
+                !x.FullName.StartsWith("ICSharpCode.") &&
+                !x.FullName.StartsWith("Unity.") &&
+                !x.FullName.StartsWith("Mono.") &&
+                !x.FullName.StartsWith("JetBrains.") &&
+                !x.FullName.StartsWith("Newtonsoft.") &&
+                !x.FullName.StartsWith("UnityEditor") &&
+                !x.FullName.StartsWith("UnityEngine") &&
+                !x.FullName.StartsWith("nunit.") &&
+                !x.FullName.StartsWith("mscorlib")
+            ).ToList();
+        }
+        
         private void Init()
         {
             if (rootNode == null)
@@ -124,6 +156,60 @@ namespace PlayQ.UITestTools
                 
                 InitNodeView();
                 filter.UpdateFilter(oldFilterValue);
+                
+                typesReordableList = new ReorderableList(PlayModeTestRunner.BaseTypes, null, false, true, true, true);
+                typesReordableList.drawHeaderCallback = rect => { EditorGUI.LabelField(rect, "Base classes"); };
+
+                typesReordableList.elementHeightCallback += index => EditorGUIUtility.singleLineHeight * 1.5f;
+
+                typesReordableList.drawElementBackgroundCallback = (rect, index, active, focused) =>
+                {    
+                    const int offset = 2;
+                    
+                    var oldColor = GUI.color;
+                    if (active)
+                    {
+                        GUI.color = new Color(255f/255f,200f/255f,200f/255f);
+                    };
+                    GUI.Box(new Rect(rect.x + offset * 2, rect.y + offset/2, rect.width - offset * 4, rect.height - offset), "");
+                    GUI.color = oldColor;
+                };
+                
+                typesReordableList.onAddDropdownCallback = (Rect buttonRect, ReorderableList list) => {  
+                    var menu = new GenericMenu();
+                    
+                    //we can cache it and reset after compilation
+                    var assemblies = GetAllSuitableAssemblies();
+                    foreach (var assembly in assemblies)
+                    {
+                        var typesInAssemblyList = assembly.GetTypes();
+                        foreach (var type in typesInAssemblyList)
+                        {
+                            menu.AddItem(new GUIContent(type.FullName),
+                                false, data =>
+                                {
+                                    if (!list.list.Contains(data))
+                                    {
+                                        list.list.Add(data);
+                                    }
+                                }, type.FullName);               
+                        }
+                    }
+                    menu.ShowAsContext();
+                };
+
+                typesReordableList.onChangedCallback += list =>
+                {
+                    //todo recalculate tests
+                    SetSerializedTestsDirty();
+                    editorUpdateEnabledForFrames = 10;
+                };
+                typesReordableList.drawElementCallback += (rect, index, active, focused) =>
+                {
+                    var type = PlayModeTestRunner.BaseTypes[index];
+                    rect.y += 3;
+                    GUI.Label(rect, type);
+                };
             }
         }
 
@@ -158,7 +244,6 @@ namespace PlayQ.UITestTools
         private void OnGUI()
         {   
             Init();
-            
             if (GUI.GetNameOfFocusedControl() != string.Empty)
             {
                 selectedNode.UpdateSelectedNode(null);
@@ -291,7 +376,7 @@ namespace PlayQ.UITestTools
                     var isDirty = rootNode.View.Draw();
                     if (isDirty)
                     {
-                        EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+                        SetSerializedTestsDirty();
                     }
                     
                 },
@@ -508,7 +593,7 @@ namespace PlayQ.UITestTools
             GUI.enabled = !Application.isPlaying;
 
             var oldValue = ShowAdvancedOptions;
-            ShowAdvancedOptions = EditorGUILayout.Foldout(ShowAdvancedOptions, "Advanced Options");
+            ShowAdvancedOptions = EditorGUILayout.Foldout(ShowAdvancedOptions, "Advanced Options", true);
             if (ShowAdvancedOptions)
             {
                 GUILayout.BeginVertical(EditorStyles.helpBox);
@@ -543,9 +628,7 @@ namespace PlayQ.UITestTools
             if (oldValue != PlayModeTestRunner.ForceMakeReferenceScreenshot)
             {
                 PlayModeTestRunner.ForceMakeReferenceScreenshot = oldValue;
-                isDirty = true;
-                EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
-                
+                SetSerializedTestsDirty();
             }
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
@@ -563,8 +646,7 @@ namespace PlayQ.UITestTools
                  string.IsNullOrEmpty(PlayModeTestRunner.EditorTestResourcesFolder)))
             {
                 PlayModeTestRunner.EditorTestResourcesFolder = path;
-                isDirty = true;
-                EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+                SetSerializedTestsDirty();
             }
             
             oldInstance = BuildTestResourcesFolder ? 
@@ -580,10 +662,11 @@ namespace PlayQ.UITestTools
                  string.IsNullOrEmpty(PlayModeTestRunner.BuildTestResourcesFolder)))
             {
                 PlayModeTestRunner.BuildTestResourcesFolder = path;
-                isDirty = true;
-                EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+                SetSerializedTestsDirty();
             }
 
+            
+            typesReordableList.DoLayoutList(); 
 //            EditorGUILayout.BeginHorizontal();
 //            GUILayout.Label("Update tests on every compilation: ");
 //            UpdateTestsOnEveryCompilation = GUILayout.Toggle(UpdateTestsOnEveryCompilation, "");
