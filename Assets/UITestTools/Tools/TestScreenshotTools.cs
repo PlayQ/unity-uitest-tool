@@ -8,9 +8,10 @@ namespace PlayQ.UITestTools
 {
 	public static class TestScreenshotTools
 	{
-		public const string REFERENCE_SCREENSHOT_FOLDER = "ReferenceScreenshots";
-		
-		private static string GenerateScreenshotName(string name)
+		public const string REFERENCE_SCREENSHOT_DIRECTORY = "ReferenceScreenshots";
+		public const string SCREENSHOT_DIRECTORY = "Screenshots";
+
+		public static string GenerateScreenshotNameWithTime(string name)
 		{
 			var adjustedName = new StringBuilder()
 				.Append(name)
@@ -20,8 +21,8 @@ namespace PlayQ.UITestTools
 
 			return adjustedName;
 		}
-		
-		private static string GenerateReferenceScreenshotName(string name)
+
+		public static string GenerateReferenceScreenshotNameToSave(string name)
 		{
 			var adjustedName = new StringBuilder()
 				.Append(name)
@@ -30,105 +31,92 @@ namespace PlayQ.UITestTools
 			return adjustedName;
 		}
 
-        public static string GetScreenshotFullPath(string name)
-        {  
-	        var path = GenerateMainScreenshotDirectoryPath();
-	        var screenshotName = GenerateScreenshotName(name);
-
-	        if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(name))
-	        {
-		        return null;
-	        }
-	        
-	        return GenerateScreenshotPathWithSubfolder(path) + '/' + screenshotName;
-        }
-        
+		public static string ScreenshotDirectoryToCaptureByUnity
+		{
+			get
+			{
+				string path;
 #if UNITY_EDITOR
-        public static string GetReferenceScreenshotFullPath(string name)
-        {
-		    var path = GenerateReferenceScreenshotFolderPath();
-		    var screenshotName = GenerateReferenceScreenshotName(name);
-
-	        if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(name))
-	        {
-		        return null;
-	        }
-	        return GenerateScreenshotPathWithSubfolder(path) + '/' + screenshotName;
-        }
+				path = Application.persistentDataPath + '/' + SCREENSHOT_DIRECTORY;
+#else
+				On mobile platforms the filename is appended to the persistent data path.
+		        path = '/' + SCREENSHOT_DIRECTORY;
 #endif
 
-		private static string GenerateScreenshotPathWithSubfolder(string path)
-		{
-			var camera = UITestUtils.FindAnyGameObject<Camera>();
-
-			var pathBuilder = new StringBuilder();
-            pathBuilder.Append(path);
-            pathBuilder.Append(Path.DirectorySeparatorChar);
-			pathBuilder.Append("resolution_")
-				.Append(camera.pixelWidth)
-				.Append("_")
-				.Append(camera.pixelHeight);
-
-			var testSuitName = CurrentTestInfo.TestSuitName;
-			if (!string.IsNullOrEmpty(testSuitName))
-			{
-				pathBuilder.Append(Path.DirectorySeparatorChar);
-				pathBuilder.Append(testSuitName);
+				return path + '/' + SubDirectoriesForCurrentTest;
 			}
-
-			var testMethodName = CurrentTestInfo.TestMethodName;
-			if (!string.IsNullOrEmpty(testMethodName))
-			{
-				pathBuilder.Append(Path.DirectorySeparatorChar);
-				pathBuilder.Append(testMethodName);
-			}
-
-			var result = pathBuilder.ToString();
-            if (!Directory.Exists(result))
-            {
-                Directory.CreateDirectory(result);
-            }
-			return result;
 		}
 		
-        private static string GenerateMainScreenshotDirectoryPath()
-        {
-            var pathBuilder = new StringBuilder();
+		public static string ScreenshotDirectoryToLoadByFileSystem
+		{
+			get
+			{
+				var path = Application.persistentDataPath + '/' + 
+				           SCREENSHOT_DIRECTORY + '/' + 
+				           SubDirectoriesForCurrentTest;
 
-            if (!Application.isMobilePlatform)
-            {
-                pathBuilder
-                    .Append(Application.persistentDataPath)
-                    .Append(Path.DirectorySeparatorChar);
-            }
+				return path;
+			}
+		}
+		
+#if UNITY_EDITOR
+		public static string ReferenceScreenshotDirectoryToSaveByFileSystem
+		{
+			get
+			{
+				var editorResources = SelectedTestsSerializable.EditorResourceDirectory;
+				var path = editorResources + "/" + REFERENCE_SCREENSHOT_DIRECTORY;
+				if (string.IsNullOrEmpty(path))
+				{
+					return null;
+				}
+				return path + '/' + SubDirectoriesForCurrentTest;
+			}
+		}
+		public static string ReferenceScreenshotDirectoryToLoadFromResources
+		{
+			get
+			{
+				return REFERENCE_SCREENSHOT_DIRECTORY + '/' + SubDirectoriesForCurrentTest;
+			}
+		}
+#endif
 
-            pathBuilder.Append("Screenshots");
-            var result = pathBuilder.ToString();
-            if (!Directory.Exists(result))
-            {
-                Directory.CreateDirectory(result);
-            }
-            return result;
-        }
+		public static string SubDirectoriesForCurrentTest
+		{
+			get
+			{
+				var camera = UITestUtils.FindAnyGameObject<Camera>();
 
-        public static string GenerateReferenceScreenshotFolderPath()
-        {
-	        var editorResources = PlayModeTestRunner.EditorTestResourcesFolder;
-	        if (string.IsNullOrEmpty(editorResources))
-	        {
-		        Debug.LogError("EditorTestResourcesFolder is not set. You have to set it before creating " +
-		                       "reference screenshots. You cat set folder in TestRunner window => Advanced Options");
-		        return null;
-	        }
+				var pathBuilder = new StringBuilder();
+				pathBuilder.Append("resolution_")
+					.Append(camera.pixelWidth)
+					.Append("_")
+					.Append(camera.pixelHeight);
 
-	        var referencePath = editorResources + "/" + REFERENCE_SCREENSHOT_FOLDER;
-	        return referencePath;
-        }
+				var testMethodName = CurrentTestInfo.TestMethodName;
+				if (!string.IsNullOrEmpty(testMethodName))
+				{
+					pathBuilder.Append(Path.DirectorySeparatorChar);
+					pathBuilder.Append(testMethodName);
+				}
+
+				var result = pathBuilder.ToString();
+				if (!Directory.Exists(result))
+				{
+					Directory.CreateDirectory(result);
+				}
+
+				return result;
+			}
+		}
+		
         
-        
+#if UNITY_EDITOR        
         public static void ClearScreenshotsEmptyFolders()
         {
-            var directories = Directory.GetDirectories(GenerateMainScreenshotDirectoryPath());
+	        var screenshotDirectory = Application.persistentDataPath + '/' + SCREENSHOT_DIRECTORY;
+            var directories = Directory.GetDirectories(screenshotDirectory);
             if (directories.Any())
             {
                 foreach (var dirName in directories)
@@ -157,6 +145,7 @@ namespace PlayQ.UITestTools
                 }
             }
         }
+#endif
 
 	}
 }

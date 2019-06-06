@@ -65,10 +65,12 @@ namespace Tests.Nodes
             get { return parentClass; }
         }
         
+        [JsonProperty]
         private MethodTestSettings testSettings;
         
         [JsonIgnore]
         public MethodTestSettings TestSettings { get { return testSettings; } }
+        
         [JsonIgnore]
         public override string FullName
         {
@@ -130,6 +132,7 @@ namespace Tests.Nodes
                 PassedAmount = otherMethodNode.PassedAmount;
                 IgnoredAmount = otherMethodNode.IgnoredAmount;
                 FailedAmount = otherMethodNode.FailedAmount;
+                Logs = otherMethodNode.Logs;
             }
         }
     }

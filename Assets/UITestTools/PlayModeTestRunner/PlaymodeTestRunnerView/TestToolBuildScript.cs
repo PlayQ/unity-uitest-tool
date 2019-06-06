@@ -194,32 +194,16 @@ public class TestToolBuildScript
 
     private static void AddScreenshotsToBuild()
     {
-        var editorTestResourcesFolder = PlayModeTestRunner.EditorTestResourcesFolder;
-        var buildTestResourcesFolder = PlayModeTestRunner.BuildTestResourcesFolder;
-        
-        if (string.IsNullOrEmpty(editorTestResourcesFolder) || string.IsNullOrEmpty(buildTestResourcesFolder))
-        {
-            return;
-        }
-        
-        MoveContentFromFolderToFolder(editorTestResourcesFolder, buildTestResourcesFolder);
+        MoveContentFromFolderToFolder(SelectedTestsSerializable.EditorResourceDirectory, 
+            SelectedTestsSerializable.BuildResourceDirectory);
     }
-    
     
     [PostProcessBuild(1)]
     public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
     {
         Debug.Log("OnPostprocessBuild: move Reference Screensots from Resources back to editor folder.");
-        
-        var editorTestResourcesFolder = PlayModeTestRunner.EditorTestResourcesFolder;
-        var buildTestResourcesFolder = PlayModeTestRunner.BuildTestResourcesFolder;
-        
-        if (string.IsNullOrEmpty(editorTestResourcesFolder) || string.IsNullOrEmpty(buildTestResourcesFolder))
-        {
-            return;
-        }
-        
-        MoveContentFromFolderToFolder(buildTestResourcesFolder, editorTestResourcesFolder);
+        MoveContentFromFolderToFolder(SelectedTestsSerializable.BuildResourceDirectory, 
+            SelectedTestsSerializable.EditorResourceDirectory);
     }
     
     [MenuItem("Window/UI Test Tools/Prepare For Device Build")]

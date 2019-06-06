@@ -61,6 +61,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Examples\ScreenShotTests.cs" />
     <Compile Include="Assets\Examples\Test1.cs" />
     <Compile Include="Assets\Examples\Test2.cs" />
     <Compile Include="Assets\Examples\Test3.cs" />
@@ -120,6 +121,7 @@
     <Compile Include="Assets\UITestTools\Tools\WaitResults.cs" />
     <Compile Include="Assets\UITestTools\UITestAttributes.cs" />
     <Compile Include="Assets\UITestTools\UITestToolsVersionInfo.cs" />
+    <None Include="Assets\Plugins\Editor\JetBrains\1234567890\1234567890\1234567890\1234567890\1234567890\1234567890\1234567890\1234567890\1234567890\NewBehaviourScript.txt" />
     <Reference Include="UnityEngine.UI">
       <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
     </Reference>

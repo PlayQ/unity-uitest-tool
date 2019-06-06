@@ -109,28 +109,6 @@ namespace PlayQ.UITestTools
             isDirty = true;
             EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
         }
-
-        //todo move from here!
-        public static List<Assembly> GetAllSuitableAssemblies()
-        {
-            //we can cache it and reset after compilation
-            return AppDomain.CurrentDomain.GetAssemblies().Where(x => 
-                !x.FullName.StartsWith("UnityScript") &&
-                !x.FullName.StartsWith("Boo.Lang") &&
-                !x.FullName.StartsWith("System") &&
-                !x.FullName.StartsWith("Unity.") &&
-                !x.FullName.StartsWith("ICSharp.") &&
-                !x.FullName.StartsWith("ICSharpCode.") &&
-                !x.FullName.StartsWith("Unity.") &&
-                !x.FullName.StartsWith("Mono.") &&
-                !x.FullName.StartsWith("JetBrains.") &&
-                !x.FullName.StartsWith("Newtonsoft.") &&
-                !x.FullName.StartsWith("UnityEditor") &&
-                !x.FullName.StartsWith("UnityEngine") &&
-                !x.FullName.StartsWith("nunit.") &&
-                !x.FullName.StartsWith("mscorlib")
-            ).ToList();
-        }
         
         private void Init()
         {
@@ -179,7 +157,7 @@ namespace PlayQ.UITestTools
                     var menu = new GenericMenu();
                     
                     //we can cache it and reset after compilation
-                    var assemblies = GetAllSuitableAssemblies();
+                    var assemblies = NodeFactory.GetAllSuitableAssemblies();
                     foreach (var assembly in assemblies)
                     {
                         var typesInAssemblyList = assembly.GetTypes();
@@ -274,26 +252,26 @@ namespace PlayQ.UITestTools
         }
         
         delegate bool IsSerializedAssetDirty(int instanceID);
-        private IsSerializedAssetDirty CheckIsAssetDirty;
+        private IsSerializedAssetDirty IsAssetDirtyDelegate;
         private int instanceID;
         
         private void CheckAssetIsDirty()
         {
-            if (CheckIsAssetDirty == null)
+            if (IsAssetDirtyDelegate == null)
             {
                 var methodInfo = typeof(EditorUtility).GetMethod("IsDirty", 
                     BindingFlags.Static | BindingFlags.NonPublic);
                 
                 var customDelegate = Delegate.CreateDelegate(
                     typeof(IsSerializedAssetDirty), methodInfo, false);
-                CheckIsAssetDirty = (IsSerializedAssetDirty) customDelegate;
+                IsAssetDirtyDelegate = (IsSerializedAssetDirty) customDelegate;
                 instanceID = PlayModeTestRunner.SerializedTests.GetInstanceID();
             }
 
             
-            isDirty = CheckIsAssetDirty(instanceID);
+            isDirty = IsAssetDirtyDelegate.Invoke(instanceID);
 
-            if (!PlayModeTestRunner.IsRunning && previousIsDirty != isDirty && !isDirty)
+            if (!PlayModeTestRunner.IsRunning && previousIsDirty && !isDirty)
             {
                 PlayModeTestRunner.SaveTestsData();
                 AssetDatabase.SaveAssets();
@@ -301,6 +279,7 @@ namespace PlayQ.UITestTools
             previousIsDirty = isDirty;
         }
 
+        
         private void DrawFooter()
         {
             footer.Draw(position, isDirty);
@@ -433,8 +412,6 @@ namespace PlayQ.UITestTools
         
         [SerializeField]
         private bool ShowAdvancedOptions;
-        public DefaultAsset EditorTestResourcesFolder;
-        public DefaultAsset BuildTestResourcesFolder;
         public bool UpdateTestsOnEveryCompilation;
         private int editorUpdateEnabledForFrames; 
         
@@ -633,39 +610,7 @@ namespace PlayQ.UITestTools
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
-            var oldInstance = EditorTestResourcesFolder ? 
-                EditorTestResourcesFolder.GetInstanceID() : -1;
-            EditorTestResourcesFolder = (DefaultAsset)EditorGUILayout.ObjectField(
-                "Editor Test Resources", 
-                EditorTestResourcesFolder, 
-                typeof(DefaultAsset), 
-                false);
-            var path = ValidateEditorResourceFolder();
-            if (!string.IsNullOrEmpty(path) && 
-                (oldInstance != EditorTestResourcesFolder.GetInstanceID() ||
-                 string.IsNullOrEmpty(PlayModeTestRunner.EditorTestResourcesFolder)))
-            {
-                PlayModeTestRunner.EditorTestResourcesFolder = path;
-                SetSerializedTestsDirty();
-            }
-            
-            oldInstance = BuildTestResourcesFolder ? 
-                BuildTestResourcesFolder.GetInstanceID() : -1;
-            BuildTestResourcesFolder = (DefaultAsset)EditorGUILayout.ObjectField(
-                "Buil Test Resources", 
-                BuildTestResourcesFolder, 
-                typeof(DefaultAsset), 
-                false);
-            path = ValidateBuildResourceFolder();
-            if (!string.IsNullOrEmpty(path) && 
-                (oldInstance != BuildTestResourcesFolder.GetInstanceID() ||
-                 string.IsNullOrEmpty(PlayModeTestRunner.BuildTestResourcesFolder)))
-            {
-                PlayModeTestRunner.BuildTestResourcesFolder = path;
-                SetSerializedTestsDirty();
-            }
-
-            
+           
             typesReordableList.DoLayoutList(); 
 //            EditorGUILayout.BeginHorizontal();
 //            GUILayout.Label("Update tests on every compilation: ");
@@ -681,75 +626,6 @@ namespace PlayQ.UITestTools
 //            GUILayout.Label("Can take several minutes...");
 //            GUI.enabled = UpdateTestsOnEveryCompilation;
 //            EditorGUILayout.EndHorizontal();
-        }
-
-        private string ValidateEditorResourceFolder()
-        {
-            if (EditorTestResourcesFolder != null)
-            {
-                var folderIncorrect = false;
-                var assetPath = AssetDatabase.GetAssetPath(EditorTestResourcesFolder);
-                assetPath = assetPath.Replace('\\', '/');
-                if (EditorTestResourcesFolder.name != "Resources")
-                {
-                    Debug.LogError("Editor test resources folder " + assetPath +
-                                   " is incorrect, it must be Resources folder");
-                    folderIncorrect = true;
-                }
-
-                if (!assetPath.Contains("/Editor/"))
-                {
-                    Debug.LogError("Editor test resources folder " + assetPath +
-                                   " is incorrect, Resource folder must be located somewhere inside Editor folder to prevent " +
-                                   "adding test resources to build.");
-                    folderIncorrect = true;
-                }
-
-                if (folderIncorrect)
-                {
-                    EditorTestResourcesFolder = null;
-                }
-                else
-                {
-                    return assetPath;
-                }
-            }
-
-            return null;
-        }
-        
-        private string ValidateBuildResourceFolder()
-        {
-            if (BuildTestResourcesFolder != null)
-            {
-                var folderIncorrect = false;
-                var assetPath = AssetDatabase.GetAssetPath(BuildTestResourcesFolder);
-                assetPath = assetPath.Replace('\\', '/');
-                if (BuildTestResourcesFolder.name != "Resources")
-                {
-                    Debug.LogError("Build test resources folder " + assetPath +
-                                   " is incorrect, it must be Resources folder");
-                    folderIncorrect = true;
-                }
-
-                if (assetPath.Contains("/Editor/") || 
-                    assetPath.Contains("/Editor"))
-                {
-                    Debug.LogError("Buld test resources folder " + assetPath +
-                                   " is incorrect, Resource folder must NOT be located inside Editor folder");
-                    folderIncorrect = true;
-                }
-
-                if (folderIncorrect)
-                {
-                    BuildTestResourcesFolder = null;
-                }
-                else
-                {
-                    return assetPath;
-                }
-            }
-            return null;
         }
 
         private void ClearAllSmokeMethods()

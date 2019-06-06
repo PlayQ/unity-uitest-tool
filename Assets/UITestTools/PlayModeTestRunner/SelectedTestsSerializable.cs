@@ -8,7 +8,65 @@ using UnityEditor;
 #endif
 
 public class SelectedTestsSerializable : ScriptableObject
-{ 
+{
+#if UNITY_EDITOR
+    private static string editorResourceDirectory;
+    public static string EditorResourceDirectory
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(editorResourceDirectory))
+            {
+                string path = FindPath("PlayModeTestRunner", Application.dataPath);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    path = "Assets" + path.Substring(Application.dataPath.Length);
+                    path += "/Editor/Resources";
+                    editorResourceDirectory = path;
+                    
+                    if (!Directory.Exists(editorResourceDirectory))
+                    {
+                        Directory.CreateDirectory(editorResourceDirectory);
+                    }
+                }
+                else
+                {
+                    throw new Exception("SelectedTestsSerializable: UNABLE TO FIND FOLDER NAMED \"PlayModeTestRunner\"");
+                }
+            }
+
+            return editorResourceDirectory;
+        }
+    }
+    private static string buildResourceDirectory;
+    public static string BuildResourceDirectory
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(buildResourceDirectory))
+            {
+                string path = FindPath("PlayModeTestRunner", Application.dataPath);
+                if (!string.IsNullOrEmpty(path))
+                {
+                    path = "Assets" + path.Substring(Application.dataPath.Length);
+                    path += "/Resources";
+                    buildResourceDirectory = path;
+                    if (!Directory.Exists(buildResourceDirectory))
+                    {
+                        Directory.CreateDirectory(buildResourceDirectory);
+                    }
+                }
+                else
+                {
+                    throw new Exception("SelectedTestsSerializable: UNABLE TO FIND FOLDER NAMED \"PlayModeTestRunner\"");
+                }
+            }
+
+            return buildResourceDirectory;
+        }
+    }
+#endif
+    
     public RunTestsMode.RunTestsModeEnum TestRunMode;
     public PlayModeTestRunner.SpecificTestType RunSpecificTestType;
     public int RepeatTestsNTimes;
@@ -18,8 +76,6 @@ public class SelectedTestsSerializable : ScriptableObject
     public string SerializedTestsData;
     public string SelectedNodeFullName;
     public string[] Namespaces;
-    public string EditorTestResourcesFolder;
-    public string BuildTestResourcesFolder;
     public bool ForceMakeReferenceScreenshot;
     public List<string> BaseTypes = new List<string>();
 
@@ -31,26 +87,11 @@ public class SelectedTestsSerializable : ScriptableObject
 
         if (!asset)
         {
-            string path = FindPath("PlayModeTestRunner", Application.dataPath);
-
-            if (!string.IsNullOrEmpty(path))
-            {
-                path = "Assets" + path.Substring(Application.dataPath.Length);
-                path = Path.Combine(path, "Resources");
-
-                asset = CreateInstance<SelectedTestsSerializable>();
-
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-                path = Path.Combine(path, "SelectedTests.asset");
-                
-                AssetDatabase.CreateAsset(asset, path);
-                AssetDatabase.SaveAssets();
-            }
-            else
-                throw new Exception("SelectedTestsSerializable: UNABLE TO FIND FOLDER NAMED \"PlayModeTestRunner\"");
+            asset = CreateInstance<SelectedTestsSerializable>();
+            var path = EditorResourceDirectory + '/' + "SelectedTests.asset";
+            
+            AssetDatabase.CreateAsset(asset, path);
+            AssetDatabase.SaveAssets();
         }
 
         return asset;

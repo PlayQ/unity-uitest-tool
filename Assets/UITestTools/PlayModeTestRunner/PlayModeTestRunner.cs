@@ -64,8 +64,8 @@ namespace PlayQ.UITestTools
 #endif
             }
         }
-        
 
+        
         public static ClassNode TestsRootNode
         {
             get
@@ -92,6 +92,10 @@ namespace PlayQ.UITestTools
                                 if (testsRootNode != null)
                                 {
                                     testsRootNode.MergeWithRoot(oldData);    
+                                }
+                                else
+                                {
+                                    testsRootNode = oldData;
                                 }
                             }
                         }
@@ -217,18 +221,6 @@ namespace PlayQ.UITestTools
             }
         }
         
-        public static string EditorTestResourcesFolder
-        {
-            set
-            {
-                SerializedTests.EditorTestResourcesFolder = value; 
-            }
-            get
-            {
-                return SerializedTests.EditorTestResourcesFolder;
-            }
-        }
-        
         public static bool ForceMakeReferenceScreenshot
         {
             set
@@ -238,20 +230,6 @@ namespace PlayQ.UITestTools
             get
             {
                 return SerializedTests.ForceMakeReferenceScreenshot;
-            }
-        }
-        
-        
-        
-        public static string BuildTestResourcesFolder
-        {
-            set
-            {
-                SerializedTests.BuildTestResourcesFolder = value;
-            }
-            get
-            {
-                return SerializedTests.BuildTestResourcesFolder;
             }
         }
 

@@ -11,6 +11,27 @@ namespace Tests.Nodes
     
     public static class NodeFactory
     {
+        public static List<Assembly> GetAllSuitableAssemblies()
+        {
+            //we can cache it and reset after compilation
+            return AppDomain.CurrentDomain.GetAssemblies().Where(x => 
+                !x.FullName.StartsWith("UnityScript") &&
+                !x.FullName.StartsWith("Boo.Lang") &&
+                !x.FullName.StartsWith("System") &&
+                !x.FullName.StartsWith("Unity.") &&
+                !x.FullName.StartsWith("ICSharp.") &&
+                !x.FullName.StartsWith("ICSharpCode.") &&
+                !x.FullName.StartsWith("Unity.") &&
+                !x.FullName.StartsWith("Mono.") &&
+                !x.FullName.StartsWith("JetBrains.") &&
+                !x.FullName.StartsWith("Newtonsoft.") &&
+                !x.FullName.StartsWith("UnityEditor") &&
+                !x.FullName.StartsWith("UnityEngine") &&
+                !x.FullName.StartsWith("nunit.") &&
+                !x.FullName.StartsWith("mscorlib")
+            ).ToList();
+        }
+        
         private static Dictionary<string, string> fileNameToFullPath;
         public static ClassNode Build()
         {
@@ -29,8 +50,8 @@ namespace Tests.Nodes
                 fullName = "Assets" + fullName;
                 fileNameToFullPath[name] =  fullName;
             }
-            
-            var assemblies = RuntimeTestRunnerWindow.GetAllSuitableAssemblies();
+
+            var assemblies = GetAllSuitableAssemblies();
             
             List<string> testBaseClassesStrings = PlayModeTestRunner.BaseTypes;
             List<Type> testBaseClasses = new List<Type>(); 

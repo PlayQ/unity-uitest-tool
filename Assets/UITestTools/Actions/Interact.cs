@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
+using System.Text;
 using PlayQ.UITestTools.WaitResults;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -12,6 +15,8 @@ namespace PlayQ.UITestTools
     /// </summary>
     public static partial class Interact
     {
+        
+#region Screenshots
         /// <summary>
         /// Makes a screenshot. Saves it to persistant data folder
         /// </summary>
@@ -19,10 +24,22 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(MakeScreenshot), "Screenshot/Make Screenshot", false)]
         public static IEnumerator MakeScreenShot(string name)
         {
-            var screenshotPath = TestScreenshotTools.GetScreenshotFullPath(name);
+            var screenshotPath = TestScreenshotTools.ScreenshotDirectoryToCaptureByUnity;
+            if (!Directory.Exists(screenshotPath))
+            {
+                Directory.CreateDirectory(screenshotPath);
+            }
+            screenshotPath += '/' + TestScreenshotTools.GenerateScreenshotNameWithTime(name);
+
+            yield return CaptureScreenshot(screenshotPath);
+        }
+
+        private static IEnumerator CaptureScreenshot(string fullPath)
+        {
             PlayModeTestRunner.IsTestUIEnabled = false;
             yield return null;
-            Application.CaptureScreenshot(screenshotPath);
+            Application.CaptureScreenshot(fullPath);
+            yield return Wait.Frame(5);
             PlayModeTestRunner.IsTestUIEnabled = true;
         }
 
@@ -51,13 +68,15 @@ namespace PlayQ.UITestTools
         public static IEnumerator MakeScreenShotReference(string name)
         {
 #if UNITY_EDITOR
-            var fullPath = TestScreenshotTools.GetReferenceScreenshotFullPath(name);
+            var path = TestScreenshotTools.ReferenceScreenshotDirectoryToSaveByFileSystem;
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
 
-            PlayModeTestRunner.IsTestUIEnabled = false;
-            yield return null;
-            Application.CaptureScreenshot(fullPath);
-            yield return Wait.Frame(5);
-            PlayModeTestRunner.IsTestUIEnabled = true;
+            var fullPath = path + '/' + TestScreenshotTools.GenerateReferenceScreenshotNameToSave(name);
+
+            yield return CaptureScreenshot(fullPath);
 
             int index = fullPath.IndexOf("Assets", StringComparison.Ordinal);
             var assetPath = fullPath.Substring(index);
@@ -67,6 +86,7 @@ namespace PlayQ.UITestTools
             textureImporter.mipmapEnabled = false;
             textureImporter.textureType = UnityEditor.TextureImporterType.Default;
             textureImporter.textureCompression = UnityEditor.TextureImporterCompression.Uncompressed;
+            textureImporter.npotScale = TextureImporterNPOTScale.None;
             UnityEditor.AssetDatabase.ImportAsset(assetPath, UnityEditor.ImportAssetOptions.ForceUpdate);
 
 #else
@@ -75,8 +95,168 @@ namespace PlayQ.UITestTools
 #endif
         }
         
-        
+        [ShowInEditor(typeof(MakeScreenshotAndCompareClass), "Screenshot/Make and Compare", false)]
+        public static IEnumerator MakeScreenshotAndCompare(string screenShotName, string referenceName,
+            float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+        {
+#if UNITY_EDITOR
+            if (UnityEditor.EditorPrefs.HasKey("ForceMakeReferenceScreenshot") &&
+                UnityEditor.EditorPrefs.GetBool("ForceMakeReferenceScreenshot"))
+            {
+                yield return MakeScreenShotReference(referenceName);
+                yield break;
+            }
+#endif
+            var screenshotPathToCapture = TestScreenshotTools.ScreenshotDirectoryToCaptureByUnity;
+            if (!Directory.Exists(screenshotPathToCapture))
+            {
+                Directory.CreateDirectory(screenshotPathToCapture);
+            }
+            var screenShotNameWithTime = TestScreenshotTools.GenerateScreenshotNameWithTime(screenShotName);
+            yield return CaptureScreenshot(screenshotPathToCapture + '/' + screenShotNameWithTime);
+            
+            var screenshotPathToLoad = TestScreenshotTools.ScreenshotDirectoryToLoadByFileSystem + '/' + 
+                                       screenShotNameWithTime;
+            
+            var referenceFullPath = TestScreenshotTools.ReferenceScreenshotDirectoryToLoadFromResources + '/' + 
+                                    referenceName;
 
+            var screenshotCompareError = "screenshot " + screenshotPathToLoad +
+                                         " doesn't match reference " + referenceFullPath;
+
+            var screenshotBytes = File.ReadAllBytes(screenshotPathToLoad);
+            var camera = UITestUtils.FindAnyGameObject<Camera>();
+            var screenshotTexture = new Texture2D(camera.pixelWidth, camera.pixelHeight,
+                TextureFormat.RGB24, false);
+            screenshotTexture.LoadImage(screenshotBytes);
+            screenshotTexture.Apply();
+
+            var referenceTex = Resources.Load<Texture2D>(referenceFullPath);
+            var referenceNotFoundMessage = "can't find reference screen shot with path "
+                                           + referenceFullPath +
+                                           " to compare it with screen shot " + screenshotPathToLoad;
+            if (!referenceTex)
+            {
+                if (dontFail)
+                {
+                    MakeScreenshotAndCompareClass.AddScreenshotErrorLog(referenceNotFoundMessage);
+                    yield break;
+                }
+
+                Assert.Fail(referenceNotFoundMessage);
+            }
+
+            var pixelsRef = referenceTex.GetPixels32();
+            var screenShot = screenshotTexture.GetPixels32();
+
+            if (dontFail)
+            {
+                if (pixelsRef.Length != screenShot.Length)
+                {
+                    screenshotCompareError += " reason: resolution missmatch";
+                    MakeScreenshotAndCompareClass.AddScreenshotErrorLog(screenshotCompareError);
+                    yield break;
+                }
+            }
+
+            Assert.AreEqual(pixelsRef.Length, screenShot.Length, screenshotCompareError);
+            var matchedPixels = 0f;
+            var epsilon = 20f;
+            for (int i = 0; i < pixelsRef.Length; i++)
+            {
+                if (Mathf.Abs(pixelsRef[i].a - screenShot[i].a) < epsilon &&
+                    Mathf.Abs(pixelsRef[i].r - screenShot[i].r) < epsilon &&
+                    Mathf.Abs(pixelsRef[i].g - screenShot[i].g) < epsilon &&
+                    Mathf.Abs(pixelsRef[i].b - screenShot[i].b) < epsilon)
+                {
+                    matchedPixels++;
+                }
+            }
+
+            var actualPercentOfCorrectPixels = matchedPixels / pixelsRef.Length;
+
+            if (dontFail)
+            {
+                if (actualPercentOfCorrectPixels < percentOfCorrectPixels)
+                {
+                    var errorMessage = screenshotCompareError + " actual treshold: " + actualPercentOfCorrectPixels +
+                                       "  need treshold: " + percentOfCorrectPixels;
+                    MakeScreenshotAndCompareClass.AddScreenshotErrorLog(errorMessage);
+                    yield break;
+                }
+            }
+
+            Assert.GreaterOrEqual(actualPercentOfCorrectPixels, percentOfCorrectPixels, screenshotCompareError);
+            GameObject.DestroyImmediate(screenshotTexture, true);
+            //GameObject.DestroyImmediate(referenceTex, true); //todo find out how to unload texture carefully
+
+            File.Delete(screenshotPathToLoad);
+            TestScreenshotTools.ClearScreenshotsEmptyFolders();
+        }
+
+        private class ResetScreenshotFailFlagGenerator : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return VoidMethod;
+            }
+        }
+
+        [ShowInEditor(typeof(ResetScreenshotFailFlagGenerator), "Screenshot/Reset Failed Flag", false)]
+        public static void ResetScreenshotFailFlag()
+        {
+            MakeScreenshotAndCompareClass.TestFailed = false;
+            MakeScreenshotAndCompareClass.ScreenshotComparisonErrors = new StringBuilder();
+        }
+
+        [ShowInEditor(typeof(FailIfScreenShotsNotEqualsGenerator), "Screenshot/Fail Test If Screenshot Failed", false)]
+        public static void FailIfScreenShotsNotEquals()
+        {
+            if (MakeScreenshotAndCompareClass.TestFailed)
+            {
+                MakeScreenshotAndCompareClass.TestFailed = false;
+                var errors = MakeScreenshotAndCompareClass.ScreenshotComparisonErrors != null
+                    ? MakeScreenshotAndCompareClass.ScreenshotComparisonErrors.ToString()
+                    : "";
+                MakeScreenshotAndCompareClass.ScreenshotComparisonErrors = new StringBuilder();
+                Assert.Fail("Screenshot equals failed: " + errors);
+
+            }
+        }
+
+        private class FailIfScreenShotsNotEqualsGenerator : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return VoidMethod;
+            }
+        }
+
+        private class MakeScreenshotAndCompareClass : ShowHelperBase
+        {
+            public static bool TestFailed;
+            public static StringBuilder ScreenshotComparisonErrors;
+
+
+            public static void AddScreenshotErrorLog(string errorMessage)
+            {
+                TestFailed = true;
+                ScreenshotComparisonErrors.Append("\n");
+                ScreenshotComparisonErrors.Append(errorMessage);
+                ScreenshotComparisonErrors.Append("\n");
+
+                Debug.LogWarning(errorMessage);
+            }
+
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return VoidMethod.String("default_screenshot_name").String("default_reference_name").Float(1f)
+                    .Bool(false);
+            }
+        }
+
+#endregion
+        
         /// <summary>
         /// Resets FPS counter
         /// FPS counter stores average fps, minimum and maximum FPS values since the last moment this method was called

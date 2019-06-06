@@ -52,7 +52,7 @@ namespace PlayQ.UITestTools
                 if (PlayModeTestRunner.IsRunning)
                 {
                     return PlayModeTestRunner.CurrentPlayingMethodNode.Node != null
-                        ? PlayModeTestRunner.CurrentPlayingMethodNode.Node.ParentClass.FullName
+                        ? PlayModeTestRunner.CurrentPlayingMethodNode.Node.ParentClass.Name
                         : null;
                 }
                 return null;
@@ -66,7 +66,7 @@ namespace PlayQ.UITestTools
                 if (PlayModeTestRunner.IsRunning)
                 {
                     return PlayModeTestRunner.CurrentPlayingMethodNode.Node != null
-                        ? PlayModeTestRunner.CurrentPlayingMethodNode.Node.FullName
+                        ? PlayModeTestRunner.CurrentPlayingMethodNode.Node.Name
                         : null;
                 }
                 return null;
