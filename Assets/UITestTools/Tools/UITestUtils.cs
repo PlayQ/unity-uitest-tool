@@ -574,8 +574,10 @@ namespace PlayQ.UITestTools
         /// <param name="text">Text</param>
         /// <param name="useRegEx">Is the specified text a regular expression</param>
         /// <param name="expectedErrorMessageCouldBeSubstring">if true, text could be substring of comparable reference</param>
-        public static IStringComparator GetStringComparator(string text, bool useRegEx,
-            bool expectedErrorMessageCouldBeSubstring)
+        public static IStringComparator GetStringComparator(
+            string text,
+            bool useRegEx = false,
+            bool expectedErrorMessageCouldBeSubstring = false)
         {
             return StringComparatorFactory.Build(text, useRegEx, expectedErrorMessageCouldBeSubstring);
         }

@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using EditorUITools;
 using Tests.Nodes;
@@ -182,6 +181,11 @@ namespace PlayQ.UITestTools
                 };
                 typesReordableList.drawElementCallback += (rect, index, active, focused) =>
                 {
+                    if (PlayModeTestRunner.BaseTypes.Count == 0)
+                    {
+                        rootNode = null;
+                        return;
+                    }
                     var type = PlayModeTestRunner.BaseTypes[index];
                     rect.y += 3;
                     GUI.Label(rect, type);

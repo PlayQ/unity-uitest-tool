@@ -22,6 +22,7 @@ namespace PlayQ.UITestTools
 
         public void IgnoreLog(string methodName, string reason)
         {
+            reason = reason.Replace("'", "");
             HookToDebugLogs();
 
             Debug.Log(DELIMETER);

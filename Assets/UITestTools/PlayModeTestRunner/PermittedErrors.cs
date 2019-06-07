@@ -13,7 +13,15 @@ namespace PlayQ.UITestTools
             public bool IsExactStacktrace;
         }
         
-        private static readonly List<ErrorInfo> erroInfos = new List<ErrorInfo>();
+        private static readonly List<ErrorInfo> erroInfos = new List<ErrorInfo>()
+        {
+            new ErrorInfo{Message = "RemoveEmptyFolders.cs"}, //AssetDatabase.DeleteAsset sometimes can log error (Unity bug)
+            new ErrorInfo{Message = "Exception when filling SpriteSharpDatabase with JSON data"},
+            new ErrorInfo{Message = "ArgumentException: An element with the same key already exists in the dictionary."},
+            new ErrorInfo{Message = "_activeBubble not set"},
+            new ErrorInfo{Message = "[ControlAssistant] _uiBlockingRequests is negative, which should never happen. Fix this! Clamping to zero for safety..."},
+            new ErrorInfo{Message = "PurchaseSuccessQueueHandler == null"}, // caused by StoreIAP.OnPurchaseSuccessOrFail() it has TODO by CK teram. Any success or failed purchase
+        };
 
         public static void AddPermittedError(string message, string stacktrace = "", 
             bool isExactMessage = false, bool isExactStacktrace = false)
