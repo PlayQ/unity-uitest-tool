@@ -14,13 +14,29 @@ namespace PlayQ.UITestTools
         /// </summary>
         /// <returns>Abstract async waiter</returns>
         /// <param name="message">Expected log message</param>
-        /// <param name="isRegExp">Is expected log a regular expression</param>
+        /// <param name="expectedErrorMessageCouldBeSubstring">Is expected log is substring of error log</param>
         /// <param name="timeout">Timeout (optional, default = 10)</param>
         [ShowInEditor(typeof(StartWaitingForLogClass), "Async Wait/Start Waiting For Log", false)]
-        public static AbstractAsyncWaiter StartWaitingForLog(string message, bool isRegExp, LogType logType = LogType.Log,
+        public static AbstractAsyncWaiter StartWaitingForLog(string message,
+            LogType logType = LogType.Log,
+            bool expectedErrorMessageCouldBeSubstring = false,
             float timeout = 10)
         {
-            return new LogWaiter(message, isRegExp, logType, timeout);
+            return new LogWaiter(message, false, expectedErrorMessageCouldBeSubstring, logType, timeout);
+        }
+        
+        /// <summary>
+        /// Starts the waiting for the log
+        /// </summary>
+        /// <returns>Abstract async waiter</returns>
+        /// <param name="message">Expected log message</param>
+        /// <param name="isRegExp">Is expected log a regular expression</param>
+        /// <param name="timeout">Timeout (optional, default = 10)</param>
+        [ShowInEditor(typeof(StartWaitingForLogRegExpClass), "Async Wait/Start Waiting For Log RegExp", false)]
+        public static AbstractAsyncWaiter StartWaitingForLogRegExp(string message, LogType logType = LogType.Log,
+            float timeout = 10)
+        {
+            return new LogWaiter(message, true, false, logType, timeout);
         }
 
         /// <summary>
@@ -172,12 +188,13 @@ namespace PlayQ.UITestTools
             private IStringComparator stringComparator;
             private LogType logType;
 
-            public LogWaiter(string message, bool isRegExp, LogType logType, float timeout)
+            public LogWaiter(string message, bool isRegExp,  bool expectedErrorMessageCouldBeSubstring,
+                LogType logType, float timeout)
             {
                 this.logType = logType;
                 Application.logMessageReceived += ApplicationOnLogMessageReceived;
                 OnCompleteCallback += OnComplete;
-                stringComparator = UITestUtils.GetStringComparator(message, isRegExp);
+                stringComparator = UITestUtils.GetStringComparator(message, isRegExp, expectedErrorMessageCouldBeSubstring);
                 this.message = message;
                 StartWait(timeout);
             }
@@ -219,7 +236,20 @@ namespace PlayQ.UITestTools
                     new CreateWaitVariable<LogWaiter>()
                         .Append(new MethodName())
                         .String("empty log")
+                        .Enum(LogType.Error)
                         .Bool(false)
+                        .Float(10);
+            }
+        }
+        private class StartWaitingForLogRegExpClass : ShowHelperBase
+        {
+            public override AbstractGenerator CreateGenerator(GameObject go)
+            {
+                return
+                    new CreateWaitVariable<LogWaiter>()
+                        .Append(new MethodName())
+                        .String("empty log")
+                        .Enum(LogType.Error)
                         .Float(10);
             }
         }

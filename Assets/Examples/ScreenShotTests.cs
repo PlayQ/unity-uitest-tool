@@ -45,6 +45,8 @@ namespace PlayQ.UITestTools
             {
                 yield return null;
             }
+            
+            PermittedErrors.Clear();
         }
 
         void OnSceneUnloaded(Scene scene)
@@ -71,6 +73,25 @@ namespace PlayQ.UITestTools
         {
             yield return Interact.MakeScreenShotReference("reference");
             yield return Interact.MakeScreenshotAndCompare("test", "reference");
+        }
+        
+        [UnityTest]
+        public IEnumerator TestMakeScreenshotDontFail()
+        {
+            string expectedWarning = "Screenshot comparing fail was ignored: "+ 
+                                   "can't find reference screen shot with path: ReferenceScreenshots/resolution_750_1334/TestMakeScreenshotDontFail/reference to compare it with screen shot: test";
+            var waiter = AsyncWait.StartWaitingForLog(expectedWarning,
+                LogType.Warning);
+            yield return Interact.MakeScreenshotAndCompare("test", "reference", 0.9f,
+                true);
+            yield return waiter;
+            
+            string expectedError = "Screenshot equals failed: \n"+ 
+                                     "can't find reference screen shot with path: ReferenceScreenshots/resolution_750_1334/TestMakeScreenshotDontFail/reference to compare it with screen shot: test";
+            PermittedErrors.AddPermittedError(expectedError);
+            waiter = AsyncWait.StartWaitingForLog(expectedError, LogType.Error);
+            Interact.FailIfScreenShotsNotEquals();
+            yield return waiter;
         }
       
     }

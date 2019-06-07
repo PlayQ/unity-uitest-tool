@@ -95,6 +95,15 @@ namespace PlayQ.UITestTools
 #endif
         }
         
+        /// <summary>
+        /// Makes a screenshot and compare it with earlier prepared reference screenshot.
+        /// </summary>
+        /// <param name="screenShotName">Name of screenshot</param>
+        /// <param name="referenceName">Name of reference screenshot</param>
+        /// <param name="percentOfCorrectPixels">amount of equal pixels with same coordinates</param>
+        /// <param name="dontFail">if comparison fails, test is not failed, but warning log appears.
+        /// Also, inner fail flag is set ti true. So you can manually fail test considering this flag.
+        /// </param>
         [ShowInEditor(typeof(MakeScreenshotAndCompareClass), "Screenshot/Make and Compare", false)]
         public static IEnumerator MakeScreenshotAndCompare(string screenShotName, string referenceName,
             float percentOfCorrectPixels = 0.9f, bool dontFail = false)
@@ -121,8 +130,8 @@ namespace PlayQ.UITestTools
             var referenceFullPath = TestScreenshotTools.ReferenceScreenshotDirectoryToLoadFromResources + '/' + 
                                     referenceName;
 
-            var screenshotCompareError = "screenshot " + screenshotPathToLoad +
-                                         " doesn't match reference " + referenceFullPath;
+            var screenshotCompareError = "screenshot: " + screenShotName +
+                                         " doesn't match reference: " + referenceFullPath;
 
             var screenshotBytes = File.ReadAllBytes(screenshotPathToLoad);
             var camera = UITestUtils.FindAnyGameObject<Camera>();
@@ -132,9 +141,9 @@ namespace PlayQ.UITestTools
             screenshotTexture.Apply();
 
             var referenceTex = Resources.Load<Texture2D>(referenceFullPath);
-            var referenceNotFoundMessage = "can't find reference screen shot with path "
+            var referenceNotFoundMessage = "can't find reference screen shot with path: "
                                            + referenceFullPath +
-                                           " to compare it with screen shot " + screenshotPathToLoad;
+                                           " to compare it with screen shot: " + screenShotName;
             if (!referenceTex)
             {
                 if (dontFail)
@@ -202,6 +211,10 @@ namespace PlayQ.UITestTools
             }
         }
 
+        /// <summary>
+        /// Set TestFailed to false. This flag is used to save state, when MakeScreenshotAndCompare method
+        /// fails with dontFail flag is set to true, and TestFailed flag is set to true.
+        /// </summary>
         [ShowInEditor(typeof(ResetScreenshotFailFlagGenerator), "Screenshot/Reset Failed Flag", false)]
         public static void ResetScreenshotFailFlag()
         {
@@ -209,6 +222,10 @@ namespace PlayQ.UITestTools
             MakeScreenshotAndCompareClass.ScreenshotComparisonErrors = new StringBuilder();
         }
 
+        /// <summary>
+        /// Fails if TestFailed flag is set to true. This flag is used to save state, when MakeScreenshotAndCompare method
+        /// fails with dontFail flag is set to true, and TestFailed flag is set to true.
+        /// </summary>
         [ShowInEditor(typeof(FailIfScreenShotsNotEqualsGenerator), "Screenshot/Fail Test If Screenshot Failed", false)]
         public static void FailIfScreenShotsNotEquals()
         {
@@ -219,8 +236,7 @@ namespace PlayQ.UITestTools
                     ? MakeScreenshotAndCompareClass.ScreenshotComparisonErrors.ToString()
                     : "";
                 MakeScreenshotAndCompareClass.ScreenshotComparisonErrors = new StringBuilder();
-                Assert.Fail("Screenshot equals failed: " + errors);
-
+                Debug.LogError("Screenshot equals failed: " + errors);
             }
         }
 
@@ -235,7 +251,7 @@ namespace PlayQ.UITestTools
         private class MakeScreenshotAndCompareClass : ShowHelperBase
         {
             public static bool TestFailed;
-            public static StringBuilder ScreenshotComparisonErrors;
+            public static StringBuilder ScreenshotComparisonErrors = new StringBuilder();
 
 
             public static void AddScreenshotErrorLog(string errorMessage)
@@ -243,9 +259,8 @@ namespace PlayQ.UITestTools
                 TestFailed = true;
                 ScreenshotComparisonErrors.Append("\n");
                 ScreenshotComparisonErrors.Append(errorMessage);
-                ScreenshotComparisonErrors.Append("\n");
 
-                Debug.LogWarning(errorMessage);
+                Debug.LogWarning("Screenshot comparing fail was ignored: " + errorMessage);
             }
 
             public override AbstractGenerator CreateGenerator(GameObject go)
