@@ -412,7 +412,6 @@ namespace PlayQ.UITestTools
         
         [SerializeField]
         private bool ShowAdvancedOptions;
-        public bool UpdateTestsOnEveryCompilation;
         private int editorUpdateEnabledForFrames; 
         
 
@@ -610,22 +609,25 @@ namespace PlayQ.UITestTools
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
-           
-            typesReordableList.DoLayoutList(); 
-//            EditorGUILayout.BeginHorizontal();
-//            GUILayout.Label("Update tests on every compilation: ");
-//            UpdateTestsOnEveryCompilation = GUILayout.Toggle(UpdateTestsOnEveryCompilation, "");
-//            GUILayout.FlexibleSpace();
-//            EditorGUILayout.EndHorizontal();
-//            EditorGUILayout.BeginHorizontal();
-//            GUI.enabled = !UpdateTestsOnEveryCompilation;
-//            if (GUILayout.Button("Force Update Tests"))
-//            {
-//                NodeFactory.Build();
-//            }
-//            GUILayout.Label("Can take several minutes...");
-//            GUI.enabled = UpdateTestsOnEveryCompilation;
-//            EditorGUILayout.EndHorizontal();
+            typesReordableList.DoLayoutList();
+            
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Update tests on every compilation: ");
+            PlayModeTestRunner.UpdateTestsOnEveryCompilation = 
+                GUILayout.Toggle(PlayModeTestRunner.UpdateTestsOnEveryCompilation, "");
+            
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            GUI.enabled = !PlayModeTestRunner.UpdateTestsOnEveryCompilation;
+            if (GUILayout.Button("Force Update Tests"))
+            {
+                PlayModeTestRunner.ResetTestRootNode();
+                rootNode = null;
+            }
+            GUILayout.Label("Can take several minutes...");
+            GUI.enabled = PlayModeTestRunner.UpdateTestsOnEveryCompilation;
+            EditorGUILayout.EndHorizontal();
         }
 
         private void ClearAllSmokeMethods()

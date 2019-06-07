@@ -78,6 +78,7 @@ public class SelectedTestsSerializable : ScriptableObject
     public string[] Namespaces;
     public bool ForceMakeReferenceScreenshot;
     public List<string> BaseTypes = new List<string>();
+    public bool UpdateTestsOnEveryCompilation = true;
 
 
 #if UNITY_EDITOR

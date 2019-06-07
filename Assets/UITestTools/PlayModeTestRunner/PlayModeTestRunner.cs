@@ -65,6 +65,11 @@ namespace PlayQ.UITestTools
             }
         }
 
+        public static void ResetTestRootNode()
+        {
+            testsRootNode = null;
+            testsRootNode = NodeFactory.Build();
+        }
         
         public static ClassNode TestsRootNode
         {
@@ -72,7 +77,15 @@ namespace PlayQ.UITestTools
             {
                 if (testsRootNode == null)
                 {
-                    testsRootNode = NodeFactory.Build();
+                    #if UNITY_EDITOR
+                    if (UpdateTestsOnEveryCompilation)
+                    {
+                        testsRootNode = NodeFactory.Build();      
+                    }
+                    #else
+                        testsRootNode = NodeFactory.Build();
+                    #endif
+                    
                     if (SerializedTests != null && 
                         !string.IsNullOrEmpty(SerializedTests.SerializedTestsData))
                     {
@@ -191,6 +204,16 @@ namespace PlayQ.UITestTools
             StartProcessingTests();
         }
 
+        
+        public static bool UpdateTestsOnEveryCompilation
+        {
+            set
+            {
+                SerializedTests.UpdateTestsOnEveryCompilation = value;
+            }
+            get { return SerializedTests.UpdateTestsOnEveryCompilation; }
+        }
+        
         public static bool QuitAppAfterCompleteTests
         {
             set
@@ -241,8 +264,13 @@ namespace PlayQ.UITestTools
         
         void RunMethod(object instance, MethodInfo info, Action callback)
         {
+            if (info == null)
+            {
+                Debug.LogError("Can't run method, because method info is null, probably is not exist anymore");
+                callback();
+                return;
+            }
             var returnType = info.ReturnType;
-
             object result;
 
             try
@@ -496,9 +524,17 @@ namespace PlayQ.UITestTools
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogErrorFormat("Can't instantiate class \"{0}\". Exception: \"{1}\"",
-                            classNode.Type.FullName, ex.Message);
-
+                        if (classNode.Type == null)
+                        {
+                            Debug.LogErrorFormat("Can't instantiate class - class type is null." +
+                                                 " class probably was deleted ");
+                        }
+                        else
+                        {
+                            Debug.LogErrorFormat("Can't instantiate class \"{0}\". Exception: \"{1}\"",
+                                classNode.Type.FullName, ex.Message);    
+                        }
+                        
                         ProcessTestFail(methodNode);
                         continue;
                     }

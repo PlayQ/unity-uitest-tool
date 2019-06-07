@@ -93,6 +93,16 @@ namespace PlayQ.UITestTools
             Interact.FailIfScreenShotsNotEquals();
             yield return waiter;
         }
+
+
+//        public class TestClass : ScreenShotTests
+//        {
+//            [UnityTest]
+//            public IEnumerator Test()
+//            {
+//                yield return null;
+//            }   
+//        }
       
     }
 }
