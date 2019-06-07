@@ -12,7 +12,9 @@ public class AddBaseClassWindow : EditorWindow
 
     private void OnEnable()
     {
-        position = new Rect(100,100, 250, 115);
+        titleContent.text = "Choose Base Class";
+        maxSize= new Vector2(250, 100);
+        minSize= new Vector2(250, 100);
 
         classes = new List<string>();
 
@@ -38,19 +40,12 @@ public class AddBaseClassWindow : EditorWindow
     private int selectedIndex;
     public Action<string> Result = s => { };
     private string filer = String.Empty;
+    
     private void OnGUI()
     {
-        GUILayout.BeginArea(new Rect(0, 0, position.width, position.height));
-        GUILayout.BeginHorizontal(EditorStyles.toolbar);
- 
-        GUILayout.Label("Choose base class");
- 
-        GUILayout.EndHorizontal();
-        GUILayout.EndArea();
-
         Rect content = new Rect(10, 10, position.width - 20, EditorGUIUtility.singleLineHeight);
         
-        content.y += EditorGUIUtility.singleLineHeight;
+//        content.y += EditorGUIUtility.singleLineHeight;
         filer = EditorGUI.TextField(content, "Filter", filer);
         
         content.y += EditorGUIUtility.singleLineHeight*1.5f;

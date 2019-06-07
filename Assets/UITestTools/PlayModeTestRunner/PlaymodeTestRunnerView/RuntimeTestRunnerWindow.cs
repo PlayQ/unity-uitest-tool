@@ -170,7 +170,7 @@ namespace PlayQ.UITestTools
                             }
                         }
                     };
-                    window.ShowPopup();
+                    window.ShowAuxWindow();
                 };
 
                 typesReordableList.onChangedCallback += list =>
