@@ -109,7 +109,8 @@ namespace PlayQ.UITestTools
             isDirty = true;
             EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
         }
-        
+
+        private AddBaseClassWindow window;
         private void Init()
         {
             if (rootNode == null)
@@ -152,28 +153,25 @@ namespace PlayQ.UITestTools
                     GUI.Box(new Rect(rect.x + offset * 2, rect.y + offset/2, rect.width - offset * 4, rect.height - offset), "");
                     GUI.color = oldColor;
                 };
-                
-                typesReordableList.onAddDropdownCallback = (Rect buttonRect, ReorderableList list) => {  
-                    var menu = new GenericMenu();
-                    
-                    //we can cache it and reset after compilation
-                    var assemblies = NodeFactory.GetAllSuitableAssemblies();
-                    foreach (var assembly in assemblies)
+
+                typesReordableList.onAddDropdownCallback = (Rect buttonRect, ReorderableList list) =>
+                {
+                    if (window != null)
                     {
-                        var typesInAssemblyList = assembly.GetTypes();
-                        foreach (var type in typesInAssemblyList)
-                        {
-                            menu.AddItem(new GUIContent(type.FullName),
-                                false, data =>
-                                {
-                                    if (!list.list.Contains(data))
-                                    {
-                                        list.list.Add(data);
-                                    }
-                                }, type.FullName);               
-                        }
+                        window.Close();
                     }
-                    menu.ShowAsContext();
+                    window = CreateInstance<AddBaseClassWindow>();
+                    window.Result += s =>
+                    {
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                            if (!list.list.Contains(s))
+                            {
+                                list.list.Add(s);
+                            }
+                        }
+                    };
+                    window.ShowPopup();
                 };
 
                 typesReordableList.onChangedCallback += list =>
