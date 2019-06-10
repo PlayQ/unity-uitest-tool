@@ -54,7 +54,7 @@ public class AddBaseClassWindow : EditorWindow
         content.y += EditorGUIUtility.singleLineHeight*1.5f;
         if (GUI.Button(content, "Accept"))
         {
-            Result(classes[selectedIndex]);
+            Result(classes.Where(x => x.ToLower().Contains(filer.ToLower())).ToArray()[selectedIndex]);
             Close();
         }
         content.y += EditorGUIUtility.singleLineHeight*1.2f;
