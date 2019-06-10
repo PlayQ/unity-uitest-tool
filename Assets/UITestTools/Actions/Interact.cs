@@ -200,7 +200,9 @@ namespace PlayQ.UITestTools
             //GameObject.DestroyImmediate(referenceTex, true); //todo find out how to unload texture carefully
 
             File.Delete(screenshotPathToLoad);
+#if UNITY_EDITOR
             TestScreenshotTools.ClearScreenshotsEmptyFolders();
+#endif
         }
 
         private class ResetScreenshotFailFlagGenerator : ShowHelperBase

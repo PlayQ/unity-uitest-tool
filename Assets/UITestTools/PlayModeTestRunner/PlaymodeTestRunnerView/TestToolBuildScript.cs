@@ -212,5 +212,11 @@ public class TestToolBuildScript
         AddTestSceneToBuild();
         AddScreenshotsToBuild();
     }
+    [MenuItem("Window/UI Test Tools/Move build resources back to editor resources")]
+    public static void MenuPostBuild()
+    {
+        MoveContentFromFolderToFolder(SelectedTestsSerializable.BuildResourceDirectory, 
+            SelectedTestsSerializable.EditorResourceDirectory);
+    }
 }
 #endif

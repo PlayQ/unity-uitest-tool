@@ -39,7 +39,7 @@ namespace PlayQ.UITestTools
 #if UNITY_EDITOR
 				path = Application.persistentDataPath + '/' + SCREENSHOT_DIRECTORY;
 #else
-				On mobile platforms the filename is appended to the persistent data path.
+				//On mobile platforms the filename is appended to the persistent data path.
 		        path = '/' + SCREENSHOT_DIRECTORY;
 #endif
 
@@ -73,6 +73,7 @@ namespace PlayQ.UITestTools
 				return path + '/' + SubDirectoriesForCurrentTest;
 			}
 		}
+#endif
 		public static string ReferenceScreenshotDirectoryToLoadFromResources
 		{
 			get
@@ -80,7 +81,6 @@ namespace PlayQ.UITestTools
 				return REFERENCE_SCREENSHOT_DIRECTORY + '/' + SubDirectoriesForCurrentTest;
 			}
 		}
-#endif
 
 		public static string SubDirectoriesForCurrentTest
 		{
