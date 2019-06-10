@@ -13,15 +13,9 @@ namespace PlayQ.UITestTools
             public bool IsExactStacktrace;
         }
         
-        private static readonly List<ErrorInfo> erroInfos = new List<ErrorInfo>()
-        {
-            new ErrorInfo{Message = "RemoveEmptyFolders.cs"}, //AssetDatabase.DeleteAsset sometimes can log error (Unity bug)
-            new ErrorInfo{Message = "Exception when filling SpriteSharpDatabase with JSON data"},
-            new ErrorInfo{Message = "ArgumentException: An element with the same key already exists in the dictionary."},
-            new ErrorInfo{Message = "_activeBubble not set"},
-            new ErrorInfo{Message = "[ControlAssistant] _uiBlockingRequests is negative, which should never happen. Fix this! Clamping to zero for safety..."},
-            new ErrorInfo{Message = "PurchaseSuccessQueueHandler == null"}, // caused by StoreIAP.OnPurchaseSuccessOrFail() it has TODO by CK teram. Any success or failed purchase
-        };
+        private static readonly List<ErrorInfo> erroInfosPermanent = new List<ErrorInfo>();
+        
+        private static List<ErrorInfo> erroInfos = new List<ErrorInfo>();
 
         public static void AddPermittedError(string message, string stacktrace = "", 
             bool isExactMessage = false, bool isExactStacktrace = false)
@@ -40,9 +34,9 @@ namespace PlayQ.UITestTools
             erroInfos.Clear();
         }
 
-        public static bool IsPermittedError(string message, string stacktrace)
+        private static bool IsPermittedError(List<ErrorInfo> errorInfos, string message, string stacktrace)
         {
-            foreach (var errorInfo in erroInfos)
+            foreach (var errorInfo in errorInfos)
             {
                 var messageCheck = false;
                 if (errorInfo.IsExactMessage)
@@ -54,14 +48,20 @@ namespace PlayQ.UITestTools
                     messageCheck = message.IndexOf(errorInfo.Message, StringComparison.Ordinal) != -1;
                 }
                 
-                var stacktraceCheck = false;
+                var stacktraceCheck = true;
                 if (errorInfo.IsExactStacktrace)
                 {
-                    stacktraceCheck = stacktrace.Equals(errorInfo.Stacktrace, StringComparison.Ordinal);
+                    if (errorInfo.Stacktrace != null)
+                    {
+                        stacktraceCheck = stacktrace.Equals(errorInfo.Stacktrace, StringComparison.Ordinal);   
+                    }
                 }
                 else
                 {
-                    stacktraceCheck = stacktrace.IndexOf(errorInfo.Stacktrace, StringComparison.Ordinal) != -1;
+                    if (errorInfo.Stacktrace != null)
+                    {
+                        stacktraceCheck = stacktrace.IndexOf(errorInfo.Stacktrace, StringComparison.Ordinal) != -1;
+                    }
                 }
 
                 if (messageCheck && stacktraceCheck)
@@ -70,6 +70,17 @@ namespace PlayQ.UITestTools
                 }
             }
             return false;
+        }
+
+        public static bool IsPermittedError(string message, string stacktrace)
+        {
+            var isPermittedPermanent = IsPermittedError(erroInfosPermanent, message, stacktrace);
+            if (isPermittedPermanent)
+            {
+                return true;
+            }
+            var isPermitted = IsPermittedError(erroInfos, message, stacktrace);    
+            return isPermitted;
         }
     }
 }
