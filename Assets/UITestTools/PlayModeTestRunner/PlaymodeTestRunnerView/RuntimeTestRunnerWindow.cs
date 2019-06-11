@@ -10,6 +10,7 @@ using UnityEngine;
 
 namespace PlayQ.UITestTools
 { 
+    
     [Serializable]
     public class Filter
     {
@@ -249,8 +250,13 @@ namespace PlayQ.UITestTools
         private void DrawFilter()
         {
             GUI.SetNextControlName("Filter");
-            var newFilter = EditorGUILayout.TextField("Filter:", filter.FilterString);
-            filter.UpdateFilter(newFilter);
+            var value = filter.FilterString;
+            GUILayout.Space(6);
+            EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(6);
+                UIHelper.SearchField(ref value);
+            EditorGUILayout.EndHorizontal();
+            filter.UpdateFilter(value);
         }
         
         delegate bool IsSerializedAssetDirty(int instanceID);

@@ -9,12 +9,13 @@ using UnityEngine;
 public class AddBaseClassWindow : EditorWindow
 {
     private List<string> classes;
+    private string[] filteredClasses;
 
     private void OnEnable()
     {
         titleContent.text = "Choose Base Class";
-        maxSize= new Vector2(250, 100);
-        minSize= new Vector2(250, 100);
+        maxSize = new Vector2(250, 100);
+        minSize = new Vector2(250, 100);
 
         classes = new List<string>();
 
@@ -40,24 +41,39 @@ public class AddBaseClassWindow : EditorWindow
     private int selectedIndex;
     public Action<string> Result = s => { };
     private string filer = String.Empty;
-    
+
     private void OnGUI()
     {
-        Rect content = new Rect(10, 10, position.width - 20, EditorGUIUtility.singleLineHeight);
-        
-//        content.y += EditorGUIUtility.singleLineHeight;
-        filer = EditorGUI.TextField(content, "Filter", filer);
-        
-        content.y += EditorGUIUtility.singleLineHeight*1.5f;
-        selectedIndex = EditorGUI.Popup(content, selectedIndex, classes.Where(x => x.ToLower().Contains(filer.ToLower())).ToArray());
+        const int padding = 10;
 
-        content.y += EditorGUIUtility.singleLineHeight*1.5f;
+        Rect content = new Rect(padding, padding, position.width - padding * 2, EditorGUIUtility.singleLineHeight);
+        var isChanged = EditorUITools.UIHelper.SearchField(ref filer, content);
+        
+        content.y += EditorGUIUtility.singleLineHeight * 1.5f;
+
+        if (isChanged || filteredClasses == null)
+        {
+            var filteredCollection = classes.Where(x => x.ToLower().Contains(filer.ToLower()));
+            if (filteredCollection.Any())
+            {
+                filteredClasses = filteredCollection.ToArray();    
+            }
+            else
+            {
+                filteredClasses = classes.ToArray();
+            }
+                
+        }
+        selectedIndex = EditorGUI.Popup(content, selectedIndex, filteredClasses);
+        
+        content.y += EditorGUIUtility.singleLineHeight * 1.5f;
         if (GUI.Button(content, "Accept"))
         {
-            Result(classes.Where(x => x.ToLower().Contains(filer.ToLower())).ToArray()[selectedIndex]);
+            Result(filteredClasses[selectedIndex]);
             Close();
         }
-        content.y += EditorGUIUtility.singleLineHeight*1.2f;
+
+        content.y += EditorGUIUtility.singleLineHeight * 1.2f;
         if (GUI.Button(content, "Cancel"))
         {
             Close();
