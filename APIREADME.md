@@ -2,6 +2,7 @@
 * [AsyncCheck](#asynccheck)
 * [AsyncWait](#asyncwait)
   * [StartWaitingForLog](#startwaitingforlog)
+  * [StartWaitingForLogRegExp](#startwaitingforlogregexp)
   * [StartWaitingForUnityAnimation](#startwaitingforunityanimation)
   * [StopWaitingForGameLog](#stopwaitingforgamelog)
   * [StopWaitingForUnityAnimation](#stopwaitingforunityanimation)
@@ -29,9 +30,13 @@
   * [ClickPixels](#clickpixels)
   * [DragPercents](#dragpercents)
   * [DragPixels](#dragpixels)
+  * [FailIfScreenShotsNotEquals](#failifscreenshotsnotequals)
   * [GetTimescale](#gettimescale)
   * [MakeScreenShot](#makescreenshot)
+  * [MakeScreenshotAndCompare](#makescreenshotandcompare)
+  * [MakeScreenShotReference](#makescreenshotreference)
   * [ResetFPS](#resetfps)
+  * [ResetScreenshotFailFlag](#resetscreenshotfailflag)
   * [SaveFPS](#savefps)
   * [ScrollToPosition](#scrolltoposition)
   * [SetText](#settext)
@@ -86,6 +91,24 @@
 
 
 #### StartWaitingForLog
+
+
+ Starts the waiting for the log
+ 
+
+
+Returns: Abstract async waiter
+
+|Argument | Description |
+|-----|------|
+|message |Expected log message|
+|expectedErrorMessageCouldBeSubstring |Is expected log is substring of error log|
+|timeout |Timeout (optional, default = 10)|
+
+
+---
+
+#### StartWaitingForLogRegExp
 
 
  Starts the waiting for the log
@@ -769,6 +792,17 @@ Returns:
 
 ---
 
+#### FailIfScreenShotsNotEquals
+
+
+ Fails if TestFailed flag is set to true. This flag is used to save state, when MakeScreenshotAndCompare method
+ fails with dontFail flag is set to true, and TestFailed flag is set to true.
+ 
+
+
+
+---
+
 #### GetTimescale
 
 
@@ -792,11 +826,53 @@ Returns:
 
 ---
 
+#### MakeScreenshotAndCompare
+
+
+ Makes a screenshot and compare it with earlier prepared reference screenshot.
+ 
+
+|Argument | Description |
+|-----|------|
+|screenShotName |Name of screenshot|
+|referenceName |Name of reference screenshot|
+|percentOfCorrectPixels |amount of equal pixels with same coordinates|
+|dontFail |if comparison fails, test is not failed, but warning log appears.
+ Also, inner fail flag is set ti true. So you can manually fail test considering this flag.
+ |
+
+
+---
+
+#### MakeScreenShotReference
+
+
+ Makes a reference screenshot. Saves it to editor resources folder
+ 
+
+|Argument | Description |
+|-----|------|
+|name |Name of screenshot|
+
+
+---
+
 #### ResetFPS
 
 
  Resets FPS counter
  FPS counter stores average fps, minimum and maximum FPS values since the last moment this method was called
+ 
+
+
+
+---
+
+#### ResetScreenshotFailFlag
+
+
+ Set TestFailed to false. This flag is used to save state, when MakeScreenshotAndCompare method
+ fails with dontFail flag is set to true, and TestFailed flag is set to true.
  
 
 
@@ -1463,6 +1539,7 @@ Returns: The string comparator
 |-----|------|
 |text |Text|
 |useRegEx |Is the specified text a regular expression|
+|expectedErrorMessageCouldBeSubstring |if true, text could be substring of comparable reference|
 
 
 ---

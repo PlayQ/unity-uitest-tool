@@ -15,7 +15,16 @@
             Contains methods which allow waiting until the game components and objects on the scene reach the certain state asynchronously
             </summary>
         </member>
-        <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForLog(System.String,System.Boolean,UnityEngine.LogType,System.Single)">
+        <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForLog(System.String,UnityEngine.LogType,System.Boolean,System.Single)">
+            <summary>
+            Starts the waiting for the log
+            </summary>
+            <returns>Abstract async waiter</returns>
+            <param name="message">Expected log message</param>
+            <param name="expectedErrorMessageCouldBeSubstring">Is expected log is substring of error log</param>
+            <param name="timeout">Timeout (optional, default = 10)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForLogRegExp(System.String,UnityEngine.LogType,System.Single)">
             <summary>
             Starts the waiting for the log
             </summary>
@@ -23,6 +32,11 @@
             <param name="message">Expected log message</param>
             <param name="isRegExp">Is expected log a regular expression</param>
             <param name="timeout">Timeout (optional, default = 10)</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.AsyncWait.StopWaitingForGameLog">
+            <summary>
+            Used only for generation waiting code for StartWaitingForLog 
+            </summary>
         </member>
         <member name="M:PlayQ.UITestTools.AsyncWait.StartWaitingForUnityAnimation(System.String,System.String,System.Single)">
             <summary>
@@ -32,11 +46,6 @@
             <param name="path">Path to `GameObject` in hierarchy</param>
             <param name="animationName">Animation name</param>
             <param name="timeout">Timeout (optional, default = 10)</param>
-        </member>
-        <member name="M:PlayQ.UITestTools.AsyncWait.StopWaitingForGameLog">
-            <summary>
-            Used only for generation waiting code for StartWaitingForLog 
-            </summary>
         </member>
         <member name="M:PlayQ.UITestTools.AsyncWait.StopWaitingForUnityAnimation">
             <summary>
@@ -273,6 +282,35 @@
             Makes a screenshot. Saves it to persistant data folder
             </summary>
             <param name="name">Name of screenshot</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.MakeScreenShotReference(System.String)">
+            <summary>
+            Makes a reference screenshot. Saves it to editor resources folder
+            </summary>
+            <param name="name">Name of screenshot</param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.MakeScreenshotAndCompare(System.String,System.String,System.Single,System.Boolean)">
+            <summary>
+            Makes a screenshot and compare it with earlier prepared reference screenshot.
+            </summary>
+            <param name="screenShotName">Name of screenshot</param>
+            <param name="referenceName">Name of reference screenshot</param>
+            <param name="percentOfCorrectPixels">amount of equal pixels with same coordinates</param>
+            <param name="dontFail">if comparison fails, test is not failed, but warning log appears.
+            Also, inner fail flag is set ti true. So you can manually fail test considering this flag.
+            </param>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.ResetScreenshotFailFlag">
+            <summary>
+            Set TestFailed to false. This flag is used to save state, when MakeScreenshotAndCompare method
+            fails with dontFail flag is set to true, and TestFailed flag is set to true.
+            </summary>
+        </member>
+        <member name="M:PlayQ.UITestTools.Interact.FailIfScreenShotsNotEquals">
+            <summary>
+            Fails if TestFailed flag is set to true. This flag is used to save state, when MakeScreenshotAndCompare method
+            fails with dontFail flag is set to true, and TestFailed flag is set to true.
+            </summary>
         </member>
         <member name="M:PlayQ.UITestTools.Interact.ResetFPS">
             <summary>
@@ -984,13 +1022,14 @@
             <param name="y">Y percents position in screen</param>
             <returns>Screen pixels</returns>
         </member>
-        <member name="M:PlayQ.UITestTools.UITestUtils.GetStringComparator(System.String,System.Boolean)">
+        <member name="M:PlayQ.UITestTools.UITestUtils.GetStringComparator(System.String,System.Boolean,System.Boolean)">
             <summary>
             Gets the string comparator by specified text and regex option
             </summary>
             <returns>The string comparator</returns>
             <param name="text">Text</param>
             <param name="useRegEx">Is the specified text a regular expression</param>
+            <param name="expectedErrorMessageCouldBeSubstring">if true, text could be substring of comparable reference</param>
         </member>
         <member name="T:EditorUITools.EditorUIConstants">
             <summary>
