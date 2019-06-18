@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace PlayQ.UITestTools
 {
@@ -9,6 +10,7 @@ namespace PlayQ.UITestTools
         {
             public string Message;
             public bool IsExactMessage;
+            public bool IsRegExpMessage;
             public string Stacktrace;
             public bool IsExactStacktrace;
         }
@@ -45,7 +47,16 @@ namespace PlayQ.UITestTools
                 }
                 else
                 {
-                    messageCheck = message.IndexOf(errorInfo.Message, StringComparison.Ordinal) != -1;
+                    if (errorInfo.IsRegExpMessage)
+                    {
+                        var regexp = new Regex(errorInfo.Message);
+                        messageCheck = regexp.IsMatch(message);
+                    }
+                    else
+                    {
+                        messageCheck = message.IndexOf(errorInfo.Message, StringComparison.Ordinal) != -1;    
+                    }
+                    
                 }
                 
                 var stacktraceCheck = true;

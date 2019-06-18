@@ -45,7 +45,6 @@ public class AddBaseClassWindow : EditorWindow
     private void OnGUI()
     {
         const int padding = 10;
-
         Rect content = new Rect(padding, padding, position.width - padding * 2, EditorGUIUtility.singleLineHeight);
         var isChanged = EditorUITools.UIHelper.SearchField(ref filer, content);
         

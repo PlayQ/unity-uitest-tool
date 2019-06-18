@@ -253,8 +253,8 @@ namespace PlayQ.UITestTools
             var value = filter.FilterString;
             GUILayout.Space(6);
             EditorGUILayout.BeginHorizontal();
-                GUILayout.Space(6);
-                UIHelper.SearchField(ref value);
+            GUILayout.Space(6);
+            UIHelper.SearchField(ref value);
             EditorGUILayout.EndHorizontal();
             filter.UpdateFilter(value);
         }

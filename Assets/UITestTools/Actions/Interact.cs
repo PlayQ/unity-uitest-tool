@@ -109,8 +109,7 @@ namespace PlayQ.UITestTools
             float percentOfCorrectPixels = 0.9f, bool dontFail = false)
         {
 #if UNITY_EDITOR
-            if (UnityEditor.EditorPrefs.HasKey("ForceMakeReferenceScreenshot") &&
-                UnityEditor.EditorPrefs.GetBool("ForceMakeReferenceScreenshot"))
+            if (PlayModeTestRunner.ForceMakeReferenceScreenshot)
             {
                 yield return MakeScreenShotReference(referenceName);
                 yield break;

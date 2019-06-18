@@ -236,7 +236,10 @@ namespace PlayQ.UITestTools
             set
             {
                 SerializedTests.DefaultTimescale = value;
-                Time.timeScale = value;
+                if (isRunning)
+                {
+                    Time.timeScale = value;
+                }
             }
             get
             {
@@ -686,6 +689,7 @@ namespace PlayQ.UITestTools
 
         private void OnDisable()
         {
+            Debug.LogWarning("Disabling playmodetestrunner: " + Environment.StackTrace);
             FinalizeTest();
         }
 
@@ -696,7 +700,7 @@ namespace PlayQ.UITestTools
                 return;
             }
             
-            Debug.Log("TestsTools: Tests are done!");
+            Debug.LogWarning("TestsTools: Tests are done!");
             logSaver.SaveTestInfo(testInfoData);
 
             logSaver.Close();
