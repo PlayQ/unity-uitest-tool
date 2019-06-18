@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using PlayQ.UITestTools;
 using UnityEngine;
@@ -39,7 +40,7 @@ namespace Tests.Nodes
             }
         }
 
-        
+        [JsonProperty]
         protected TestState cachedState;
         protected bool stateIsDirty = true;
         
@@ -70,6 +71,26 @@ namespace Tests.Nodes
                 }
             }
             return false;
+        }
+        
+        protected List<MethodInfo> MethodNamesToInfos(Type type, List<string> names)
+        {
+            List<MethodInfo> infos = new List<MethodInfo>();
+            foreach (var setupMethodName in names)
+            {
+                var methodInfo = type.GetMethod(setupMethodName);
+                infos.Add(methodInfo);    
+            }
+            return infos;
+        }
+        protected List<string> MethodInfosToNames(List<MethodInfo> infos)
+        {
+            List<string> names = new List<string>();
+            foreach (var info in infos)
+            {
+                names.Add(info.Name);
+            }
+            return names;
         }
         
         public void SetHided(bool isHided)

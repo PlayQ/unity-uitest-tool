@@ -5,10 +5,12 @@ using System.Reflection;
 using EditorUITools;
 using Tests.Nodes;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace PlayQ.UITestTools
 { 
+    
     [Serializable]
     public class Filter
     {
@@ -89,8 +91,6 @@ namespace PlayQ.UITestTools
         private TwoSectionWithSliderDrawer twoSectionDrawer;
         [SerializeField]
         private UITestToolWindowFooter footer;
-        
-        public bool ForceMakeReferenceScreenshot;
       
         [MenuItem("Window/UI Test Tools/Runtime Test Runner")]
         private static void ShowWindow()
@@ -102,11 +102,24 @@ namespace PlayQ.UITestTools
         private ClassNode rootNode; 
         public List<MethodNode> AllMethodNodes { get; private set; }
 
+        private ReorderableList typesReordableList;
+
+        private void SetSerializedTestsDirty()
+        {
+            isDirty = true;
+            EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+        }
+
+        private AddBaseClassWindow window;
         private void Init()
         {
             if (rootNode == null)
             {
                 rootNode = PlayModeTestRunner.TestsRootNode;
+                if (rootNode == null)
+                {
+                    return;
+                }
                 currentPlayingTest = PlayModeTestRunner.CurrentPlayingMethodNode;
                 
                 rootNode.StateUpdated += CalculateAllTestsResults;
@@ -122,16 +135,67 @@ namespace PlayQ.UITestTools
                 
                 InitNodeView();
                 filter.UpdateFilter(oldFilterValue);
+                
+                typesReordableList = new ReorderableList(PlayModeTestRunner.BaseTypes, null, false, true, true, true);
+                typesReordableList.drawHeaderCallback = rect => { EditorGUI.LabelField(rect, "Base classes"); };
+
+                typesReordableList.elementHeightCallback += index => EditorGUIUtility.singleLineHeight * 1.5f;
+
+                typesReordableList.drawElementBackgroundCallback = (rect, index, active, focused) =>
+                {    
+                    const int offset = 2;
+                    
+                    var oldColor = GUI.color;
+                    if (active)
+                    {
+                        GUI.color = new Color(255f/255f,200f/255f,200f/255f);
+                    };
+                    GUI.Box(new Rect(rect.x + offset * 2, rect.y + offset/2, rect.width - offset * 4, rect.height - offset), "");
+                    GUI.color = oldColor;
+                };
+
+                typesReordableList.onAddDropdownCallback = (Rect buttonRect, ReorderableList list) =>
+                {
+                    if (window != null)
+                    {
+                        window.Close();
+                    }
+                    window = CreateInstance<AddBaseClassWindow>();
+                    window.Result += s =>
+                    {
+                        if (!string.IsNullOrEmpty(s))
+                        {
+                            if (!list.list.Contains(s))
+                            {
+                                list.list.Add(s);
+                            }
+                        }
+                    };
+                    window.ShowAuxWindow();
+                };
+
+                typesReordableList.onChangedCallback += list =>
+                {
+                    //todo recalculate tests
+                    SetSerializedTestsDirty();
+                    editorUpdateEnabledForFrames = 10;
+                };
+                typesReordableList.drawElementCallback += (rect, index, active, focused) =>
+                {
+                    if (PlayModeTestRunner.BaseTypes.Count == 0)
+                    {
+                        rootNode = null;
+                        return;
+                    }
+                    var type = PlayModeTestRunner.BaseTypes[index];
+                    rect.y += 3;
+                    GUI.Label(rect, type);
+                };
             }
         }
 
         private void OnEnable()
         {
-            if (EditorPrefs.HasKey("ForceMakeReferenceScreenshot"))
-            {
-                ForceMakeReferenceScreenshot = EditorPrefs.GetBool("ForceMakeReferenceScreenshot");
-            }
-            
             footer = new UITestToolWindowFooter();
             if (twoSectionDrawer == null)
             {
@@ -145,12 +209,14 @@ namespace PlayQ.UITestTools
 
             PlayModeTestRunner.OnMethodStateUpdated += Repaint;
             TestStep.OnTestStepUpdated += Repaint;
+            EditorApplication.update += OnEditorUpdate;
         }
 
         private void OnDisable()
         {
             PlayModeTestRunner.OnMethodStateUpdated -= Repaint;
             TestStep.OnTestStepUpdated -= Repaint;
+            EditorApplication.update -= OnEditorUpdate;
         }
 
 
@@ -159,49 +225,61 @@ namespace PlayQ.UITestTools
         private void OnGUI()
         {   
             Init();
-            
             if (GUI.GetNameOfFocusedControl() != string.Empty)
             {
                 selectedNode.UpdateSelectedNode(null);
             }
 
-            GUI.enabled = !Application.isPlaying;
+            
             DrawHeader((int) position.width);
-            GUI.enabled = true;
-            DrawStatistics();
-            DrawFilter();
-            DrawClasses();
-            DrawFooter();
+            
+            if (rootNode == null)
+            {
+                GUILayout.Label("No serialized tests found after compilation");
+                GUILayout.Label("You can adjust tests updating in Advanced Options");
+            }
+            else
+            {
+                DrawStatistics();
+                DrawFilter();        
+                DrawClasses();
+                DrawFooter();
+            }
         }
 
         private void DrawFilter()
         {
             GUI.SetNextControlName("Filter");
-            var newFilter = EditorGUILayout.TextField("Filter:", filter.FilterString);
-            filter.UpdateFilter(newFilter);
+            var value = filter.FilterString;
+            GUILayout.Space(6);
+            EditorGUILayout.BeginHorizontal();
+                GUILayout.Space(6);
+                UIHelper.SearchField(ref value);
+            EditorGUILayout.EndHorizontal();
+            filter.UpdateFilter(value);
         }
         
         delegate bool IsSerializedAssetDirty(int instanceID);
-        private IsSerializedAssetDirty CheckIsAssetDirty;
+        private IsSerializedAssetDirty IsAssetDirtyDelegate;
         private int instanceID;
         
         private void CheckAssetIsDirty()
         {
-            if (CheckIsAssetDirty == null)
+            if (IsAssetDirtyDelegate == null)
             {
                 var methodInfo = typeof(EditorUtility).GetMethod("IsDirty", 
                     BindingFlags.Static | BindingFlags.NonPublic);
                 
                 var customDelegate = Delegate.CreateDelegate(
                     typeof(IsSerializedAssetDirty), methodInfo, false);
-                CheckIsAssetDirty = (IsSerializedAssetDirty) customDelegate;
+                IsAssetDirtyDelegate = (IsSerializedAssetDirty) customDelegate;
                 instanceID = PlayModeTestRunner.SerializedTests.GetInstanceID();
             }
 
             
-            isDirty = CheckIsAssetDirty(instanceID);
+            isDirty = IsAssetDirtyDelegate.Invoke(instanceID);
 
-            if (!PlayModeTestRunner.IsRunning && previousIsDirty != isDirty && !isDirty)
+            if (!PlayModeTestRunner.IsRunning && previousIsDirty && !isDirty)
             {
                 PlayModeTestRunner.SaveTestsData();
                 AssetDatabase.SaveAssets();
@@ -209,6 +287,7 @@ namespace PlayQ.UITestTools
             previousIsDirty = isDirty;
         }
 
+        
         private void DrawFooter()
         {
             footer.Draw(position, isDirty);
@@ -284,7 +363,7 @@ namespace PlayQ.UITestTools
                     var isDirty = rootNode.View.Draw();
                     if (isDirty)
                     {
-                        EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
+                        SetSerializedTestsDirty();
                     }
                     
                 },
@@ -338,6 +417,11 @@ namespace PlayQ.UITestTools
         private int allIgnoredTests;
         private int allFailedTests;
         private int totalTests;
+        
+        [SerializeField]
+        private bool ShowAdvancedOptions;
+        private int editorUpdateEnabledForFrames; 
+        
 
         private void CalculateAllTestsResults()
         { 
@@ -391,6 +475,8 @@ namespace PlayQ.UITestTools
 
         private void DrawHeader(int width)
         {
+            GUI.enabled = !Application.isPlaying && rootNode != null;
+            
             const int buttonOffset = 3;
 
             width -= 10;
@@ -413,6 +499,7 @@ namespace PlayQ.UITestTools
                     rootNode.SetSelected(true);
                 }
                 rootNode.SetSelected(false);
+            
             }
             
             if (GUILayout.Button("Run all", GUILayout.Width(buttonSize)))
@@ -488,24 +575,67 @@ namespace PlayQ.UITestTools
             }
             
             GUI.enabled = !Application.isPlaying;
-            
-            var text = "Make reference screenshot instead of comparing:";
 
-            var content = new GUIContent(text);
+            var oldValue = ShowAdvancedOptions;
+            ShowAdvancedOptions = EditorGUILayout.Foldout(ShowAdvancedOptions, "Advanced Options", true);
+            if (ShowAdvancedOptions)
+            {
+                GUILayout.BeginVertical(EditorStyles.helpBox);
+                AdvancedSettings();
+                GUILayout.EndVertical();
+            }
 
-            var oldValue = EditorGUIUtility.labelWidth;
+            if (oldValue != ShowAdvancedOptions)
+            {
+                editorUpdateEnabledForFrames = 10;
+            }
 
-            EditorGUIUtility.labelWidth = GetContentLenght(content);
-
-            GUI.SetNextControlName("Reference");
-
-            ForceMakeReferenceScreenshot = EditorGUILayout.Toggle(text, ForceMakeReferenceScreenshot);
-
-            EditorPrefs.SetBool("ForceMakeReferenceScreenshot", ForceMakeReferenceScreenshot);
-
-            EditorGUIUtility.labelWidth = oldValue;
-            
             EditorGUILayout.LabelField("Playmode tests: ", EditorStyles.boldLabel);
+            GUI.enabled = true;
+        }
+
+        private void OnEditorUpdate()
+        {
+            if (editorUpdateEnabledForFrames > 0)
+            {
+                editorUpdateEnabledForFrames--;
+                Repaint();
+            }
+        }
+        
+        
+        void AdvancedSettings()
+        {
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Make reference screenshot instead of comparing:");
+            var oldValue = EditorGUILayout.Toggle("", PlayModeTestRunner.ForceMakeReferenceScreenshot);
+            if (oldValue != PlayModeTestRunner.ForceMakeReferenceScreenshot)
+            {
+                PlayModeTestRunner.ForceMakeReferenceScreenshot = oldValue;
+                SetSerializedTestsDirty();
+            }
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+
+            typesReordableList.DoLayoutList();
+            
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Update tests on every compilation: ");
+            PlayModeTestRunner.UpdateTestsOnEveryCompilation = 
+                GUILayout.Toggle(PlayModeTestRunner.UpdateTestsOnEveryCompilation, "");
+            
+            GUILayout.FlexibleSpace();
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            GUI.enabled = !PlayModeTestRunner.UpdateTestsOnEveryCompilation;
+            if (GUILayout.Button("Force Update Tests"))
+            {
+                PlayModeTestRunner.ResetTestRootNode();
+                rootNode = null;
+            }
+            GUILayout.Label("Can take several minutes...");
+            GUI.enabled = PlayModeTestRunner.UpdateTestsOnEveryCompilation;
+            EditorGUILayout.EndHorizontal();
         }
 
         private void ClearAllSmokeMethods()

@@ -573,9 +573,13 @@ namespace PlayQ.UITestTools
         /// <returns>The string comparator</returns>
         /// <param name="text">Text</param>
         /// <param name="useRegEx">Is the specified text a regular expression</param>
-        public static IStringComparator GetStringComparator(string text, bool useRegEx)
+        /// <param name="expectedErrorMessageCouldBeSubstring">if true, text could be substring of comparable reference</param>
+        public static IStringComparator GetStringComparator(
+            string text,
+            bool useRegEx = false,
+            bool expectedErrorMessageCouldBeSubstring = false)
         {
-            return StringComparatorFactory.Build(text, useRegEx);
+            return StringComparatorFactory.Build(text, useRegEx, expectedErrorMessageCouldBeSubstring);
         }
     }
 
@@ -599,6 +603,21 @@ namespace PlayQ.UITestTools
             return this.text == text;
         }
     }
+    
+    public class SubstringStringComparator : IStringComparator
+    {
+        private string text;
+
+        public SubstringStringComparator(string text)
+        {
+            this.text = text;
+        }
+
+        public bool TextEquals(string text)
+        {
+            return text.IndexOf(this.text, StringComparison.Ordinal) != -1;
+        }
+    }
 
     public class RegexStringComparator : IStringComparator
     {
@@ -617,11 +636,22 @@ namespace PlayQ.UITestTools
 
     public static class StringComparatorFactory
     {
-        public static IStringComparator Build(string text, bool useRegex)
+        public static IStringComparator Build(string text, bool useRegex, 
+            bool expectedErrorMessageCouldBeSubstring)
         {
-            return useRegex
-                ? (IStringComparator)new RegexStringComparator(text)
-                : (IStringComparator)new DefaultStringComparator(text);
+            if (expectedErrorMessageCouldBeSubstring)
+            {
+                return new SubstringStringComparator(text);
+            }
+
+            if (useRegex)
+            {
+                return new RegexStringComparator(text);
+            }
+            else
+            {
+                return new DefaultStringComparator(text);
+            }
         }
     }
 }

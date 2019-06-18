@@ -64,15 +64,28 @@ namespace PlayQ.UITestTools
 #endif
             }
         }
-        
 
+        public static void ResetTestRootNode()
+        {
+            testsRootNode = null;
+            testsRootNode = NodeFactory.Build();
+        }
+        
         public static ClassNode TestsRootNode
         {
             get
             {
                 if (testsRootNode == null)
                 {
-                    testsRootNode = NodeFactory.Build();
+                    #if UNITY_EDITOR
+                    if (UpdateTestsOnEveryCompilation)
+                    {
+                        testsRootNode = NodeFactory.Build();      
+                    }
+                    #else
+                        testsRootNode = NodeFactory.Build();
+                    #endif
+                    
                     if (SerializedTests != null && 
                         !string.IsNullOrEmpty(SerializedTests.SerializedTestsData))
                     {
@@ -89,7 +102,14 @@ namespace PlayQ.UITestTools
                             
                             if (oldData != null)
                             {
-                                testsRootNode.MergeWithRoot(oldData);
+                                if (testsRootNode != null)
+                                {
+                                    testsRootNode.MergeWithRoot(oldData);    
+                                }
+                                else
+                                {
+                                    testsRootNode = oldData;
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -128,14 +148,36 @@ namespace PlayQ.UITestTools
         private PlayModeTestRunnerGUI screenGUIDrawer;
         private static bool isRunning;
 
+        #if UNITY_EDITOR
+        private class Postprocessor : AssetPostprocessor
+        {
+            static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, 
+                                               string[] movedAssets, string[] movedFromAssetPaths)
+            {
+                foreach (string str in deletedAssets)
+                {
+                    if (str.EndsWith("SelectedTests.asset"))
+                    {
+                        serializedTests = null;
+                    }
+                }
+            }
+        }
+        #endif
 
         private static SelectedTestsSerializable serializedTests;
+
         public static SelectedTestsSerializable SerializedTests
         {
             get
             {
 #if UNITY_EDITOR
-                return SelectedTestsSerializable.CreateOrLoad();
+                if (!serializedTests)
+                {
+                    serializedTests = SelectedTestsSerializable.CreateOrLoad();
+                }
+
+                return serializedTests;
 #else
                 if (!serializedTests)
                 {
@@ -162,6 +204,16 @@ namespace PlayQ.UITestTools
             StartProcessingTests();
         }
 
+        
+        public static bool UpdateTestsOnEveryCompilation
+        {
+            set
+            {
+                SerializedTests.UpdateTestsOnEveryCompilation = value;
+            }
+            get { return SerializedTests.UpdateTestsOnEveryCompilation; }
+        }
+        
         public static bool QuitAppAfterCompleteTests
         {
             set
@@ -169,6 +221,14 @@ namespace PlayQ.UITestTools
                 SerializedTests.QuitAferComplete = value;
             }
             get { return SerializedTests.QuitAferComplete; }
+        }
+
+        public static List<string> BaseTypes
+        {
+            get
+            {
+                return SerializedTests.BaseTypes;
+            }
         }
 
         public static float DefaultTimescale
@@ -183,6 +243,18 @@ namespace PlayQ.UITestTools
                 return SerializedTests.DefaultTimescale;
             }
         }
+        
+        public static bool ForceMakeReferenceScreenshot
+        {
+            set
+            {
+                SerializedTests.ForceMakeReferenceScreenshot = value;
+            }
+            get
+            {
+                return SerializedTests.ForceMakeReferenceScreenshot;
+            }
+        }
 
         public static int RunTestsGivenAmountOfTimes
         {
@@ -192,8 +264,13 @@ namespace PlayQ.UITestTools
         
         void RunMethod(object instance, MethodInfo info, Action callback)
         {
+            if (info == null)
+            {
+                Debug.LogError("Can't run method, because method info is null, probably is not exist anymore");
+                callback();
+                return;
+            }
             var returnType = info.ReturnType;
-
             object result;
 
             try
@@ -447,9 +524,17 @@ namespace PlayQ.UITestTools
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogErrorFormat("Can't instantiate class \"{0}\". Exception: \"{1}\"",
-                            classNode.Type.FullName, ex.Message);
-
+                        if (classNode.Type == null)
+                        {
+                            Debug.LogErrorFormat("Can't instantiate class - class type is null." +
+                                                 " class probably was deleted ");
+                        }
+                        else
+                        {
+                            Debug.LogErrorFormat("Can't instantiate class \"{0}\". Exception: \"{1}\"",
+                                classNode.Type.FullName, ex.Message);    
+                        }
+                        
                         ProcessTestFail(methodNode);
                         continue;
                     }

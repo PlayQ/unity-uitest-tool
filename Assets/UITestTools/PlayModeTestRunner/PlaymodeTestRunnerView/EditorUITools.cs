@@ -417,5 +417,53 @@ namespace EditorUITools
             }
         }
     }
+
+    public static class UIHelper
+    {
+        public static bool SearchField(ref string text, Rect rect)
+        {
+            const int buttonSize = 14;
+            Rect filterRect = rect;
+            filterRect.width -= buttonSize; 
+            var oldText = text; 
+            text = EditorGUI.TextField(filterRect, "", text, "ToolbarSeachTextField");
+
+            Rect buttonRect = filterRect;
+            buttonRect.x += filterRect.width;
+            buttonRect.width = buttonSize;
+            if (GUI.Button(buttonRect, GUIContent.none,
+                text.Length > 0 ? "ToolbarSeachCancelButton" : "ToolbarSeachCancelButtonEmpty"))
+            {
+                text = "";
+                GUIUtility.keyboardControl = 0;
+            }
+            return oldText.Equals(text, StringComparison.Ordinal);
+        }
+        
+        public static bool SearchField(ref string text, float width = -1)
+        {
+            EditorGUILayout.BeginHorizontal();
+            var oldText = text;
+            GUILayout.Space(width);
+            if (width != -1)
+            {
+                text = EditorGUILayout.TextField("", text, "ToolbarSeachTextField",
+                    GUILayout.Width(width));    
+            }
+            else
+            {
+                text = EditorGUILayout.TextField("", text, "ToolbarSeachTextField");
+            }
+            
+            if (GUILayout.Button(GUIContent.none, text.Length > 0 ? "ToolbarSeachCancelButton"
+                : "ToolbarSeachCancelButtonEmpty"))
+            {
+                text = "";
+                GUIUtility.keyboardControl = 0;
+            }
+            EditorGUILayout.EndHorizontal();
+            return oldText.Equals(text, StringComparison.Ordinal);
+        }
+    }
 }
 #endif

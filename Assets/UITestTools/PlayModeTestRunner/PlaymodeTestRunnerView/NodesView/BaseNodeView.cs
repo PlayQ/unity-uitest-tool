@@ -1,6 +1,9 @@
 #if UNITY_EDITOR
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json.Utilities;
 using Tests.Nodes;
 using UnityEditor;
 using UnityEngine;
@@ -22,7 +25,7 @@ namespace PlayQ.UITestTools
         protected DateTime clickInterval;
 
         public bool? IsOpenFiltered { get; protected set; }
-        protected bool IsNodeOpened
+        protected virtual bool IsNodeOpened
         {
             get
             {
@@ -135,13 +138,31 @@ namespace PlayQ.UITestTools
 
                     case KeyCode.UpArrow:
 
-                        if (selectedNode.Node != null && selectedNode.Node.Parent != null && !selectedNode.Node.Parent.IsRoot)
+                        if (selectedNode.Node != null 
+                            && selectedNode.Node.Parent != null 
+                            && !selectedNode.Node.Parent.IsRoot)
                         {
-                            if (selectedNode.Node.Index > 0)
+                            Node upperChild = null;
+                            foreach (var child in selectedNode.Node.Parent.Children)
                             {
-                                Node targetNode = selectedNode.Node.Parent.ChildAt(selectedNode.Node.Index - 1);
-                                targetNode = GetLastOpenChild(targetNode);
-                                selectedNode.UpdateSelectedNode(targetNode);
+                                if (!child.IsHided)
+                                {
+                                    if (child != selectedNode.Node)
+                                    {
+                                        upperChild = child;
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }       
+                            }
+                            
+                            if (upperChild != null)
+                            {
+                                upperChild = GetLastOpenChild(upperChild);
+                                selectedNode.UpdateSelectedNode(upperChild);
+                                
                             }
                             else
                             {
@@ -158,12 +179,16 @@ namespace PlayQ.UITestTools
                         if (selectedNode.Node != null && selectedNode.Node.ChildrenCount > 0 && 
                             IsNodeOpened)
                         {
-                            
-                            selectedNode.UpdateSelectedNode(selectedNode.Node.ChildAt(0));
-
-                            Event.current.Use();
-
-                            return;
+                            Node upperChild = null;
+                            foreach (var child in selectedNode.Node.Children)
+                            {
+                                if (!child.IsHided)
+                                {
+                                    selectedNode.UpdateSelectedNode(child);
+                                    Event.current.Use();
+                                    return;
+                                }       
+                            }
                         }
 
                         TrySelectElementBelow(node);
@@ -178,7 +203,10 @@ namespace PlayQ.UITestTools
                         {
                             if (!IsNodeOpened)
                             {
-                                IsOpenFiltered = false;
+                                if (IsOpenFiltered.HasValue)
+                                {
+                                    IsOpenFiltered = true;  
+                                } 
                                 node.SetOpened(true);
                                 Event.current.Use();
                                 return;
@@ -195,7 +223,11 @@ namespace PlayQ.UITestTools
 
                         if (IsNodeOpened)
                         {
-                            IsOpenFiltered = false;
+                            //IsOpenFiltered = false;
+                            if (IsOpenFiltered.HasValue)
+                            {
+                                IsOpenFiltered = false;  
+                            } 
                             node.SetOpened(false);
                             Event.current.Use();
                             return;
@@ -217,24 +249,28 @@ namespace PlayQ.UITestTools
         {
             if (node.Parent != null && !node.Parent.IsRoot)
             {
-                if (node.Parent.ChildrenCount == node.Index + 1)
+                foreach (var child in node.Parent.Children)
                 {
-                    TrySelectElementBelow(node.Parent);
+                    if (!child.IsHided && child.Index > node.Index)
+                    {
+                        selectedNode.UpdateSelectedNode(child);
+                        Event.current.Use();
+                        return;
+                    }       
                 }
-                else
-                {
-                    selectedNode.UpdateSelectedNode(node.Parent.ChildAt(node.Index + 1));
-                }
+                
+                TrySelectElementBelow(node.Parent);
             }
         }
         
         private Node GetLastOpenChild(Node node)
         {
-            if (IsNodeOpened)
+            if (node.View.IsNodeOpened)
             {
-                if (node.ChildrenCount > 0)
+                var openedChildren = node.Children.Where(c => !c.IsHided).ToList();
+                if (openedChildren.Count > 0)
                 {
-                    var targetNode = node.ChildAt(node.ChildrenCount - 1);
+                    var targetNode = openedChildren.Last();
                     return GetLastOpenChild(targetNode);
                 }
             }

@@ -10,16 +10,13 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-
 public class TestToolBuildScript
-{
-    //You may call it from PlayQ.Build.Builder class
-    [UsedImplicitly]
-    public static void PrepareTestBuild()
+{   
+    private static void PrepareBuild()
     {
         AddTestSceneToBuild();
         ResolveTestMode();
-        AddScreenshotsAndEventsToBuild();
+        AddScreenshotsToBuild();
     }
 
     //For executing from command line
@@ -27,7 +24,7 @@ public class TestToolBuildScript
     private static void TestBuild()
     {
         SetTimeScaleFromCommandLineArgument();
-        PrepareTestBuild();
+        PrepareBuild();
         
         string[] list = EditorBuildSettings.scenes.Where(x => x.enabled).Select(x => x.path).ToArray();
         BuildPipeline.BuildPlayer(list,
@@ -109,7 +106,7 @@ public class TestToolBuildScript
         var scenes = EditorBuildSettings.scenes.ToList();
         var allScenes = scenes.Aggregate("", (concated, scene) => scene.path + "; " + concated);
         
-        Debug.LogError("----------- test scene path: " + scenePath + 
+        Debug.Log("----------- test scene path: " + scenePath + 
                        " all scenes amount: " + scenes.Count +
                        " all scene names " + allScenes);
         
@@ -117,7 +114,7 @@ public class TestToolBuildScript
         {
             if (scenes.Count > 0)
             {
-                Debug.LogError("----------- scenes[0].path: " + scenes[0].path + 
+                Debug.Log("----------- scenes[0].path: " + scenes[0].path + 
                                " scenes[0].enabled: " + scenes[0].enabled);
             }
             var index = scenes.FindIndex(s => s.path.Contains(PlayModeTestRunner.TEST_NAME_SCENE));
@@ -125,12 +122,12 @@ public class TestToolBuildScript
             {
                 scenes.RemoveAt(index);
             }
-            Debug.LogError("----------- test scene index " + index);
+            Debug.Log("----------- test scene index " + index);
             
             scenes.Insert(0, new EditorBuildSettingsScene(scenePath, true));
             EditorBuildSettings.scenes = scenes.ToArray();
             
-            Debug.LogError("------- EditorBuildSettings.scenes "
+            Debug.Log("------- EditorBuildSettings.scenes "
                            + EditorBuildSettings.scenes.Aggregate("", (concated, scene) => scene.path + "; " + concated));
         }
     }
@@ -161,83 +158,65 @@ public class TestToolBuildScript
         }
     }
 
-
-    private const string PATH_EDITOR_RESOURCES = "/Tests/Editor/Resources";
-    private const string PATH_MOBILE_RESOURCES = "/Tests/Resources";
-    private const string SCREENSHOT_FOLDER = "/ReferenceScreenshots";
-    private const string EVENTS = "/ArchivedEvents.asset";
-
-    private static void AddScreenshotsAndEventsToBuild()
+    private static void MoveContentFromFolderToFolder(string folderSrc, string folderDst)
     {
-        if (Directory.Exists(Application.dataPath + PATH_EDITOR_RESOURCES + SCREENSHOT_FOLDER))
+        if (!Directory.Exists(folderSrc) ||
+            !Directory.Exists(folderDst))
         {
-            if (Directory.Exists(Application.dataPath + PATH_MOBILE_RESOURCES + SCREENSHOT_FOLDER))
-            {
-                Directory.Delete(Application.dataPath + PATH_MOBILE_RESOURCES + SCREENSHOT_FOLDER, true);
-            }
-            if (!Directory.Exists(Application.dataPath + PATH_MOBILE_RESOURCES))
-            {
-                Directory.CreateDirectory(Application.dataPath + PATH_MOBILE_RESOURCES);
-            }
-            Directory.Move(Application.dataPath + PATH_EDITOR_RESOURCES + SCREENSHOT_FOLDER,
-                Application.dataPath + PATH_MOBILE_RESOURCES + SCREENSHOT_FOLDER);
+            return;
         }
 
-        var editorEventsPath = Application.dataPath + PATH_EDITOR_RESOURCES + EVENTS;
-        if (File.Exists(editorEventsPath))
+        var buildFiles = Directory.GetFiles(folderDst);
+        foreach (var file in buildFiles)
         {
-            var mobileEventsPath = Application.dataPath + PATH_MOBILE_RESOURCES + EVENTS;
-            if (File.Exists(mobileEventsPath))
-            {
-                File.Delete(mobileEventsPath);
-            }
-
-            var mobileResourcesPath = Application.dataPath + PATH_MOBILE_RESOURCES;
-            if (Directory.Exists(mobileResourcesPath))
-            {
-                Directory.CreateDirectory(mobileResourcesPath);
-            }
-
-            Directory.Move(editorEventsPath, mobileEventsPath);
+            File.Delete(file);
+        }
+        
+        var buildFolders = Directory.GetDirectories(folderDst);
+        foreach (var folder in buildFolders)
+        {
+            Directory.Delete(folder, true);
+        }
+        
+        var editorFiles = Directory.GetFiles(folderSrc);
+        foreach (var file in editorFiles)
+        {
+            var fileToMove = new FileInfo(file);
+            File.Move(file,folderDst + '/' + fileToMove.Name);
+        }
+        var editorFolders = Directory.GetDirectories(folderSrc);
+        foreach (var folder in editorFolders)
+        {
+            var folderToMove = new DirectoryInfo(folder);
+            Directory.Move(folder,folderDst + '/' + folderToMove.Name);
         }
     }
 
+    private static void AddScreenshotsToBuild()
+    {
+        MoveContentFromFolderToFolder(SelectedTestsSerializable.EditorResourceDirectory, 
+            SelectedTestsSerializable.BuildResourceDirectory);
+    }
+    
     [PostProcessBuild(1)]
     public static void OnPostprocessBuild(BuildTarget target, string pathToBuiltProject)
     {
         Debug.Log("OnPostprocessBuild: move Reference Screensots from Resources back to editor folder.");
-
-        if (!Directory.Exists(Application.dataPath + PATH_EDITOR_RESOURCES))
-        {
-            Directory.CreateDirectory(Application.dataPath + PATH_EDITOR_RESOURCES);
-        }
-
-        if (Directory.Exists(Application.dataPath + PATH_MOBILE_RESOURCES + SCREENSHOT_FOLDER))
-        {
-            Directory.Move(Application.dataPath + PATH_MOBILE_RESOURCES + SCREENSHOT_FOLDER,
-                Application.dataPath + PATH_EDITOR_RESOURCES + SCREENSHOT_FOLDER);
-        }
-
-        var mobileEventsPath = Application.dataPath + PATH_MOBILE_RESOURCES + EVENTS;
-        if (File.Exists(mobileEventsPath))
-        {
-            var editorEventsPath = Application.dataPath + PATH_EDITOR_RESOURCES + EVENTS;
-            Directory.Move(mobileEventsPath, editorEventsPath);
-        }
-
-        if (Directory.Exists(Application.dataPath + PATH_MOBILE_RESOURCES))
-        {
-            Directory.Delete(Application.dataPath + PATH_MOBILE_RESOURCES, true);
-        }
+        MoveContentFromFolderToFolder(SelectedTestsSerializable.BuildResourceDirectory, 
+            SelectedTestsSerializable.EditorResourceDirectory);
     }
     
     [MenuItem("Window/UI Test Tools/Prepare For Device Build")]
     public static void MenuPreBuild()
     {
         AddTestSceneToBuild();
-        AddScreenshotsAndEventsToBuild();
+        AddScreenshotsToBuild();
+    }
+    [MenuItem("Window/UI Test Tools/Move build resources back to editor resources")]
+    public static void MenuPostBuild()
+    {
+        MoveContentFromFolderToFolder(SelectedTestsSerializable.BuildResourceDirectory, 
+            SelectedTestsSerializable.EditorResourceDirectory);
     }
 }
-
-
 #endif

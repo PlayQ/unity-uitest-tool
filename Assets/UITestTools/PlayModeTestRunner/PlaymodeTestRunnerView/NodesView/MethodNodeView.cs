@@ -142,6 +142,11 @@ namespace PlayQ.UITestTools
             return namePostfix;
         }
 
+        protected override bool IsNodeOpened
+        {
+            get { return true; }
+        }
+
         public MethodNodeView(MethodNode node, SelectedNode selectedNode,
             PlayModeTestRunner.PlayingMethodNode currentPlayingTest) : base(node, selectedNode)
         {

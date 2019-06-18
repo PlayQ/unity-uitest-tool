@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 
@@ -7,73 +8,119 @@ namespace Tests.Nodes
 {
     public class ClassNode : Node
     {
-        public Type Type { get; private set; }
-
-        private List<MethodInfo> setUpMethods;
+        [JsonProperty] private string assemblySerialized;
+        [JsonProperty] private string typeSerialized;
         
+        private Type type;
         [JsonIgnore]
-        public IEnumerable<MethodInfo> SetUpMethods { get { return setUpMethods; } set { setUpMethods = (List<MethodInfo>)value; } }
+        public Type Type
+        {
+            get
+            {
+                if (type == null)
+                {
+                    var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                    var assembly = assemblies.FirstOrDefault(a => a.FullName == assemblySerialized);
+                    if (assembly != null)
+                    {
+                        type = assembly.GetType(typeSerialized);
+                    }
+                }
+                return type;
+            }
+            private set
+            {
+                type = value;
+                typeSerialized = type.FullName;
+                assemblySerialized = type.Assembly.FullName;
+            }
+        }
+        
+        private List<MethodInfo> Getter(Type type, 
+            ref List<MethodInfo> infos, List<string> names)
+        {
+            if (infos == null)
+            {
+                infos = MethodNamesToInfos(type, names);
+            }
+            return infos;
+        }
+        private void Setter(IEnumerable<MethodInfo> value, 
+            ref List<MethodInfo> infos, ref List<string> names)
+        {
+            infos = (List<MethodInfo>)value;
+            names = MethodInfosToNames(infos);
+        }
 
+        [JsonProperty] private List<string> setUpMethodsNames = new List<string>();
+        [JsonProperty] private List<string> oneTimeSetUpMethodsNames = new List<string>();
+        [JsonProperty] private List<string> tearDownMethodsNames = new List<string>();
+        [JsonProperty] private List<string> oneTimeTearDownMethodsNames = new List<string>();
+        
+        private List<MethodInfo> setUpMethods;
         private List<MethodInfo> oneTimeSetUpMethods;
+        private List<MethodInfo> tearDownMethods;
+        private List<MethodInfo> oneTimeTearDownMethods;
+
+        [JsonIgnore]
+        public IEnumerable<MethodInfo> SetUpMethods
+        {
+            get
+            {
+                return Getter(Type, ref setUpMethods, setUpMethodsNames);
+            }
+            set
+            {
+                Setter(value, ref setUpMethods, ref setUpMethodsNames);
+            }
+        }
+        
         [JsonIgnore]
         public IEnumerable<MethodInfo> OneTimeSetUpMethods
         { 
             get 
             {
-                return oneTimeSetUpMethods;  
+                return Getter(Type, ref oneTimeSetUpMethods, oneTimeSetUpMethodsNames);
             }
             set
             { 
-                oneTimeSetUpMethods = (List<MethodInfo>)value;
-
-                oneTimeSetUpMethods.Sort((a, b) => 
-                {
-                    return NamespaceDepth(a).CompareTo(NamespaceDepth(b));
-                });
+                Setter(value, ref oneTimeSetUpMethods, ref oneTimeSetUpMethodsNames);
             } 
         }
 
         [JsonIgnore]
-        public readonly string FilePath;
-
-        private List<MethodInfo> tearDownMethods;
-        [JsonIgnore]
-        public IEnumerable<MethodInfo> TearDownMethods { get { return tearDownMethods; } set { tearDownMethods = (List<MethodInfo>)value; } }
-
-        private List<MethodInfo> oneTimeTearDownMethods;
-        
-        [JsonProperty]
-        private string fullName;
+        public IEnumerable<MethodInfo> TearDownMethods
+        {
+            get
+            {
+                return Getter(Type, ref tearDownMethods, tearDownMethodsNames);
+            }
+            set
+            {
+                Setter(value, ref tearDownMethods, ref tearDownMethodsNames);
+            }
+        }
 
         [JsonIgnore]
         public IEnumerable<MethodInfo> OneTimeTearDownMethods 
         {
             get 
             {
-                return oneTimeTearDownMethods;
+                return Getter(Type, ref oneTimeTearDownMethods, oneTimeTearDownMethodsNames);
             }
             set
             {
-                oneTimeTearDownMethods = (List<MethodInfo>)value;
-
-                oneTimeTearDownMethods.Sort((a, b) =>
-                {
-                    return -(NamespaceDepth(a).CompareTo(NamespaceDepth(b)));
-                });
+                Setter(value, ref oneTimeTearDownMethods, ref oneTimeTearDownMethodsNames);
             }
         }
 
-        private int NamespaceDepth(MethodInfo info)
-        {
-            Type baseType = info.DeclaringType.BaseType;
 
-            if (baseType == typeof(Object))
-                return 0;
-
-            return baseType.FullName.Split('.').Length;
-        }
-
-
+        [JsonProperty]
+        private string fullName;
+        
+        [JsonIgnore]
+        public readonly string FilePath;
+        
         public void UpdateType(Type type)
         {
             Type = type;

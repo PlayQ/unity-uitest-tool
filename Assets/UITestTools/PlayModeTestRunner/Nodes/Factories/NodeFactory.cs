@@ -11,6 +11,27 @@ namespace Tests.Nodes
     
     public static class NodeFactory
     {
+        public static List<Assembly> GetAllSuitableAssemblies()
+        {
+            //we can cache it and reset after compilation
+            return AppDomain.CurrentDomain.GetAssemblies().Where(x => 
+                !x.FullName.StartsWith("UnityScript") &&
+                !x.FullName.StartsWith("Boo.Lang") &&
+                !x.FullName.StartsWith("System") &&
+                !x.FullName.StartsWith("Unity.") &&
+                !x.FullName.StartsWith("ICSharp.") &&
+                !x.FullName.StartsWith("ICSharpCode.") &&
+                !x.FullName.StartsWith("Unity.") &&
+                !x.FullName.StartsWith("Mono.") &&
+                !x.FullName.StartsWith("JetBrains.") &&
+                !x.FullName.StartsWith("Newtonsoft.") &&
+                !x.FullName.StartsWith("UnityEditor") &&
+                !x.FullName.StartsWith("UnityEngine") &&
+                !x.FullName.StartsWith("nunit.") &&
+                !x.FullName.StartsWith("mscorlib")
+            ).ToList();
+        }
+        
         private static Dictionary<string, string> fileNameToFullPath;
         public static ClassNode Build()
         {
@@ -29,9 +50,36 @@ namespace Tests.Nodes
                 fullName = "Assets" + fullName;
                 fileNameToFullPath[name] =  fullName;
             }
+
+            var assemblies = GetAllSuitableAssemblies();
             
-            
-            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+            List<string> testBaseClassesStrings = PlayModeTestRunner.BaseTypes;
+            List<Type> testBaseClasses = new List<Type>(); 
+            if (testBaseClassesStrings != null)
+            {
+                foreach (var testBaseClassString in testBaseClassesStrings)
+                {
+                    Type testBaseClass = null;
+                    foreach (var assembly in assemblies)
+                    {
+                        testBaseClass = assembly.GetType(testBaseClassString);
+                        if (testBaseClass != null)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (testBaseClass == null)
+                    {
+                        Debug.LogError("Can't find type " + testBaseClassString + " in any assemblies");
+                    }
+                    else
+                    {
+                        testBaseClasses.Add(testBaseClass);
+                    }
+                }
+            }
+
             foreach (var assembly in assemblies)
             {
                 var types = assembly.GetTypes();
@@ -41,9 +89,28 @@ namespace Tests.Nodes
                     {
                         continue;
                     }
+
                     if (!type.IsClass || type.IsAbstract)
                     {
                         continue;
+                    }
+
+                    if (testBaseClasses.Count > 0)
+                    {
+                        bool isAssignable = false;
+                        foreach (var testBaseClass in testBaseClasses)
+                        {
+                            if (testBaseClass.IsAssignableFrom(type))
+                            {
+                                isAssignable = true;
+                                break;
+                            }
+                        }
+
+                        if (!isAssignable)
+                        {
+                            continue;
+                        }
                     }
 
                     BuildClassNode(type, rootNode);
