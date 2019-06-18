@@ -38,4 +38,4 @@ sysinfo.txt
 *.apk
 *.unitypackage
 /.gitignore
-SelectedTests
+SelectedTests.*
