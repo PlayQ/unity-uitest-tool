@@ -23,7 +23,7 @@ namespace PlayQ.UITestTools
 
         public virtual bool IsAvailable(GameObject go)
         {
-            return true;
+            return go == null;//default behavior is "available without any object"
         }
 
         public virtual Camera GetCamera()

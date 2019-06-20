@@ -213,11 +213,6 @@ namespace PlayQ.UITestTools
             {
                 return IEnumeratorMethod.Int(1);
             }
-
-            public override bool IsAvailable(GameObject go)
-            {
-                return true;
-            }
         }
 
         /// <summary>

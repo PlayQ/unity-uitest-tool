@@ -850,11 +850,6 @@ namespace PlayQ.UITestTools
             {
                 return VoidMethod.Float(20f);
             }
-
-            public override bool IsAvailable(GameObject go)
-            {
-                return true;
-            }
         }
 
         #endregion

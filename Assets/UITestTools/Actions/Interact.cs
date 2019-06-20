@@ -289,11 +289,6 @@ namespace PlayQ.UITestTools
             {
                 return VoidMethod;
             }
-
-            public override bool IsAvailable(GameObject go)
-            {
-                return true;
-            }
         }
         
         /// <summary>
@@ -337,11 +332,6 @@ namespace PlayQ.UITestTools
             public override AbstractGenerator CreateGenerator(GameObject go)
             {
                 return VoidMethod.Float(1);
-            }
-
-            public override bool IsAvailable(GameObject go)
-            {
-                return true;
             }
         }
         
