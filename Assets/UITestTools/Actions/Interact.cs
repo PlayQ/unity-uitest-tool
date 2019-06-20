@@ -384,7 +384,7 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Click, Tap/Wait, Delay and Click", true)]
         public static IEnumerator WaitDelayAndClick(string path, float delay = 1, float timeout = 5, bool ignoreTimeScale = false)
         {
-            yield return Wait.ObjectEnableAndInteractibleIfButton(path, timeout, false, ignoreTimeScale);
+            yield return Wait.ButtonInteractible(path, timeout, false, ignoreTimeScale);
             yield return DelayAndClick(path, delay, ignoreTimeScale);
         }
 
@@ -397,7 +397,7 @@ namespace PlayQ.UITestTools
         [ShowInEditor(typeof(ButtonWaitDelayAndClick), "Click, Tap/Wait, Delay and Click", true)]
         public static IEnumerator WaitDelayAndClick(GameObject gameObject, float delay, float timeout, bool ignoreTimeScale = false)
         {
-            yield return Wait.ObjectEnableAndInteractibleIfButton(gameObject, timeout, false, ignoreTimeScale);
+            yield return Wait.ButtonInteractible(gameObject, timeout, false, ignoreTimeScale);
             if (delay > 0)
             {
                 yield return new WaitForSeconds(delay);

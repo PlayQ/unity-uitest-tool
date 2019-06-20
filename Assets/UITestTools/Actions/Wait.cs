@@ -54,8 +54,8 @@ namespace PlayQ.UITestTools
         /// <param name="timeout">Timeout (optional, default = 2)</param>
         /// <param name="dontFail">Whether the test should fail upon exceeding timeout (optional, default = false)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
-        [ShowInEditor(typeof(ObjectEnableAndInteractibleIfButtonClass), "Wait/For Object Enabled And Interactible If Button")]
-        public static IEnumerator ObjectEnableAndInteractibleIfButton(string path, float timeout = 2f, bool dontFail = false, bool ignoreTimeScale = false)
+        [ShowInEditor(typeof(ButtonInteractibleClass), "Wait/For Button Interactible")]
+        public static IEnumerator ButtonInteractible(string path, float timeout = 2f, bool dontFail = false, bool ignoreTimeScale = false)
         {
             yield return WaitFor(() =>
             {
@@ -121,7 +121,7 @@ namespace PlayQ.UITestTools
         /// <param name="timeout">Timeout (optional, default = 2)</param>
         /// <param name="dontFail">Whether the test should fail upon exceeding timeout (optional, default = false)</param>
         /// <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
-        public static IEnumerator ObjectEnableAndInteractibleIfButton(GameObject go, float timeout = 2f,
+        public static IEnumerator ButtonInteractible(GameObject go, float timeout = 2f,
             bool dontFail = false, bool ignoreTimeScale = false)
         {
             string path = UITestUtils.GetGameObjectFullPath(go);
@@ -148,7 +148,7 @@ namespace PlayQ.UITestTools
             }, timeout, dontFail, ignoreTimeScale: ignoreTimeScale);
         }
 
-        private class ObjectEnableAndInteractibleIfButtonClass : ShowHelperBase
+        private class ButtonInteractibleClass : ShowHelperBase
         {
             public override AbstractGenerator CreateGenerator(GameObject go)
             {
