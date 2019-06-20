@@ -291,7 +291,7 @@ namespace PlayQ.UITestTools
             }
             
             var labelForButton = userAction.SelectedAssertation.AssertationMethodDescription;
-            labelForButton = labelForButton.Replace('/', ' ');
+            labelForButton = labelForButton.Replace("/", " / ");
             if (GUI.Button(rectToDrawWith, labelForButton))
             {
                 GenericMenu menu = new GenericMenu();
