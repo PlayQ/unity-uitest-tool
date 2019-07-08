@@ -38,7 +38,11 @@ namespace PlayQ.UITestTools
         {
             PlayModeTestRunner.IsTestUIEnabled = false;
             yield return null;
+#if UNITY_2019_1_OR_NEWER
+            ScreenCapture.CaptureScreenshot(fullPath);            
+#else
             Application.CaptureScreenshot(fullPath);
+#endif
             yield return Wait.Frame(5);
             PlayModeTestRunner.IsTestUIEnabled = true;
         }
