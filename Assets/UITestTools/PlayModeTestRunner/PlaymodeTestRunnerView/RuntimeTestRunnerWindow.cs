@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using EditorUITools;
 using Tests.Nodes;
 using UnityEditor;
@@ -258,26 +257,31 @@ namespace PlayQ.UITestTools
             EditorGUILayout.EndHorizontal();
             filter.UpdateFilter(value);
         }
+
         
-        delegate bool IsSerializedAssetDirty(int instanceID);
-        private IsSerializedAssetDirty IsAssetDirtyDelegate;
+#if !UNITY_2019_1_OR_NEWER
+       delegate bool IsSerializedAssetDirty(int instanceID);
+
+       private IsSerializedAssetDirty IsAssetDirtyDelegate;
+#endif
         private int instanceID;
-        
-        
+
         private void CheckAssetIsDirty()
         {
-            if (IsAssetDirtyDelegate == null)
-            {
-                var methodInfo = typeof(EditorUtility).GetMethod("IsDirty", 
-                    BindingFlags.Static | BindingFlags.NonPublic);
-                
-                var customDelegate = Delegate.CreateDelegate(
-                    typeof(IsSerializedAssetDirty), methodInfo, false);
-                IsAssetDirtyDelegate = (IsSerializedAssetDirty) customDelegate;
-            }
-            instanceID = PlayModeTestRunner.SerializedTests.GetInstanceID();
-            
-            isDirty = IsAssetDirtyDelegate.Invoke(instanceID);
+#if !UNITY_2019_1_OR_NEWER
+           if (IsAssetDirtyDelegate == null)
+           {
+               var methodInfo = typeof(EditorUtility).GetMethod("IsDirty",
+                   System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic);
+               var customDelegate = Delegate.CreateDelegate(
+                   typeof(IsSerializedAssetDirty), methodInfo, false);
+               IsAssetDirtyDelegate = (IsSerializedAssetDirty) customDelegate;
+               instanceID = PlayModeTestRunner.SerializedTests.GetInstanceID();
+           }
+           isDirty = IsAssetDirtyDelegate.Invoke(instanceID);
+#else
+            isDirty = EditorUtility.IsDirty(instanceID);
+#endif
 
             if (!PlayModeTestRunner.IsRunning && previousIsDirty && !isDirty)
             {
