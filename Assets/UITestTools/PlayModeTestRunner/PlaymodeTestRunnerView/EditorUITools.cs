@@ -420,19 +420,22 @@ namespace EditorUITools
 
     public static class UIHelper
     {
+        private const string FIELD_STYLE = "ToolbarSeachTextField";
+        private const string CANCEL_BUTTON = "ToolbarSeachCancelButton";
+        private const string CANCEL_BUTTON_EMPTY = "ToolbarSeachCancelButtonEmpty";
         public static bool SearchField(ref string text, Rect rect)
         {
             const int buttonSize = 14;
             Rect filterRect = rect;
             filterRect.width -= buttonSize; 
             var oldText = text; 
-            text = EditorGUI.TextField(filterRect, "", text, "ToolbarSeachTextField");
+            text = EditorGUI.TextField(filterRect, "", text, FIELD_STYLE);
 
             Rect buttonRect = filterRect;
             buttonRect.x += filterRect.width;
             buttonRect.width = buttonSize;
             if (GUI.Button(buttonRect, GUIContent.none,
-                text.Length > 0 ? "ToolbarSeachCancelButton" : "ToolbarSeachCancelButtonEmpty"))
+                text.Length > 0 ? CANCEL_BUTTON : CANCEL_BUTTON_EMPTY))
             {
                 text = "";
                 GUIUtility.keyboardControl = 0;
@@ -444,19 +447,19 @@ namespace EditorUITools
         {
             EditorGUILayout.BeginHorizontal();
             var oldText = text;
-            GUILayout.Space(width);
             if (width != -1)
             {
-                text = EditorGUILayout.TextField("", text, "ToolbarSeachTextField",
+                text = EditorGUILayout.TextField("", text, FIELD_STYLE,
                     GUILayout.Width(width));    
             }
             else
             {
-                text = EditorGUILayout.TextField("", text, "ToolbarSeachTextField");
+                text = EditorGUILayout.TextField("", text, FIELD_STYLE);
             }
             
-            if (GUILayout.Button(GUIContent.none, text.Length > 0 ? "ToolbarSeachCancelButton"
-                : "ToolbarSeachCancelButtonEmpty"))
+            //cancel button
+            if (GUILayout.Button(GUIContent.none, text.Length > 0 ? CANCEL_BUTTON
+                : CANCEL_BUTTON_EMPTY))
             {
                 text = "";
                 GUIUtility.keyboardControl = 0;

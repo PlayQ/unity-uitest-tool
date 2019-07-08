@@ -248,14 +248,16 @@ namespace PlayQ.UITestTools
 
         private void DrawFilter()
         {
-            GUI.SetNextControlName("Filter");
             var value = filter.FilterString;
             GUILayout.Space(6);
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Space(6);
-            UIHelper.SearchField(ref value);
+            GUILayout.Space(5);//left padding
+            if (UIHelper.SearchField(ref value))
+            {
+                filter.UpdateFilter(value);
+            }
+
             EditorGUILayout.EndHorizontal();
-            filter.UpdateFilter(value);
         }
 
         
