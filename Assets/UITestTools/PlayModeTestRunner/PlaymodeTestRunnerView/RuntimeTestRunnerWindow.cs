@@ -19,6 +19,7 @@ namespace PlayQ.UITestTools
             this.allMethodNodes = allMethodNodes;
         }
         
+        
         private List<MethodNode> allMethodNodes;
         public void UpdateFilter(string newFilter)
         {
@@ -109,7 +110,7 @@ namespace PlayQ.UITestTools
             isDirty = true;
             EditorUtility.SetDirty(PlayModeTestRunner.SerializedTests);
         }
-
+        
         private AddBaseClassWindow window;
         private void Init()
         {
@@ -225,11 +226,6 @@ namespace PlayQ.UITestTools
         private void OnGUI()
         {   
             Init();
-            if (GUI.GetNameOfFocusedControl() != string.Empty)
-            {
-                selectedNode.UpdateSelectedNode(null);
-            }
-
             
             DrawHeader((int) position.width);
             
@@ -237,14 +233,18 @@ namespace PlayQ.UITestTools
             {
                 GUILayout.Label("No serialized tests found after compilation");
                 GUILayout.Label("You can adjust tests updating in Advanced Options");
+                return;
             }
-            else
+            
+            if (GUI.GetNameOfFocusedControl() != string.Empty)
             {
-                DrawStatistics();
-                DrawFilter();        
-                DrawClasses();
-                DrawFooter();
+                selectedNode.UpdateSelectedNode(null);
             }
+            
+            DrawStatistics();
+            DrawFilter();        
+            DrawClasses();
+            DrawFooter();
         }
 
         private void DrawFilter()
@@ -263,6 +263,7 @@ namespace PlayQ.UITestTools
         private IsSerializedAssetDirty IsAssetDirtyDelegate;
         private int instanceID;
         
+        
         private void CheckAssetIsDirty()
         {
             if (IsAssetDirtyDelegate == null)
@@ -273,16 +274,14 @@ namespace PlayQ.UITestTools
                 var customDelegate = Delegate.CreateDelegate(
                     typeof(IsSerializedAssetDirty), methodInfo, false);
                 IsAssetDirtyDelegate = (IsSerializedAssetDirty) customDelegate;
-                instanceID = PlayModeTestRunner.SerializedTests.GetInstanceID();
             }
-
+            instanceID = PlayModeTestRunner.SerializedTests.GetInstanceID();
             
             isDirty = IsAssetDirtyDelegate.Invoke(instanceID);
 
             if (!PlayModeTestRunner.IsRunning && previousIsDirty && !isDirty)
             {
                 PlayModeTestRunner.SaveTestsData();
-                AssetDatabase.SaveAssets();
             }
             previousIsDirty = isDirty;
         }
@@ -488,35 +487,48 @@ namespace PlayQ.UITestTools
             int buttonSize = width/4 - buttonOffset;
 
             if (GUILayout.Button("Select all", GUILayout.Width(buttonSize)))
-            {   
-                rootNode.SetSelected(true);
+            {
+                if (rootNode != null)
+                {
+                    rootNode.SetSelected(true);
+                }
             }
 
             if (GUILayout.Button("Deselect all", GUILayout.Width(buttonSize)))
             {
-                if (rootNode.IsSemiSelected)
+                if (rootNode != null)
                 {
-                    rootNode.SetSelected(true);
+                    if (rootNode.IsSemiSelected)
+                    {
+                        rootNode.SetSelected(true);
+                    }
+
+                    rootNode.SetSelected(false);
                 }
-                rootNode.SetSelected(false);
-            
             }
             
             if (GUILayout.Button("Run all", GUILayout.Width(buttonSize)))
             {
-                foreach (var method in AllMethodNodes)
+                if (rootNode != null)
                 {
-                    method.ResetTestState();
+                    foreach (var method in AllMethodNodes)
+                    {
+                        method.ResetTestState();
+                    }
+
+                    RunTestsMode.SelectAllTests();
+                    PlayModeTestRunner.Run();
                 }
-                RunTestsMode.SelectAllTests();
-                PlayModeTestRunner.Run();
             }
             
             if (GUILayout.Button("Run smoke", GUILayout.Width(buttonSize)))
             {
-                ClearAllSmokeMethods();
-                RunTestsMode.SelectOnlySmokeTests();
-                PlayModeTestRunner.Run();
+                if (rootNode != null)
+                {
+                    ClearAllSmokeMethods();
+                    RunTestsMode.SelectOnlySmokeTests();
+                    PlayModeTestRunner.Run();
+                }
             }
             
             EditorGUILayout.EndHorizontal();
@@ -526,16 +538,19 @@ namespace PlayQ.UITestTools
             
             if (GUILayout.Button("Run selected", GUILayout.Width(width * 0.25f - buttonOffset)))
             {
-                var children = rootNode.GetChildrenOfType<MethodNode>(true, false,
-                    node => node.IsSelected);
-                
-                foreach (var testInfo in children)
+                if (rootNode != null)
                 {
-                    testInfo.ResetTestState();
-                }
+                    var children = rootNode.GetChildrenOfType<MethodNode>(true, false,
+                        node => node.IsSelected);
 
-                RunTestsMode.SelectOnlySelectedTests();
-                PlayModeTestRunner.Run();
+                    foreach (var testInfo in children)
+                    {
+                        testInfo.ResetTestState();
+                    }
+
+                    RunTestsMode.SelectOnlySelectedTests();
+                    PlayModeTestRunner.Run();
+                }
             }
 
             if (runTestsGivenAmountOfTimes == -1)
@@ -617,8 +632,11 @@ namespace PlayQ.UITestTools
             GUILayout.FlexibleSpace();
             EditorGUILayout.EndHorizontal();
 
-            typesReordableList.DoLayoutList();
-            
+            if (typesReordableList != null)
+            {
+                typesReordableList.DoLayoutList();
+            }
+
             EditorGUILayout.BeginHorizontal();
             GUILayout.Label("Update tests on every compilation: ");
             PlayModeTestRunner.UpdateTestsOnEveryCompilation = 
@@ -631,6 +649,7 @@ namespace PlayQ.UITestTools
             if (GUILayout.Button("Force Update Tests"))
             {
                 PlayModeTestRunner.ResetTestRootNode();
+                PlayModeTestRunner.SaveTestsData();
                 rootNode = null;
             }
             GUILayout.Label("Can take several minutes...");
