@@ -252,110 +252,130 @@ yield return Interact.WaitDelayAndClick("LayoutComponent/ButtonCherryTree", 0, 2
 yield return soundCheck;
 ```
 
-#### Screenshot testing
-You can check game state by making screenshot during test running and comparing it with reference image. There are several methods to work with screenshots:
-```c#
-public static IEnumerator MakeScreenShot(string name)
-```
-Works both in editor and mobile build.
-Method makes screenshot and store it in persistant data folder by <p id="screenshot_path">screenshot path</p>: 
-`Screenshots/{resolution_WITH_HEIGHT}/{name_of_your_test}/{name_currentTime}`. 
-Parameter `string name` is a name of screenshot without extention, current date and time is automatically added to screenshot name.
+### [See full list of all assertations here!](APIREADME.md)
+
+
+### Screenshot testing
+
+You can check game state by making screenshot during test running and comparing it with reference image. This functionality works both in Editor and Mobile Build.
+
+There are several methods to work with screenshots in `Ineract` class:
 
 ```c#
-public static IEnumerator MakeScreenShotReference(string name)
+IEnumerator MakeScreenShot(string name)
 ```
-Works only in editor.
-Method makes screenshot and store it in resources folder by <p id="reference_path">reference path</p>:
-`Assets/.../PlayModeTestRunner/Editor/Resources/ReferenceScreenshots/{resolution_WITH_HEIGHT}/{name_of_your_test}/{name}`. 
-Parameter `string name` is a name of screenshot without extention.
+
+<p id="screenshot_path">Method makes screenshot and store it in persistant data folder by screenshot path:</p>
+
+`Screenshots/{resolution_WITH_HEIGHT}/{name_of_your_test}/{name_currentTime}`
+
+String Parameter `name` is a name of screenshot. Current date and time and image extention (`.png`) will be automatically added to screenshot name.
 
 
 ```c#
-public static IEnumerator MakeScreenshotAndCompare(string screenShotName, string referenceName, float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+IEnumerator MakeScreenShotReference(string name)
 ```
-Behaviour of this method depends on checkbox `Make reference screenshots instead of comparing` in `Advanced Options` foldout in [Test Runner Window](#test-runner). 
-##### `Make reference screenshots instead of comparing` is `FALSE`:
 
-Method works both in editor and build, method makes screenshot, stores it at <a href="#screenshot_path">screenshot path</a> and compares with given reference screenshot.
-Comparison is performed as follows: pixel arrays are extracted from current and reference screenshots, lengths of both arrays has to be equal, then method iterates through
-both arrays and compare corresponding pixels. Red, green, blue and alpha channels of current and reference pixels are comparing by formula `abs(current - reference) < epsilon`
-where epsilon is empirically derived constant with value 20f. Channels values are going from 0 to 255. If formula value is true we increment matched pixels counter. We take length of any pixel array as 100%
-and if percent of matched pixels is greater or equals than `percentOfCorrectPixels` value then method passes, else throw assert fail.
+Works only in editor!
 
-Sometimes you have several screenshot comparison in a one test. If first comparison fails test would failed, and further comparison would not happend. If you want to perform all comparisons
-in test disregard if comparisons succeed of failed you have to set `bool dontFail` as `true`. In that case if comparison fails error message would stored without raising error log
-preventing test from failing.
+<p id="reference_path">Method makes screenshot and store it in resources folder by reference path:</p>
+
+`Assets/.../PlayModeTestRunner/Editor/Resources/ReferenceScreenshots/{resolution_WITH_HEIGHT}/{name_of_your_test}/{name}`
+
+String Parameter `name` is a name of screenshot. An image extention (`.png`) will be automatically added.
+
+
+```c#
+IEnumerator MakeScreenshotAndCompare(string screenShotName, string referenceName, float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+```
+
+Behaviour of this method depends on checkbox `Make reference screenshots instead of comparing` in `Advanced Options` foldout in [Test Runner Window](#test-runner).
+
+If you run this method from Build it will work as `Make reference screenshots instead of comparing` paramert is `False`:
+
+* `Make reference screenshots instead of comparing` is `FALSE`:
+
+Method makes screenshot, stores it at <a href="#screenshot_path">screenshot path</a> and compares with given reference screenshot.
+
+Comparison is performed as follows: pixel arrays are extracted from current and reference screenshots, lengths of both arrays has to be equal, then method iterates through both arrays and compare corresponding pixels. Red, green and blue channels of current and reference pixels are comparing by formula `abs(current - reference) < epsilon` where epsilon is empirically derived constant with value `20f`. Channels values are going from 0 to 255. If formula value is true - pixels are considered equal. If percent of matched pixels is greater or equals than `percentOfCorrectPixels` value then method passes, else throw an Exception to fail test.
+
+Sometimes you have several screenshot comparison in a one test. If first comparison fails test would failed, and further comparison would not happend. If you want to perform all comparisons in test disregard if comparisons succeed of failed you have to set `bool dontFail` to `true`. In this case if comparison fails error message would stored internally without raising error log preventing test from failing.
+
 Examples:
+
 ```c#
 [Test]
-public IEnumerator SomeTest(string screenShotName, string referenceName, float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+public IEnumerator SomeTest1()
 {
-    yield return  MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: false); //this line always fails
+    yield return MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: false); //this line fails
     //test failed, further line will never performed
-    yield return  MakeScreenshotAndCompare("screen2", "reference2", 0.9f, dontFail: true); //this line always succeed 
+    yield return MakeScreenshotAndCompare("screen2", "reference2", 0.9f, dontFail: true); //this line succeed 
 }
+
 [Test]
-public IEnumerator SomeTest(string screenShotName, string referenceName, float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+public IEnumerator SomeTest2()
 {
-    yield return  MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line always fails, error log stored internally
+    yield return MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line fails, error log stored internally
     //further line will performed
-    yield return  MakeScreenshotAndCompare("screen2", "reference2", 0.9f, dontFail: true);  //this line always succeed
+    yield return MakeScreenshotAndCompare("screen2", "reference2", 0.9f, dontFail: true);  //this line succeed
     //test succeed
 }
 ```
 
-If some screenshot comparing with flag `dontFail` set to `true` are failed, test will pass and you will not know that something failed. To fail test and log all stored internally errors
-you have to call next method:
+If some screenshot comparing with flag `dontFail` set to `true` are failed, test will pass and you will not know that something failed. To fail test and log all stored internally errors you have to call next method:
+
 ```c#
-public static void FailIfScreenShotsNotEquals()
+void FailIfScreenShotsNotEquals()
 ```
+
 Examples:
+
 ```c#
 [Test]
-public IEnumerator SomeTest(string screenShotName, string referenceName, float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+public IEnumerator SomeTest1()
 {
-    yield return  MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line always fails, error log "error 1" is stored
-    yield return  MakeScreenshotAndCompare("screen2", "reference2", 0.9f, dontFail: true); //this line always succeed 
-    FailIfScreenShotsNotEquals() //test failed, error log "error 1" is logged 
+    yield return MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line fails, error log "error 1" is stored
+    yield return MakeScreenshotAndCompare("screen2", "reference2", 0.9f, dontFail: true); //this line succeed 
+    FailIfScreenShotsNotEquals(); //test failed, error log "error 1" is logged 
 }
+
 [Test]
-public IEnumerator SomeTest(string screenShotName, string referenceName, float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+public IEnumerator SomeTest2()
 {
-    yield return  MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line always succeed
-    yield return  MakeScreenshotAndCompare("screen2", "reference2", 0.9f, dontFail: true);  //this line always succeed
-    FailIfScreenShotsNotEquals() //nothing happened
+    yield return MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line succeed
+    yield return MakeScreenshotAndCompare("screen2", "reference2", 0.9f, dontFail: true);  //this line succeed
+    FailIfScreenShotsNotEquals(); //nothing happened
     //test succeed
 }
 ```
-You can also clear all stored errors by calling method `ResetScreenshotFailFlag()`
+
+You can also clear all stored errors by calling method `ResetScreenshotFailFlag()`.
+
 Example:
 
 ```c#
 [Test]
-public IEnumerator SomeTest(string screenShotName, string referenceName, float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+public IEnumerator SomeTest1()
 {
-    yield return  MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line always fails
-    FailIfScreenShotsNotEquals() //test failed
+    yield return MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line fails
+    FailIfScreenShotsNotEquals(); //test failed
 }
+
 [Test]
-public IEnumerator SomeTest(string screenShotName, string referenceName, float percentOfCorrectPixels = 0.9f, bool dontFail = false)
+public IEnumerator SomeTest2()
 {
-    yield return  MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line always fails
+    yield return MakeScreenshotAndCompare("screen1", "reference1", 0.9f, dontFail: true); //this line fails
     ResetScreenshotFailFlag(); // all error logs are cleared
-    FailIfScreenShotsNotEquals() //nothing happened
+    FailIfScreenShotsNotEquals(); //nothing happened
     //test succeed
 }
 ```
 
-##### `Make reference screenshots instead of comparing` is `TRUE`:
-With this flag method `MakeScreenshotAndCompare` just makes reference screenshots. This is handfull in case when you implement a lot of test with screenshot comparing buy there are no 
-reference screenshots created yet and you want to create them automatically. If you are sure that for the moment application behaviour is correct, you have to set `Make reference screenshots instead of comparing` flag
-to `true` and run all screenshot test you want to create reference screenshots for. Than you reset flag to let test run normally.
+* `Make reference screenshots instead of comparing` is `TRUE`:
 
+With this flag method `MakeScreenshotAndCompare` just makes reference screenshots. This is handfull in case when you implement a lot of test with screenshot comparing but there are no reference screenshots created yet and you want to create them automatically. If you are sure that for the moment application behaviour is correct, you have to set `Make reference screenshots instead of comparing` flag to `true` and run all screenshot test you want to create reference screenshots for. 
 
-
-### [See full list of all assertations here!](APIREADME.md)
+Then you should reset flag to let test run normally.
 
 
 Extending Test Tool
