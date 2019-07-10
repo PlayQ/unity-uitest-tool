@@ -291,7 +291,7 @@ IEnumerator MakeScreenshotAndCompare(string screenShotName, string referenceName
 
 Behaviour of this method depends on checkbox `Make reference screenshots instead of comparing` in `Advanced Options` foldout in [Test Runner Window](#test-runner).
 
-If you run this method from Build it will work as `Make reference screenshots instead of comparing` paramert is `False`:
+If you run this method from Build it will work as `Make reference screenshots instead of comparing` paramert is `False`.
 
 * `Make reference screenshots instead of comparing` is `FALSE`:
 
