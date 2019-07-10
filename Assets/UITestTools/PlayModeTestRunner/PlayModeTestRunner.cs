@@ -192,9 +192,9 @@ namespace PlayQ.UITestTools
             }
         }
 
-        private void Awake()
+        private void Start()
         {
-            Debug.Log("TestTools: PlayMode test runner awakes");
+            Debug.Log("TestTools: PlayMode test runner starts");
             DontDestroyOnLoad(gameObject);
             playModeLogger = new PlayModeLogger();
             screenGUIDrawer = new PlayModeTestRunnerGUI();
