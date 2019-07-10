@@ -43,14 +43,18 @@ namespace PlayQ.UITestTools
             {
                 drawContextMenu = false;
                 GenericMenu menu = new GenericMenu();
-                if (!string.IsNullOrEmpty(methodNode.TestSettings.TestRailURL))
+                if (methodNode.TestSettings.TestRailURLs != null)
                 {
-                    menu.AddItem(new GUIContent("Open TestRail"), false,
-                        () => { Application.OpenURL(methodNode.TestSettings.TestRailURL); });
+                    foreach (var testRail in methodNode.TestSettings.TestRailURLs)
+                    {
+                        menu.AddItem(new GUIContent("Open TestRail " + testRail.Description), false,
+                            () => { Application.OpenURL(testRail.URL); });
+                    }
                 }
+
+                menu.AddItem(new GUIContent("Run"), false, RunTest);
                 menu.AddItem(new GUIContent("Open Source"), false, OpenSource);
                 menu.AddItem(new GUIContent("Copy Name"), false, CopyName);
-                menu.AddItem(new GUIContent("Run"), false, RunTest);
                 menu.ShowAsContext();
             }
         }

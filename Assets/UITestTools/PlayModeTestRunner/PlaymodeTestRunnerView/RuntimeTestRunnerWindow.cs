@@ -287,7 +287,7 @@ namespace PlayQ.UITestTools
 
             if (!PlayModeTestRunner.IsRunning && previousIsDirty && !isDirty)
             {
-                PlayModeTestRunner.SaveTestsData();
+                PlayModeTestRunner.SaveTestsData(true);
             }
             previousIsDirty = isDirty;
         }

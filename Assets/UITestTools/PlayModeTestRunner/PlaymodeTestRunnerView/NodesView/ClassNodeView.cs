@@ -70,9 +70,9 @@ namespace PlayQ.UITestTools
             {
                 drawContextMenu = false;
                 GenericMenu menu = new GenericMenu();
+                menu.AddItem(new GUIContent("Run"), false, RunClass);
                 menu.AddItem(new GUIContent("Open source"), false, OpenSource);
                 menu.AddItem(new GUIContent("Copy Name"), false, CopyName);
-                menu.AddItem(new GUIContent("Run"), false, RunClass);
                 menu.ShowAsContext();
             }
         }
@@ -136,7 +136,7 @@ namespace PlayQ.UITestTools
                 },
                 string.Empty);
 
-            var isDirty = classNode.IsOpened != isOpenedOld;
+            var isDirty = IsNodeOpened != isOpenedOld;
             isDirty |= prevSelection != classNode.IsSelected;
             
             

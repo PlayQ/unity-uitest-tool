@@ -20,7 +20,7 @@ namespace Tests.Nodes
                 if (type == null)
                 {
                     var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                    var assembly = assemblies.FirstOrDefault(a => a.FullName == assemblySerialized);
+                    var assembly = assemblies.FirstOrDefault(a => a.GetName().Name == assemblySerialized);
                     if (assembly != null)
                     {
                         type = assembly.GetType(typeSerialized);
@@ -32,7 +32,7 @@ namespace Tests.Nodes
             {
                 type = value;
                 typeSerialized = type.FullName;
-                assemblySerialized = type.Assembly.FullName;
+                assemblySerialized = type.Assembly.GetName().Name;
             }
         }
         

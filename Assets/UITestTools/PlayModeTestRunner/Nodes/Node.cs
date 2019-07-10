@@ -29,6 +29,7 @@ namespace Tests.Nodes
         [JsonIgnore]
         public abstract TestState State { get; }
         
+        [JsonProperty]
         private bool isHided;
 
         [JsonIgnore]

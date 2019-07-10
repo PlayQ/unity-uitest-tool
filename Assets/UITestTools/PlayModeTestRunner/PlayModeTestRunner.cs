@@ -46,7 +46,7 @@ namespace PlayQ.UITestTools
 
         public static event Action OnMethodStateUpdated;
 
-        public static void SaveTestsData()
+        public static void SaveTestsData(bool saveAssets)
         {
             string testsStatesStr = JsonConvert.SerializeObject(TestsRootNode,
                 new JsonSerializerSettings
@@ -61,6 +61,10 @@ namespace PlayQ.UITestTools
                 SerializedTests.SerializedTestsData = testsStatesStr;
 #if UNITY_EDITOR
                 EditorUtility.SetDirty(SerializedTests);
+                if (saveAssets)
+                {
+                    AssetDatabase.SaveAssets();
+                }
 #endif
             }
         }
@@ -70,6 +74,7 @@ namespace PlayQ.UITestTools
             testsRootNode = null;
             testsRootNode = NodeFactory.Build();
         }
+        
         
         public static ClassNode TestsRootNode
         {
@@ -708,7 +713,7 @@ namespace PlayQ.UITestTools
             isRunning = false;
             
 #if UNITY_EDITOR
-            SaveTestsData();            
+            SaveTestsData(false);            
             EditorApplication.isPlaying = false;
             CurrentPlayingMethodNode.UpdateCurrentPlayingNode(null);
             
@@ -794,7 +799,7 @@ namespace PlayQ.UITestTools
                 Debug.LogError("Cant find test scene");
                 return;
             }
-            SaveTestsData();
+            SaveTestsData(true);
             UnityEditor.SceneManagement.EditorSceneManager.OpenScene(scenePath);
             EditorApplication.isPlaying = true;
         }

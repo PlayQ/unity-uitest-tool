@@ -16,7 +16,7 @@ namespace Tests
             bool isSmoke = false;
             List<CustomResolution> targetResolutions = new List<CustomResolution>();
             CustomResolution editorTargetResolution = null;
-            string testRailURL = null;
+            List<TestRailsData> testRailURLs = new List<TestRailsData>();
 
             var attributes = methodInfo.GetCustomAttributes(false);
 
@@ -69,12 +69,12 @@ namespace Tests
                 if (attribute is TestRailAttribute)
                 {
                     var testRail = (TestRailAttribute) attribute;
-                    testRailURL = testRail.TestRailURL;
+                    testRailURLs.Add(new TestRailsData(testRail.TestRailURL, testRail.Description));
                     continue;
                 }
             }
 
-            return new MethodTestSettings(methodInfo, timeOut, isIgnored, ignoreReason, isSmoke, testRailURL, targetResolutions, editorTargetResolution);
+            return new MethodTestSettings(methodInfo, timeOut, isIgnored, ignoreReason, isSmoke, testRailURLs, targetResolutions, editorTargetResolution);
         }
     }
 }

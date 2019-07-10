@@ -25,7 +25,7 @@ namespace Tests
                     if (ownerType == null)
                     {
                         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
-                        var assembly = assemblies.FirstOrDefault(a => a.FullName == assemblySerialized);
+                        var assembly = assemblies.FirstOrDefault(a => a.GetName().Name == assemblySerialized);
                         if (assembly != null)
                         {
                             ownerType = assembly.GetType(typeSerialized);
@@ -44,7 +44,7 @@ namespace Tests
             {
                 ownerType = value.DeclaringType;
                 typeSerialized = ownerType.FullName;
-                assemblySerialized = ownerType.Assembly.FullName;
+                assemblySerialized = ownerType.Assembly.GetName().Name;
                 methodName = value.Name;
                 methodInfo = value;
             }
@@ -57,7 +57,7 @@ namespace Tests
         private List<CustomResolution> targetResolutions;
         public readonly CustomResolution EditorTargetResolution;
         public readonly bool IsSmoke;
-        public readonly string TestRailURL;
+        public readonly List<TestRailsData> TestRailURLs;
 
         
         [JsonConstructor]
@@ -66,11 +66,11 @@ namespace Tests
             bool isIgnored,
             string ignoreReason,
             bool isSmoke,
-            string testRailUrl,
+            List<TestRailsData> testRailUrls,
             List<CustomResolution> targetResolutions,
             CustomResolution editorTargetResolution)
         {
-            TestRailURL = testRailUrl;
+            TestRailURLs = testRailUrls;
             TimeOut = timeOut;
             IsIgnored = isIgnored;
             IgnoreReason = ignoreReason;
@@ -83,11 +83,11 @@ namespace Tests
                                   bool isIgnored,
                                   string ignoreReason,
                                   bool isSmoke,
-                                  string testRailUrl,
+                                  List<TestRailsData> testRailUrl,
                                   List<CustomResolution> targetResolutions,
                                   CustomResolution editorTargetResolution)
         {
-            TestRailURL = testRailUrl;
+            TestRailURLs = testRailUrl;
             MethodInfo = methodInfo;
             TimeOut = timeOut;
             IsIgnored = isIgnored;

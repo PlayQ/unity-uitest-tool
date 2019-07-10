@@ -171,6 +171,7 @@ namespace PlayQ.UITestTools
         
         protected void StopTestCoroutine()
         {
+            Debug.LogWarning("StopTestCoroutine");
             enumeratorExecutor = null;
             if (onDone != null)
             {
