@@ -37,7 +37,6 @@ namespace PlayQ.UITestTools
             var waitMethods = typeof(Wait).GetMethods(BindingFlags.Public | BindingFlags.Static);
             var checkAssertationMethods = typeof(Check).GetMethods(BindingFlags.Public | BindingFlags.Static);
             var interactionMethods = typeof(Interact).GetMethods(BindingFlags.Public | BindingFlags.Static);
-            var asyncCheckMethods = typeof(AsyncCheck).GetMethods(BindingFlags.Public | BindingFlags.Static);
             var asyncWaitMethods = typeof(AsyncWait).GetMethods(BindingFlags.Public | BindingFlags.Static);
             
             var forceRaycastMethodsAll = typeof(RaycastChanger).GetMethods(BindingFlags.Public | BindingFlags.Static).ToList();
@@ -46,7 +45,6 @@ namespace PlayQ.UITestTools
             allMethods.AddRange(waitMethods);
             allMethods.AddRange(checkAssertationMethods);
             allMethods.AddRange(interactionMethods);
-            allMethods.AddRange(asyncCheckMethods);
             allMethods.AddRange(asyncWaitMethods);
 
             foreach (var raycastMethod in forceRaycastMethodsAll)

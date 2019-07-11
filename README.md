@@ -228,7 +228,7 @@ Arguments are equal in both methods.
 API methods
 --------
 
-`Test Tool` common actions are split to 5 static partial classes: `Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`. Each of these classes contain a list of methods which perform a corresponding action like checking the state of the given object, waiting for specific condition or interacting with specific object.
+`Test Tool` common actions are split to 4 static partial classes: `Check`, `Wait`, `Interact` and `AsyncWait`. Each of these classes contain a list of methods which perform a corresponding action like checking the state of the given object, waiting for specific condition or interacting with specific object.
 
 For example:
 
@@ -247,9 +247,9 @@ yield return Interact.SwipeCell(4, 7, Interact.SwipeCellClass.SwipeDirection.Dow
 For example:
 
 ```c#
-var soundCheck = AsyncCheck.CheckSoundPlaying("button_sound");
+var logWaiter = AsyncWait.StartWaitingForLog("some log");
 yield return Interact.WaitDelayAndClick("LayoutComponent/ButtonCherryTree", 0, 20f);
-yield return soundCheck;
+yield return logWaiter;
 ```
 
 ### [See full list of all assertations here!](APIREADME.md)
@@ -381,7 +381,7 @@ Then you should reset flag to let test run normally.
 Extending Test Tool
 -----------
 
-You can extend any of 5 common test actions classes (`Check`, `Wait`, `Interact`, `AsyncCheck` and `AsyncWait`) with new sets of actions using partial class modifier.
+You can extend any of 4 common test actions classes (`Check`, `Wait`, `Interact` and `AsyncWait`) with new sets of actions using partial class modifier.
 
 
 ### Example 1
