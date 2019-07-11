@@ -4,12 +4,6 @@
         <name>Assembly-CSharp</name>
     </assembly>
     <members>
-        <member name="T:PlayQ.UITestTools.AsyncCheck">
-            <summary>
-            Contains methods which allow checking the state of game components and objects on the scene asynchronously
-            No methods provided by default
-            </summary>
-        </member>
         <member name="T:PlayQ.UITestTools.AsyncWait">
             <summary>
             Contains methods which allow waiting until the game components and objects on the scene reach the certain state asynchronously
@@ -492,7 +486,7 @@
             <param name="timeout">Timeout (optional, default = 2)</param>
             <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Wait.ObjectEnableAndInteractibleIfButton(System.String,System.Single,System.Boolean,System.Boolean)">
+        <member name="M:PlayQ.UITestTools.Wait.ButtonInteractible(System.String,System.Single,System.Boolean,System.Boolean)">
             <summary>
             Awaits for 'GameObject' to become enabled and interactible if it is a button
             </summary>
@@ -501,7 +495,7 @@
             <param name="dontFail">Whether the test should fail upon exceeding timeout (optional, default = false)</param>
             <param name="ignoreTimeScale">Should time scale be ignored or not (optional, default = false)</param>
         </member>
-        <member name="M:PlayQ.UITestTools.Wait.ObjectEnableAndInteractibleIfButton(UnityEngine.GameObject,System.Single,System.Boolean,System.Boolean)">
+        <member name="M:PlayQ.UITestTools.Wait.ButtonInteractible(UnityEngine.GameObject,System.Single,System.Boolean,System.Boolean)">
             <summary>
             Awaits for 'GameObject' to become enabled and interactible if it is a button
             </summary>

@@ -1,5 +1,4 @@
 # API methods
-* [AsyncCheck](#asynccheck)
 * [AsyncWait](#asyncwait)
   * [StartWaitingForLog](#startwaitingforlog)
   * [StartWaitingForLogRegExp](#startwaitingforlogregexp)
@@ -45,10 +44,10 @@
 * [Wait](#wait)
   * [AnimationCompleted](#animationcompleted)
   * [ButtonAccessible](#buttonaccessible)
+  * [ButtonInteractible](#buttoninteractible)
   * [Frame](#frame)
   * [ObjectDestroyed](#objectdestroyed)
   * [ObjectDisabled](#objectdisabled)
-  * [ObjectEnableAndInteractibleIfButton](#objectenableandinteractibleifbutton)
   * [ObjectEnabled](#objectenabled)
   * [ObjectEnabledInstantiatedAndDelay](#objectenabledinstantiatedanddelay)
   * [ObjectInstantiated](#objectinstantiated)
@@ -76,13 +75,6 @@
   * [PercentsToPixels](#percentstopixels)
   * [ScreenVerticesOfObject](#screenverticesofobject)
   * [WidthPercentsToPixels](#widthpercentstopixels) 
-
-## AsyncCheck 
-
- Contains methods which allow checking the state of game components and objects on the scene asynchronously
- No methods provided by default
- 
-
 
 ## AsyncWait 
 
@@ -1018,6 +1010,38 @@ Returns:
 
 ---
 
+#### ButtonInteractible
+
+
+ Awaits for 'GameObject' to become enabled and interactible if it is a button
+ 
+
+|Argument | Description |
+|-----|------|
+|path |Path to 'GameObject' in hierarchy|
+|timeout |Timeout (optional, default = 2)|
+|dontFail |Whether the test should fail upon exceeding timeout (optional, default = false)|
+|ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
+
+
+---
+
+#### ButtonInteractible
+
+
+ Awaits for 'GameObject' to become enabled and interactible if it is a button
+ 
+
+|Argument | Description |
+|-----|------|
+|go |'GameObject' of button|
+|timeout |Timeout (optional, default = 2)|
+|dontFail |Whether the test should fail upon exceeding timeout (optional, default = false)|
+|ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
+
+
+---
+
 #### Frame
 
 
@@ -1099,38 +1123,6 @@ Returns:
 |Argument | Description |
 |-----|------|
 |timeout |Timeout (optional, default = 2)|
-|ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
-
-
----
-
-#### ObjectEnableAndInteractibleIfButton
-
-
- Awaits for 'GameObject' to become enabled and interactible if it is a button
- 
-
-|Argument | Description |
-|-----|------|
-|path |Path to 'GameObject' in hierarchy|
-|timeout |Timeout (optional, default = 2)|
-|dontFail |Whether the test should fail upon exceeding timeout (optional, default = false)|
-|ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
-
-
----
-
-#### ObjectEnableAndInteractibleIfButton
-
-
- Awaits for 'GameObject' to become enabled and interactible if it is a button
- 
-
-|Argument | Description |
-|-----|------|
-|go |'GameObject' of button|
-|timeout |Timeout (optional, default = 2)|
-|dontFail |Whether the test should fail upon exceeding timeout (optional, default = false)|
 |ignoreTimeScale |Should time scale be ignored or not (optional, default = false)|
 
 
