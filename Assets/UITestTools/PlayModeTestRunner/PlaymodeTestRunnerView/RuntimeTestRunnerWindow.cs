@@ -252,7 +252,7 @@ namespace PlayQ.UITestTools
             GUILayout.Space(6);
             EditorGUILayout.BeginHorizontal();
             GUILayout.Space(5);//left padding
-            if (UIHelper.SearchField(ref value))
+            if (!UIHelper.SearchField(ref value))
             {
                 filter.UpdateFilter(value);
             }
