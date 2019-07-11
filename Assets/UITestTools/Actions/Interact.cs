@@ -176,8 +176,7 @@ namespace PlayQ.UITestTools
             var epsilon = 20f;
             for (int i = 0; i < pixelsRef.Length; i++)
             {
-                if (Mathf.Abs(pixelsRef[i].a - screenShot[i].a) < epsilon &&
-                    Mathf.Abs(pixelsRef[i].r - screenShot[i].r) < epsilon &&
+                if (Mathf.Abs(pixelsRef[i].r - screenShot[i].r) < epsilon &&
                     Mathf.Abs(pixelsRef[i].g - screenShot[i].g) < epsilon &&
                     Mathf.Abs(pixelsRef[i].b - screenShot[i].b) < epsilon)
                 {
