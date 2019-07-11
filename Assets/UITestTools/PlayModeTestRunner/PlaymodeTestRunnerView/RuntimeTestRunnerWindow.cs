@@ -655,7 +655,7 @@ namespace PlayQ.UITestTools
             if (GUILayout.Button("Force Update Tests"))
             {
                 PlayModeTestRunner.ResetTestRootNode();
-                PlayModeTestRunner.SaveTestsData();
+                PlayModeTestRunner.SaveTestsData(true);
                 rootNode = null;
             }
             GUILayout.Label("Can take several minutes...");

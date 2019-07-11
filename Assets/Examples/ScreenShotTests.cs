@@ -46,7 +46,7 @@ namespace PlayQ.UITestTools
                 yield return null;
             }
             
-            PermittedErrors.Clear();
+            PermittedErrors.ClearAll();
         }
 
         void OnSceneUnloaded(Scene scene)
@@ -88,7 +88,7 @@ namespace PlayQ.UITestTools
             
             string expectedError = "Screenshot equals failed: \n"+ 
                                      "can't find reference screen shot with path: ReferenceScreenshots/resolution_750_1334/TestMakeScreenshotDontFail/reference to compare it with screen shot: test";
-            PermittedErrors.AddPermittedError(expectedError);
+            PermittedErrors.Add(expectedError);
             waiter = AsyncWait.StartWaitingForLog(expectedError, LogType.Error);
             Interact.FailIfScreenShotsNotEquals();
             yield return waiter;

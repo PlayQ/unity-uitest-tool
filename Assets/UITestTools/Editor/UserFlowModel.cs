@@ -312,27 +312,59 @@ namespace PlayQ.UITestTools
             FetchAssertationMethods();
         }
 
+        private void LogParams(List<Type> parameterTypes, List<Type> paramValuesTyes)
+        {
+            var errorText = "";
+            errorText += "Parameter types:\n";
+            for (int i=0; i< parameterTypes.Count; i++)
+            {
+                errorText += "  "+i+": " + parameterTypes[i];
+            }
+            Debug.LogError(errorText);
+                
+            errorText = "Parameter values types:\n";
+            for (int i=0; i< paramValuesTyes.Count; i++)
+            {
+                errorText += "  "+i+": " + paramValuesTyes[i];
+            }
+
+            Debug.LogError(errorText);
+        }
+        
+        private bool IsAssertationParamsCorrect(object[] paramValues, MethodInfo methodInfo)
+        {
+            var parameterTypes = methodInfo.GetParameters().Select(param=>param.ParameterType).ToList();
+            var paramValuesTyes = paramValues.Select(paramVal => paramVal.GetType()).ToList();
+            
+            if (parameterTypes.Count != paramValuesTyes.Count)
+            {
+                Debug.LogError("parameters count is not matched with values cound for" +
+                               " method " + methodInfo.DeclaringType.FullName + "." + methodInfo.Name);
+                
+                LogParams(parameterTypes, paramValuesTyes);
+                return false;
+            }
+
+            for (int i = 0; i < parameterTypes.Count; i++)
+            {
+                if (parameterTypes[i] != paramValuesTyes[i])
+                {
+                    Debug.LogError("parameters types is not matched with values types for" +
+                                   " method " + methodInfo.DeclaringType.FullName + "." + methodInfo.Name);
+                    LogParams(parameterTypes, paramValuesTyes);
+                    return false;    
+                }
+            }
+            return true;
+        }
+
         public void ApplyAction(UserActionInfo userAction)
         {
             var assertationToApply = userAction.SelectedAssertation;
             if (assertationToApply.methodInfo == null)
             {
-                var fullNameToApply = AbstractGenerator.MethodFullName(assertationToApply.methodInfo);
-                var requiredAssertation = assertations.FirstOrDefault(assertation =>
-                {
-                    var fullName = AbstractGenerator.MethodFullName(assertation.methodInfo);
-                    return fullName == fullNameToApply;
-                });
-
-                if (requiredAssertation != null)
-                {
-                    userAction.AvailableAssertations[userAction.SelectedIndex] = requiredAssertation;
-                }
-                else
-                {
-                    Debug.LogWarning("can't find assertation method for method with name: " + fullNameToApply);
-                    return;
-                }
+                Debug.LogError("can't apply action: methodInfo is null");
+                return;
             }
 
             var generators = userAction.SelectedCodeGenerator.CalculateGeneratorSequence();
@@ -340,7 +372,12 @@ namespace PlayQ.UITestTools
                 .Where(gen => gen is AbstractParameter)
                 .Select(gen => (gen as AbstractParameter).ParameterValueToObject()).ToArray();
 
-
+            var isCorrect = IsAssertationParamsCorrect(parameters, assertationToApply.methodInfo);
+            if (!isCorrect)
+            {
+                Debug.LogError("can't apply action: parameters mismatch");
+                return;
+            }
 
             if (assertationToApply.methodInfo.ReturnType == typeof(IEnumerator))
             {
@@ -584,17 +621,29 @@ namespace PlayQ.UITestTools
         public void OnAfterDeserialize()
         {
             var declareType = typeof(Interact).Assembly.GetType(methodDeclareClass);
-            if (declareType == null || String.IsNullOrEmpty(helperShowInEditorType))
+            if (String.IsNullOrEmpty(helperShowInEditorType))
             {
+                Debug.LogError("helperShowInEditorType is not set for assertation method: "+
+                               methodDeclareClass + "." +methodName + " You have to create class derived from" +
+                               " ShowHelperBase and describe in it method return type and parameters");
+                return;
+            }
+            if (declareType == null)
+            {
+                Debug.LogError("Cant find declaring type " + methodDeclareClass + " for method " +
+                               methodName + " in assembly " + typeof(Interact).Assembly.GetName().Name +
+                               " probably class was renamed or deleted");
                 return;
             }
             
             var helperType = typeof(Interact).Assembly.GetType(helperShowInEditorType);
             if (helperType == null)
             {
+                Debug.LogError("Cant find method helper class " + helperShowInEditorType +
+                               " for method " + methodName + " in assembly " + typeof(Interact).Assembly.GetName().Name +
+                               " probably class was renamed or deleted");
                 return;
             }
-
             Helper = Activator.CreateInstance(helperType) as ShowHelperBase;
             
            
@@ -619,6 +668,13 @@ namespace PlayQ.UITestTools
                 }
                 return false;
             });
+
+            if (methodInfo == null)
+            {
+                Debug.LogError("Cant find method " + methodName +
+                               " in class "+ methodDeclareClass + " probably method was renamed or deleted");
+            }
+            
         }
     }
     
