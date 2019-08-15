@@ -379,7 +379,7 @@ namespace PlayQ.UITestTools
         /// <param name="path">Path to `GameObject` in hierarchy</param>
         /// <typeparam name="T">Type of `GameObject`</typeparam>
         /// <returns>active and non-active `GameObjects` or null</returns>
-        public static GameObject FindAnyGameObject<T>(String path) where T : Component
+        public static T FindAnyGameObject<T>(String path) where T : Component
         {
             if (String.IsNullOrEmpty(path))
             {
@@ -411,7 +411,7 @@ namespace PlayQ.UITestTools
                 return null;
             }
 
-            return result.gameObject;
+            return result;
         }
 
         /// <summary>

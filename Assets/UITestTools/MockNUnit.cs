@@ -235,7 +235,7 @@ namespace PlayQ.UITestTools
             {
                 return AssertionMessageUtil.GetMessage(
                     string.Format("Values are {0}equal.", (!expectEqual ? "" : "not ")),
-                    string.Format("{0} {2} {1}", actual, expected, (!expectEqual ? "!=" : "==")));
+                    string.Format("{0} {2} {1}", actual, expected ?? "null", (!expectEqual ? "!=" : "==")));
             }
 
             public static string NullFailureMessage(object value, bool expectNull)
