@@ -45,6 +45,18 @@ public class TestToolBuildScript
         ResolveTestMode();
         PlayModeTestRunner.Run();
     }
+    
+    [UsedImplicitly]
+    public static void RunPlayModeTests(bool runOnlySelected, bool runOnlySmoke,
+        float timeScale = 1, string[] namespaces = null, bool quitAppAfterCompleteTests = false)
+    {
+        PlayModeTestRunner.DefaultTimescale = timeScale;
+        PlayModeTestRunner.Namespaces = namespaces;
+        PlayerPrefs.SetString("PackageUpdaterLastChecked68207", DateTime.Now.ToString(CultureInfo.InvariantCulture));
+        PlayModeTestRunner.QuitAppAfterCompleteTests = quitAppAfterCompleteTests;
+        ResolveTestMode(runOnlySelected, runOnlySmoke);
+        PlayModeTestRunner.Run();
+    }
 
     private static void SetTestsNamespacesFromCommandLineArgument()
     {
@@ -137,6 +149,11 @@ public class TestToolBuildScript
         bool runOnlySelected = ConsoleArgumentHelper.IsArgExist("-runOnlySelectedTests");
         bool runOnlySmoke = ConsoleArgumentHelper.IsArgExist("-runOnlySmokeTests");
 
+        ResolveTestMode(runOnlySelected, runOnlySmoke);
+    }
+    
+    private static void ResolveTestMode(bool runOnlySelected, bool runOnlySmoke)
+    {
         if (runOnlySelected && runOnlySmoke)
         {
             Debug.LogError("You trying to launck selected and smoke tests together.");

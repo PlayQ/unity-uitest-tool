@@ -1,4 +1,6 @@
-﻿namespace Tests
+﻿using Newtonsoft.Json;
+
+namespace Tests
 {
     public class CustomResolution
     {
@@ -8,7 +10,9 @@
             Height = height;
         }
 
+        [JsonProperty]
         public readonly int Width;
+        [JsonProperty]
         public readonly int Height;
     }
 }

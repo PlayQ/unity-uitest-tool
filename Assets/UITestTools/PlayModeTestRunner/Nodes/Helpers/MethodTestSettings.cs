@@ -55,6 +55,7 @@ namespace Tests
         public readonly string IgnoreReason;
         [JsonProperty]
         private List<CustomResolution> targetResolutions;
+        [JsonProperty]
         public readonly CustomResolution EditorTargetResolution;
         public readonly bool IsSmoke;
         public readonly List<TestRailsData> TestRailURLs;
@@ -75,6 +76,7 @@ namespace Tests
             IsIgnored = isIgnored;
             IgnoreReason = ignoreReason;
             this.targetResolutions = targetResolutions;
+            EditorTargetResolution = editorTargetResolution;
             IsSmoke = isSmoke;
         }
         
@@ -93,6 +95,7 @@ namespace Tests
             IsIgnored = isIgnored;
             IgnoreReason = ignoreReason;
             this.targetResolutions = targetResolutions;
+            EditorTargetResolution = editorTargetResolution;
             IsSmoke = isSmoke;
         }
 

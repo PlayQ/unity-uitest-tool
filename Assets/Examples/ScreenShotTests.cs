@@ -69,6 +69,7 @@ namespace PlayQ.UITestTools
         }
         
         [UnityTest]
+        [EditorResolution(750, 1334)]
         public IEnumerator TestMakeScreenShotAndCompare()
         {
             yield return Interact.MakeScreenShotReference("reference");
@@ -76,6 +77,7 @@ namespace PlayQ.UITestTools
         }
         
         [UnityTest]
+        [EditorResolution(750, 1334)]
         public IEnumerator TestMakeScreenshotDontFail()
         {
             string expectedWarning = "Screenshot comparing fail was ignored: "+ 
