@@ -941,23 +941,5 @@ namespace PlayQ.UITestTools
         }
 
         #endregion
-
-        public static void GameBoardColumnSize(int rowIndex, int expectedColumnsCount)
-        {
-            var slotsObject = UITestUtils.FindEnabledGameObjectByPath("Slots");
-            var slots = slotsObject.gameObject.GetComponentsInChildren<Slot>();
-            var slotsCountY = slots.Count(s => s.name.StartsWith("Slot_" + rowIndex));
-
-            Assert.AreEqual(slotsCountY, expectedColumnsCount);
-        }
-
-        public static void GameBoardRowSize(int columnIndex, int expectedRowsCount)
-        {
-            var slotsObject = UITestUtils.FindEnabledGameObjectByPath("Slots");
-            var slots = slotsObject.gameObject.GetComponentsInChildren<Slot>();
-            var slotsCountX = slots.Count(s => s.name.EndsWith(columnIndex.ToString()));
-
-            Assert.AreEqual(slotsCountX, expectedRowsCount);
-        }
     }
 }
